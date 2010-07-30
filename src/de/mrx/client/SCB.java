@@ -81,7 +81,7 @@ public class SCB implements EntryPoint {
 		
 		
 		
-			Window.alert("Our business will soon offer service. Please return!");
+			Window.alert("Our business will soon offer service. Please return! Soon!");
 			
 	
 	
