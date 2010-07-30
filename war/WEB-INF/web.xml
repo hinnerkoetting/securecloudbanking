@@ -21,11 +21,20 @@
     <servlet-class>de.mrx.server.BankingServiceImpl</servlet-class>
   </servlet>
 
+
   <servlet-mapping>
     <servlet-name>bankingServlet</servlet-name>
     <url-pattern>/scb/banking</url-pattern>
   </servlet-mapping>
 
+<servlet>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
+</servlet>
+<servlet-mapping>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <url-pattern>/scb/gwt-log</url-pattern>
+</servlet-mapping>
 
 
   <servlet-mapping>
