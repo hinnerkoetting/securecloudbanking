@@ -17,7 +17,9 @@ public class RegisterServiceImpl extends RemoteServiceServlet implements Registe
 	 */
 	private static final long serialVersionUID = -1791669577170197531L;
 	public void register(IdentityDTO identity){
-		Identity id=new Identity(identity.getName());
+		System.out.println("Transfer: "+identity);
+		Identity id=new Identity(identity);
+		System.out.println("Register ID: "+id);
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
         try {

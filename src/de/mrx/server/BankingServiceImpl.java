@@ -2,6 +2,8 @@ package de.mrx.server;
 
 import java.util.List;
 
+import javax.jdo.PersistenceManager;
+
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -41,6 +43,18 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	      loginInfo.setEmailAddress(user.getEmail());
 	      loginInfo.setNickname(user.getNickname());
 	      loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
+	      System.out.println("Login: "+loginInfo);
+	      String query = "select from " + Identity.class.getName()+" WHERE email=='"+user.getEmail()+"'";
+	      GWT.log("Query: "+query);
+	      System.out.println("Query: "+query);
+	      PersistenceManager pm = PMF.get().getPersistenceManager();
+	      List<Identity> ids=(List<Identity>) pm.newQuery(query).execute();
+	      System.out.println("RESULS  :"+ids.size());
+	      for (Identity i:ids){
+	    	  GWT.log("ID : "+i);
+	    	  System.out.println("Gefundene ID"+i);
+	      }
+	      
 	    } else {
 	      loginInfo.setLoggedIn(false);
 	      loginInfo.setLoginUrl(userService.createLoginURL(requestUri));

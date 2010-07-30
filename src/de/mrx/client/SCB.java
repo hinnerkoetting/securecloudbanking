@@ -53,9 +53,19 @@ public class SCB implements EntryPoint {
 	private VerticalPanel mainPanel = new VerticalPanel();
 	
 	
-	private TextBox name;
+	private TextBox nameTxt;
+	private TextBox streetTxt;
+	private TextBox plzTxt;
+	private TextBox cityTxt;
+	private TextBox emailTxt;
+	
 
 	private Label nameLbl;
+	private Label streetLbl;
+	private Label plzLbl;
+	private Label cityLbl;
+	private Label emailLbl;
+	private Label onlyGoogleAllowedLabel=new Label("As a bank we need to rely on highest security standards. Therefore we need to require you having an google account. ");
 	
 	private PasswordTextBox password;
 	private Label passwordLbl;
@@ -64,8 +74,10 @@ public class SCB implements EntryPoint {
 
 	
 	private VerticalPanel registrationPanel;
+	
+	private boolean loggedInAtGoogle=false;
 
-	HTMLTable registrationTable;
+	private HTMLTable registrationTable;
 
 	
 	 private LoginInfo loginInfo = null;
@@ -75,6 +87,7 @@ public class SCB implements EntryPoint {
 	  private Label logoutLabel = new Label("Sign out gefaellig.");
 	  private Anchor signInLink = new Anchor("Sign In");
 	  private Anchor signOutLink = new Anchor("Sign Out");
+	private MenuBar informationMenu;
 
 	
 	private void doShowNoService() {
@@ -93,22 +106,52 @@ public class SCB implements EntryPoint {
 	}
 
 	public VerticalPanel getRegistrationPanel() {
-		if (registrationPanel!=null){
-			return registrationPanel;
+//		if (registrationPanel!=null){
+//			return registrationPanel;
+//		}
+		
+		if (loginInfo==null){
+			Window.alert("Logininformation not available!");			
 		}
+		if (!loginInfo.isLoggedIn()){
+			Label registrationOnlyWithLogin=new Label("Remember: SCB only offers its services to Google customer. Please sign in!");
+			RootPanel.get(PAGEID_CONTENT).insert(registrationOnlyWithLogin, 0);
+			
+		}
+		else{
+			GWT.log("Eingeloggt");
+		}
+		
 		registrationPanel=new VerticalPanel();
-		registrationTable=new Grid(3,2);
+		registrationTable=new Grid(6,4);
 		nameLbl=new Label("Your name: ");
+		streetLbl=new Label("Your street: ");
+		plzLbl=new Label("Postal Code: ");
+		cityLbl=new Label("City: ");
+		emailLbl=new Label("Email: ");
+		
 		passwordLbl=new Label("Your desired password: ");
-		name=new TextBox();
+		nameTxt=new TextBox();
+		streetTxt=new TextBox();
+		plzTxt=new TextBox();
+		cityTxt=new TextBox();
+		emailTxt=new TextBox();
 		password=new PasswordTextBox();
 		agbBox=new CheckBox("I accept the Terms Of Services");
 		registrationTable.setWidget(0,0,nameLbl);
-		registrationTable.setWidget(0,1,name);
-		registrationTable.setWidget(1,0,passwordLbl);
-		registrationTable.setWidget(1,1,password);
-		registrationTable.setWidget(2,0,agbBox);
-		registrationTable.setWidget(2,1,registerButton);
+		registrationTable.setWidget(0,1,nameTxt);
+		registrationTable.setWidget(0,2,emailLbl);
+		registrationTable.setWidget(0,3,emailTxt);
+		registrationTable.setWidget(1,0,streetLbl);
+		registrationTable.setWidget(1,1,streetTxt);
+		registrationTable.setWidget(2,0,plzLbl);
+		registrationTable.setWidget(2,1,plzTxt);
+		registrationTable.setWidget(2,2,cityLbl);
+		registrationTable.setWidget(2,3,cityTxt);
+		registrationTable.setWidget(3,0,passwordLbl);
+		registrationTable.setWidget(3,1,password);
+		registrationTable.setWidget(4,0,agbBox);
+		registrationTable.setWidget(4,1,registerButton);
 		
 		registerButton.addClickHandler(new ClickHandler() {
 			
@@ -123,9 +166,20 @@ public class SCB implements EntryPoint {
 	}
 
 protected void register() {
-		String n=name.getText();
+	
+		String n=nameTxt.getText();
 		String pw=password.getText();
+		String str=streetTxt.getText();
+		String city=cityTxt.getText();
+		String plz=plzTxt.getText();
+		String email=emailTxt.getText();
+		
+		
 		IdentityDTO id=new IdentityDTO(n);
+		id.setStreet(str);
+		id.setCity(city);
+		id.setPlz(plz);
+		id.setEmail(email);
 		if (registerSvc==null){
 			registerSvc=GWT.create(RegisterService.class);
 		}
@@ -146,6 +200,7 @@ protected void register() {
 				
 			}
 		};
+		System.out.println("CLIENT: ID :"+id);
 		registerSvc.register(id, callback);
 		// TODO Auto-generated method stub
 		
@@ -156,6 +211,8 @@ protected void register() {
  * This is the entry point method.
  */
 public void onModuleLoad() {
+	System.out.println("sadasd");
+	try{
 	GWT.log("On Module Load");
 	RootPanel r=RootPanel.get(PAGEID_CLOUDBANKING);
     if (r==null){
@@ -201,8 +258,8 @@ public void onModuleLoad() {
     
         Command cmdLogin = new Command() {
             public void execute() {
-          	 GWT.log("Login starts");
-            	doLogin();
+          	 GWT.log("Login starts. TODO");
+//            	checkGoogleStatus();
               
             }
 
@@ -211,11 +268,11 @@ public void onModuleLoad() {
 
     MenuBar bankingMenu = new MenuBar(true);
     bankingMenu.addItem("Private Banking", cmdLogin);
-    bankingMenu.addItem("Institutional Banking", cmdShowNoService);
-    bankingMenu.addItem("Depot ", cmdShowNoService);
+//    bankingMenu.addItem("Institutional Banking", cmdShowNoService);
+//    bankingMenu.addItem("Depot ", cmdShowNoService);
 
-    MenuBar informationMenu = new MenuBar(true);
-    informationMenu.addItem("Partner", cmdShowNoService);
+    informationMenu = new MenuBar(true);
+//    informationMenu.addItem("Partner", cmdShowNoService);
     informationMenu.addItem("Impressum", cmdShowNoService);
     informationMenu.addItem("About Secure Cloud Computing", cmdShowNoService);
     
@@ -229,15 +286,22 @@ public void onModuleLoad() {
     mainPanel.add(menu);
     
     r.add(mainPanel);
+    checkGoogleStatus();
+    GWT.log("Module laden durchgefuehrt");
 
-
+	}
+	catch (Exception e){
+		GWT.log(e.getMessage());
+		e.printStackTrace();
+	}
 }
 
-private void doLogin() {
+private void checkGoogleStatus() {
 	
 	if (bankingService==null){
 		bankingService=GWT.create(BankingService.class);
 	}
+	GWT.log(GWT.getHostPageBaseURL());
 	bankingService.login(GWT.getHostPageBaseURL(), new AsyncCallback<LoginInfo>() {
 	      public void onFailure(Throwable error) {
 	    	  error.printStackTrace();
@@ -248,7 +312,7 @@ private void doLogin() {
 	        loginInfo = result;
 	        if(loginInfo.isLoggedIn()) {
 	          GWT.log("Eingeloggt");
-	          loadLogout();
+	          loadLoggedInSetup();
 	        } else {
 	          loadLogin();
 	        }
@@ -264,12 +328,12 @@ private void loadLogin() {
     // Assemble login panel.
     signInLink.setHref(loginInfo.getLoginUrl());
     
-    loginPanel.add(loginLabel);
+    loginPanel.add(onlyGoogleAllowedLabel);
     loginPanel.add(signInLink);
     RootPanel.get(PAGEID_CONTENT).add(loginPanel);
   }
 
-private void loadLogout() {
+private void loadLoggedInSetup() {
     // Assemble logout panel.
     
     signOutLink.setHref(loginInfo.getLogoutUrl());    

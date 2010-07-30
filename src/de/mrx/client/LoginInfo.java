@@ -18,7 +18,14 @@ public class LoginInfo implements Serializable {
     this.loggedIn = loggedIn;
   }
 
-  public String getLoginUrl() {
+  @Override
+public String toString() {
+	return "LoginInfo [loggedIn=" + loggedIn + ", loginUrl=" + loginUrl
+			+ ", logoutUrl=" + logoutUrl + ", emailAddress=" + emailAddress
+			+ ", nickname=" + nickname + "]";
+}
+
+public String getLoginUrl() {
     return loginUrl;
   }
 
