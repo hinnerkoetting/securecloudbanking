@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+  
+  <!-- Servlets -->
+  <servlet>
+    <servlet-name>greetServlet</servlet-name>
+    <servlet-class>de.mrx.server.GreetingServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>registerServlet</servlet-name>
+    <servlet-class>de.mrx.server.RegisterServiceImpl</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>bankingServlet</servlet-name>
+    <servlet-class>de.mrx.server.BankingServiceImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>bankingServlet</servlet-name>
+    <url-pattern>/scb/banking</url-pattern>
+  </servlet-mapping>
+
+
+
+  <servlet-mapping>
+    <servlet-name>registerServlet</servlet-name>
+    <url-pattern>/scb/register</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>greetServlet</servlet-name>
+    <url-pattern>/scb/greet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>SCB.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>
