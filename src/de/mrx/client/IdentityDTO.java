@@ -2,12 +2,6 @@ package de.mrx.client;
 
 import java.io.Serializable;
 
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
-
-import com.google.appengine.api.datastore.Key;
-
 public class IdentityDTO implements Serializable {
 	/**
 	 * 
@@ -17,50 +11,61 @@ public class IdentityDTO implements Serializable {
 		return serialVersionUID;
 	}
 
-	private String city;
+	private boolean activated=false;
 	
+	private String city;
+
+	private String email;
+
 	private String houseNr;
+	
+	private boolean loggedIn = false;
+	private String loginUrl;
+	private String logoutUrl;
+	
+	private String nickName;
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
 
 	private String name;
-
+	
 	private String phone;
+	  private String plz;
+	  private String street;
 	
-	private String plz;
-	private String street;
-	private String email;
 	
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getStreet() {
-		return street;
-	}
-
-	public void setStreet(String street) {
-		this.street = street;
-	}
-
 	public IdentityDTO(){
 		
-	}	
+	}
 
 	public IdentityDTO(String name) {
 		super();
 		this.name = name;
 	}
 
-
 	public String getCity() {
 		return city;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
 	public String getHouseNr() {
 		return houseNr;
+	}
+
+	public String getLoginUrl() {
+		return loginUrl;
+	}
+
+	public String getLogoutUrl() {
+		return logoutUrl;
 	}
 
 	public String getName() {
@@ -75,12 +80,45 @@ public class IdentityDTO implements Serializable {
 		return plz;
 	}
 
+	public String getStreet() {
+		return street;
+	}
+
+	public boolean isActivated() {
+		return activated;
+	}
+
+	public boolean isLoggedIn() {
+		return loggedIn;
+	}	
+
+	public void setActivated(boolean activated) {
+		this.activated = activated;
+	}
+
+
 	public void setCity(String city) {
 		this.city = city;
 	}
 
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	public void setHouseNr(String houseNr) {
 		this.houseNr = houseNr;
+	}
+
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
+	}
+
+	public void setLoginUrl(String loginUrl) {
+		this.loginUrl = loginUrl;
+	}
+
+	public void setLogoutUrl(String logoutUrl) {
+		this.logoutUrl = logoutUrl;
 	}
 
 	public void setName(String name) {
@@ -93,6 +131,10 @@ public class IdentityDTO implements Serializable {
 
 	public void setPlz(String plz) {
 		this.plz = plz;
+	}
+
+	public void setStreet(String street) {
+		this.street = street;
 	}
 
 	@Override

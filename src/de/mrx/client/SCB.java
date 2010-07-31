@@ -1,5 +1,7 @@
 package de.mrx.client;
 
+import com.allen_sauer.gwt.log.client.DivLogger;
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -15,18 +17,24 @@ import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class SCB implements EntryPoint {
 	
-	private static final String PAGEID_CLOUDBANKING = "cloudbanking";
+//	private static final Logger log = Logger.getLogger(SCB.class.getName());
+	 Widget divLogger= Log.getLogger(DivLogger.class).getWidget();
+
+	private static final String PAGEID_HEADER = "cloudbanking";
 	private static final String PAGEID_CONTENT = "content";
+	private static final String PAGEID_FEHLER = "fehler";
 	
 	RegisterServiceAsync registerSvc;
 	private BankingServiceAsync bankingService;
@@ -80,7 +88,7 @@ public class SCB implements EntryPoint {
 	private HTMLTable registrationTable;
 
 	
-	 private LoginInfo loginInfo = null;
+	 private IdentityDTO identityInfo = null;
 	  private VerticalPanel loginPanel = new VerticalPanel();
 	  private Label loginLabel = new Label("Please sign in to your Google Account to access the banking application.");
 	  
@@ -88,6 +96,8 @@ public class SCB implements EntryPoint {
 	  private Anchor signInLink = new Anchor("Sign In");
 	  private Anchor signOutLink = new Anchor("Sign Out");
 	private MenuBar informationMenu;
+
+	private MenuBar menu;
 
 	
 	private void doShowNoService() {
@@ -110,17 +120,7 @@ public class SCB implements EntryPoint {
 //			return registrationPanel;
 //		}
 		
-		if (loginInfo==null){
-			Window.alert("Logininformation not available!");			
-		}
-		if (!loginInfo.isLoggedIn()){
-			Label registrationOnlyWithLogin=new Label("Remember: SCB only offers its services to Google customer. Please sign in!");
-			RootPanel.get(PAGEID_CONTENT).insert(registrationOnlyWithLogin, 0);
-			
-		}
-		else{
-			GWT.log("Eingeloggt");
-		}
+		
 		
 		registrationPanel=new VerticalPanel();
 		registrationTable=new Grid(6,4);
@@ -162,6 +162,19 @@ public class SCB implements EntryPoint {
 		});
 		registrationPanel.add(registrationTable);
 		
+//		if (identityInfo==null){
+//			Window.alert("Logininformation not available!");	
+//		
+//		}
+//		if (!identityInfo.isLoggedIn()){
+//			Label registrationOnlyWithLogin=new Label("Remember: SCB only offers its services to Google customer. Please sign in!");
+//			RootPanel.get(PAGEID_CONTENT).insert(registrationOnlyWithLogin, 0);
+//			
+//		}
+//		else{
+//			GWT.log("Eingeloggt");
+//		}
+		
 		return registrationPanel;
 	}
 
@@ -200,7 +213,7 @@ protected void register() {
 				
 			}
 		};
-		System.out.println("CLIENT: ID :"+id);
+		Log.info("CLIENT: ID :"+id);
 		registerSvc.register(id, callback);
 		// TODO Auto-generated method stub
 		
@@ -211,15 +224,22 @@ protected void register() {
  * This is the entry point method.
  */
 public void onModuleLoad() {
-	System.out.println("sadasd");
+	
+	
+	
 	try{
 	GWT.log("On Module Load");
-	RootPanel r=RootPanel.get(PAGEID_CLOUDBANKING);
+	RootPanel r=RootPanel.get(PAGEID_HEADER);
     if (r==null){
-    	GWT.log("Root nicht gefunden: '"+PAGEID_CLOUDBANKING+"'");
+    	GWT.log("Root nicht gefunden: '"+PAGEID_HEADER+"'");
     	return ;
     }
     GWT.log("Root gefunden");
+    
+    RootPanel.get(PAGEID_FEHLER).add(divLogger);
+    Log.setUncaughtExceptionHandler() ;
+    Log.error("HALLO");
+    
     
     
     
@@ -277,8 +297,7 @@ public void onModuleLoad() {
     informationMenu.addItem("About Secure Cloud Computing", cmdShowNoService);
     
 
-    // Make a new menu bar, adding a few cascading menus to it.
-    MenuBar menu = new MenuBar();
+    menu = new MenuBar();
     menu.addItem("Register", cmdRegister);
     menu.addItem("Banking", bankingMenu);
     menu.addItem("Information", informationMenu);
@@ -302,18 +321,19 @@ private void checkGoogleStatus() {
 		bankingService=GWT.create(BankingService.class);
 	}
 	GWT.log(GWT.getHostPageBaseURL());
-	bankingService.login(GWT.getHostPageBaseURL(), new AsyncCallback<LoginInfo>() {
+	bankingService.login(GWT.getHostPageBaseURL(), new AsyncCallback<IdentityDTO>() {
 	      public void onFailure(Throwable error) {
 	    	  error.printStackTrace();
 	    	  
 	      }
 
-	      public void onSuccess(LoginInfo result) {
-	        loginInfo = result;
-	        if(loginInfo.isLoggedIn()) {
-	          GWT.log("Eingeloggt");
+	      public void onSuccess(IdentityDTO result) {
+	        identityInfo = result;
+	        if(identityInfo.isLoggedIn()) {
+	        	Log.info("Eingeloggt");
 	          loadLoggedInSetup();
 	        } else {
+	        	Log.info("Nicht eingeloggt");
 	          loadLogin();
 	        }
 	      }
@@ -326,17 +346,19 @@ private void checkGoogleStatus() {
 
 private void loadLogin() {
     // Assemble login panel.
-    signInLink.setHref(loginInfo.getLoginUrl());
+    signInLink.setHref(identityInfo.getLoginUrl());
     
     loginPanel.add(onlyGoogleAllowedLabel);
     loginPanel.add(signInLink);
     RootPanel.get(PAGEID_CONTENT).add(loginPanel);
+    
+//    RootPanel.get(PAGEID_HEADER).add(signInLink);
   }
 
 private void loadLoggedInSetup() {
     // Assemble logout panel.
     
-    signOutLink.setHref(loginInfo.getLogoutUrl());    
+    signOutLink.setHref(identityInfo.getLogoutUrl());    
     loginPanel.add(logoutLabel);
     loginPanel.add(signOutLink);
     RootPanel.get(PAGEID_CONTENT).add(loginPanel);

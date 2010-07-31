@@ -13,7 +13,7 @@ public interface BankingServiceAsync {
 	void getTransaction(AsyncCallback<List<MoneyTransferDTO>> callback);
 
 	void  login(String requestUri,
-			AsyncCallback<LoginInfo> callback);
+			AsyncCallback<IdentityDTO> callback);
 
 	void getAccounts(AsyncCallback<List<AccountDTO>> callback);
 

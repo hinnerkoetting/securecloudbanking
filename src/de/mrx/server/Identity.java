@@ -26,20 +26,48 @@ public class Identity implements Serializable{
 
 
 	@Persistent
+	private boolean activated=false;
+	
+	@Persistent
 	private String city;
 	
 	@Persistent
+	private String email;
+
+
+	@Persistent
 	private String houseNr;
 	
+	@Persistent
+	private String nickName;
+
+
+	public String getNickName() {
+		return nickName;
+	}
+
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
 
 
+	private boolean loggedIn = false;
+
+
+	private String loginUrl;
+
+	
+	private String logoutUrl;
+	
 	@Persistent
 	private String name;
-
-
+	
 	@Persistent
 	private String phone;
 
@@ -51,19 +79,6 @@ public class Identity implements Serializable{
 	@Persistent
 	private String street;
 
-	
-	@Persistent
-	private String email;
-
-	public String getEmail() {
-		return email;
-	}
-
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 
 	public Identity(IdentityDTO dto){
 		this.name=dto.getName();	
@@ -74,6 +89,8 @@ public class Identity implements Serializable{
 		setPlz(dto.getPlz());
 		setStreet(dto.getStreet());
 		setEmail(dto.getEmail());
+		setActivated(dto.isActivated());
+		setNickName(dto.getNickName());
 	}
 
 
@@ -97,17 +114,30 @@ public class Identity implements Serializable{
 		dto.setPhone(getPhone());
 		dto.setStreet(getStreet());
 		dto.setEmail(getEmail());
+		dto.setActivated(isActivated());
+		dto.setNickName(getNickName());
 		return dto;
 	}
-
-
-	public String getHouseNr() {
+	  public String getEmail() {
+		return email;
+	}
+	  public String getHouseNr() {
 		return houseNr;
 	}
-
+	  
 
 	public Key getId() {
 		return id;
+	}
+
+
+	public String getLoginUrl() {
+		return loginUrl;
+	}
+
+
+	public String getLogoutUrl() {
+		return logoutUrl;
 	}
 
 
@@ -119,28 +149,63 @@ public class Identity implements Serializable{
 	public String getPhone() {
 		return phone;
 	}
-	
+
+
 	public String getPlz() {
 		return plz;
 	}
-	
+
+
 	public String getStreet() {
 		return street;
 	}
-	
+
+
+	public boolean isActivated() {
+		return activated;
+	}
+
+
+	public boolean isLoggedIn() {
+		return loggedIn;
+	}
+
+
+	public void setActivated(boolean activated) {
+		this.activated = activated;
+	}
+
+
 	public void setCity(String city) {
 		this.city = city;
 	}
+
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	
-
-
 	public void setHouseNr(String houseNr) {
 		this.houseNr = houseNr;
 	}
-
-
+	
 	public void setId(Key id) {
 		this.id = id;
+	}
+	
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
+	}
+	
+
+
+	public void setLoginUrl(String loginUrl) {
+		this.loginUrl = loginUrl;
+	}
+
+
+	public void setLogoutUrl(String logoutUrl) {
+		this.logoutUrl = logoutUrl;
 	}
 
 
