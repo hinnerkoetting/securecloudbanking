@@ -27,21 +27,30 @@ public class MoneyTransfer implements Serializable{
 	private double amount;
 	
 	@Persistent
-	private Account sender;
+	private String senderAccountNr;
 	
+	public String getSenderAccountNr() {
+		return senderAccountNr;
+	}
+
+
+
+	public void setSenderAccountNr(String senderAccountNr) {
+		this.senderAccountNr = senderAccountNr;
+	}
 	@Persistent
-	private int receiverAccountNr;
+	private String receiverAccountNr;
 	
 	@Persistent
 	private String receiverBankNr;
 
 	
 
-	public MoneyTransfer(double amount, Account sender, int receiverAccountNr,
+	public MoneyTransfer(double amount, Account sender, String receiverAccountNr,
 			String receiverBankNr) {
 		super();
 		this.amount = amount;
-		this.sender = sender;
+		this.senderAccountNr = sender.getAccountNr();
 		this.receiverAccountNr = receiverAccountNr;
 		this.receiverBankNr = receiverBankNr;
 	}
@@ -56,7 +65,7 @@ public class MoneyTransfer implements Serializable{
 		return id;
 	}
 
-	public int getReceiverAccountNr() {
+	public String getReceiverAccountNr() {
 		return receiverAccountNr;
 	}
 
@@ -64,15 +73,13 @@ public class MoneyTransfer implements Serializable{
 		return receiverBankNr;
 	}
 
-	public Account getSender() {
-		return sender;
-	}
+	
 
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
 
-	public void setReceiverAccountNr(int receiverAccountNr) {
+	public void setReceiverAccountNr(String receiverAccountNr) {
 		this.receiverAccountNr = receiverAccountNr;
 	}
 
@@ -80,9 +87,6 @@ public class MoneyTransfer implements Serializable{
 		this.receiverBankNr = receiverBankNr;
 	}
 
-	public void setSender(Account sender) {
-		this.sender = sender;
-	}
 	
 	@Override
 	public String toString() {
@@ -93,17 +97,17 @@ public class MoneyTransfer implements Serializable{
 				+ ", "
 				+ (receiverBankNr != null ? "receiverBankNr=" + receiverBankNr
 						+ ", " : "")
-				+ (sender != null ? "sender=" + sender : "") + "]";
+				+ (senderAccountNr != null ? "sender=" + senderAccountNr : "") + "]";
 	}
 	
 	public MoneyTransfer(MoneyTransferDTO dto){
 		setAmount(dto.getAmount());
 		setReceiverAccountNr(dto.getReceiverAccountNr());
 		setReceiverBankNr(dto.getReceiverBankNr());
-		setSender(new Account(dto.getSender()));
+		setSenderAccountNr(dto.getSenderAccountNr());
 	}
 	public MoneyTransferDTO getDTO(){
-		MoneyTransferDTO dto=new MoneyTransferDTO(getAmount(),getSender().getDTO(),getReceiverAccountNr(),getReceiverBankNr());
+		MoneyTransferDTO dto=new MoneyTransferDTO(getAmount(),getSenderAccountNr(),getReceiverAccountNr(),getReceiverBankNr());
 		return dto;
 	}
 	

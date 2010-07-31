@@ -1,26 +1,40 @@
 package de.mrx.client;
 
-import de.mrx.server.Account;
+import java.io.Serializable;
 
-public class MoneyTransferDTO {
+
+public class MoneyTransferDTO implements Serializable{
 
 	private double amount;
 
 
-	private int receiverAccountNr;
+	private String receiverAccountNr;
 
 
 	private String receiverBankNr;
 
 
-	private AccountDTO sender;
+	private String senderAccountNr;
 
 
-	public MoneyTransferDTO(double amount, AccountDTO sender,
-			int receiverAccountNr, String receiverBankNr) {
+	public String getSenderAccountNr() {
+		return senderAccountNr;
+	}
+
+
+	public void setSenderAccountNr(String senderAccountNr) {
+		this.senderAccountNr = senderAccountNr;
+	}
+
+	public MoneyTransferDTO(){
+		
+	}
+	
+	public MoneyTransferDTO(double amount, String senderAccountNr,
+			String receiverAccountNr, String receiverBankNr) {
 		super();
 		this.amount = amount;
-		this.sender = sender;
+		this.senderAccountNr = senderAccountNr;
 		this.receiverAccountNr = receiverAccountNr;
 		this.receiverBankNr = receiverBankNr;
 	}
@@ -31,7 +45,7 @@ public class MoneyTransferDTO {
 	}
 
 
-	public int getReceiverAccountNr() {
+	public String getReceiverAccountNr() {
 		return receiverAccountNr;
 	}
 
@@ -41,17 +55,14 @@ public class MoneyTransferDTO {
 	}
 
 
-	public AccountDTO getSender() {
-		return sender;
-	}
-
+	
 
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
 	
 
-	public void setReceiverAccountNr(int receiverAccountNr) {
+	public void setReceiverAccountNr(String receiverAccountNr) {
 		this.receiverAccountNr = receiverAccountNr;
 	}
 	
@@ -61,9 +72,6 @@ public class MoneyTransferDTO {
 	}
 
 
-	public void setSender(AccountDTO sender) {
-		this.sender = sender;
-	}
 	
 
 	@Override
@@ -75,7 +83,7 @@ public class MoneyTransferDTO {
 				+ ", "
 				+ (receiverBankNr != null ? "receiverBankNr=" + receiverBankNr
 						+ ", " : "")
-				+ (sender != null ? "sender=" + sender : "") + "]";
+				+ (senderAccountNr != null ? "sender=" + senderAccountNr : "") + "]";
 	}
 
 	

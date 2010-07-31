@@ -50,16 +50,10 @@ public class SCB implements EntryPoint {
 			+ "connection and try again.";
 
 	private CheckBox agbBox;;
-	private HorizontalPanel buttonPanel = new HorizontalPanel();
+//	private HorizontalPanel buttonPanel = new HorizontalPanel();
 	MenuBar generalMenu = new MenuBar(true);
-	/**
-	 * Create a remote service proxy to talk to the server-side Greeting
-	 * service.
-	 */
-	private final GreetingServiceAsync greetingService = GWT
-			.create(GreetingService.class);
-
-	private Button loginButton = new Button("Login");
+	
+//	private Button loginButton = new Button("Login");
 	// private Label status = new Label("Welcome to Cloud Banking");
 	private VerticalPanel mainPanel = new VerticalPanel();
 
@@ -78,8 +72,8 @@ public class SCB implements EntryPoint {
 	private Label plzLbl;
 	private Label cityLbl;
 	private Label emailLbl;
-	private Label onlyGoogleAllowedLabel = new Label(
-			"As a bank we need to rely on highest security standards. Therefore we need to require you having an google account. ");
+//	private Label onlyGoogleAllowedLabel = new Label(
+//			"As a bank we need to rely on highest security standards. Therefore we need to require you having an google account. ");
 
 	private PasswordTextBox password;
 	private Label passwordLbl;
@@ -88,16 +82,14 @@ public class SCB implements EntryPoint {
 
 	private VerticalPanel registrationPanel;
 
-	private boolean loggedInAtGoogle = false;
-
+	
 	private HTMLTable registrationTable;
 
 	private IdentityDTO identityInfo = null;
 	private VerticalPanel loginPanel = new VerticalPanel();
-	private Label loginLabel = new Label(
-			"Please sign in to your Google Account to access the banking application.");
+//	private Label loginLabel = new Label(
+//			"Please sign in to your Google Account to access the banking application.");
 
-	// private Label logoutLabel = new Label("Sign out gefaellig.");
 	private Anchor signInLink = new Anchor("Sign In");
 	private Anchor signOutLink = new Anchor("Sign Out");
 	private MenuBar informationMenu;
@@ -107,6 +99,13 @@ public class SCB implements EntryPoint {
 	private MenuItem userInformationMenuItem;
 
 	private MenuItem registerMItem;
+	private String currentAccount;
+
+	private TextBox receiverAccountNrTxt;
+
+	private TextBox receiverBankNrTxt;
+
+	private TextBox amountTxt;
 
 	private void doShowNoService() {
 
@@ -184,7 +183,7 @@ public class SCB implements EntryPoint {
 	protected void register() {
 
 		String n = nameTxt.getText();
-		String pw = password.getText();
+//		String pw = password.getText();
 		String str = streetTxt.getText();
 		String city = cityTxt.getText();
 		String plz = plzTxt.getText();
@@ -237,20 +236,24 @@ public class SCB implements EntryPoint {
 			RootPanel.get(PAGEID_FEHLER).add(divLogger);
 			Log.setUncaughtExceptionHandler();
 
-			// mainPanel.add(buttonPanel);
 
-			// buttonPanel.add(registerButton);
-			// buttonPanel.add(loginButton);
-			//
-			//
-			// registerButton.addClickHandler(new ClickHandler() {
-			//
-			// public void onClick(ClickEvent event) {
-			// doOpenRegisterMenu();
-			//
-			// }
-			//
-			// });
+			Command cmdShowImpressum = new Command() {
+				public void execute() {
+					GWT.log("Impressum follows");
+					Window.alert("This is a academic technology study in Cloud Computing. At the moment you see an internal development state." );
+					
+
+				}
+			};
+
+			Command cmdShowInfoSCB = new Command() {
+				public void execute() {
+					GWT.log("SCB Info");
+					Window.alert("Demonstration of cloud and security technology ." );
+					
+
+				}
+			};
 
 			Command cmdShowNoService = new Command() {
 				public void execute() {
@@ -284,9 +287,9 @@ public class SCB implements EntryPoint {
 
 			informationMenu = new MenuBar(true);
 			// informationMenu.addItem("Partner", cmdShowNoService);
-			informationMenu.addItem("Impressum", cmdShowNoService);
+			informationMenu.addItem("Impressum", cmdShowImpressum);
 			informationMenu.addItem("About Secure Cloud Computing",
-					cmdShowNoService);
+					cmdShowInfoSCB);
 
 			menu = new MenuBar();
 			registerMItem = new MenuItem("Register", cmdRegister);
@@ -465,7 +468,17 @@ public class SCB implements EntryPoint {
 			bankingService = GWT.create(BankingService.class);
 		}
 		accountsDetailsPanel.clear();
-		bankingService.getBalance(new AsyncCallback<Double>() {
+		Button transferMoneyButton=new Button("Send money");
+		currentAccount=accNr;
+		transferMoneyButton.addClickHandler(new ClickHandler() {
+			
+			public void onClick(ClickEvent event) {
+				sendMoney(currentAccount);
+				
+			}
+		});
+		accountsDetailsPanel.add(transferMoneyButton);
+		bankingService.getBalance(accNr,new AsyncCallback<Double>() {
 
 			public void onFailure(Throwable caught) {
 				Log.error("Error loading balance", caught);
@@ -479,7 +492,9 @@ public class SCB implements EntryPoint {
 			}
 			
 		});
-		bankingService.getTransaction(new AsyncCallback<List<MoneyTransferDTO>>() {
+		bankingService.getTransaction(currentAccount, new AsyncCallback<List<MoneyTransferDTO>>() {
+
+			private HTMLTable accountDetailTable;
 
 			public void onFailure(Throwable caught) {
 				Log.error("Error loading transactions", caught);				
@@ -491,13 +506,75 @@ public class SCB implements EntryPoint {
 					accountsDetailsPanel.add(new Label("No transactions"));
 					return;
 				}
+				if (accountDetailTable!=null){
+					accountsDetailsPanel.remove(accountDetailTable);
+				}
+				accountDetailTable = new Grid(result.size(),4);
+				int pos=0;
+				Log.info("Einträge: "+result.size());
 				for (MoneyTransferDTO transfer: result){
 					Log.info("Transfer: "+transfer);
+					accountDetailTable.setWidget(pos,0,new Label(transfer.getSenderAccountNr()));
+					accountDetailTable.setWidget(pos,1,new Label(transfer.getReceiverAccountNr()));
+					accountDetailTable.setWidget(pos,2,new Label(""+transfer.getAmount()));
+					pos++;
 					
 				}
+				accountsDetailsPanel.add(accountDetailTable);
 
 				
 			}
 		});
+	}
+
+	protected void sendMoney(String accNr) {
+		accountsDetailsPanel.clear();
+		HTMLTable transferForm = new Grid(6, 4);
+		Label receiverAccountNrLbl=new Label("Receiver Account Nr:");
+		Label receiverBankNrLbl=new Label("Receiver Bank number");
+		Label amountLbl=new Label("Amount");
+		receiverAccountNrTxt = new TextBox();
+		receiverBankNrTxt = new TextBox();
+		amountTxt = new TextBox();
+		Button sendMoneyBtn=new Button("Send Money");
+		sendMoneyBtn.addClickHandler(new ClickHandler() {
+			
+			public void onClick(ClickEvent event) {
+				doSendMoney();
+				
+			}
+		});
+		transferForm.setWidget(0,0,receiverAccountNrLbl);
+		transferForm.setWidget(0,1,receiverAccountNrTxt);
+		transferForm.setWidget(1,0,receiverBankNrLbl);
+		transferForm.setWidget(1,1,receiverBankNrTxt);
+		transferForm.setWidget(2,0,amountLbl);
+		transferForm.setWidget(2,1,amountTxt);
+		transferForm.setWidget(3,1,sendMoneyBtn);
+		
+		accountsDetailsPanel.add(transferForm);
+		
+	}
+
+	protected void doSendMoney() {
+		if (bankingService == null) {
+			bankingService = GWT.create(BankingService.class);
+		}
+		
+		Double amount=Double.parseDouble( amountTxt.getText());
+		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,new AsyncCallback<Void>() {
+
+			public void onFailure(Throwable caught) {
+				Log.error("Sending money failed",caught);
+				
+			}
+
+			
+			public void onSuccess(Void result) {
+				Window.alert("Money sent sucessfully");
+				
+			}
+		});
+		
 	}
 }

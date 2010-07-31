@@ -7,8 +7,7 @@ import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 
-import org.apache.coyote.http11.filters.IdentityInputFilter;
-
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -18,20 +17,21 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankingService;
 import de.mrx.client.IdentityDTO;
-import de.mrx.client.LoginInfo;
 import de.mrx.client.MoneyTransferDTO;
 
+@SuppressWarnings("serial")
 public class BankingServiceImpl extends RemoteServiceServlet implements
 		BankingService {
 	
 	Logger log=Logger.getLogger(BankingServiceImpl.class.getName());
-	
+	PersistenceManager pm = PMF.get().getPersistenceManager();
 
 	public List<AccountDTO> getAccounts() {
 		UserService userService = UserServiceFactory.getUserService();
 	    User user = userService.getCurrentUser();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 	      String query=" SELECT FROM "+Account.class.getName()+" WHERE owner =='"+user.getEmail()+"'";
+	      Log.info("geTAccounts Query: "+query);
 	      List<Account> accounts=    (List<Account>)pm.newQuery(query).execute();
 	      List<AccountDTO> accountDTOs=new ArrayList<AccountDTO>();
 	      for (Account acc:accounts){
@@ -42,14 +42,32 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	      return accountDTOs;
 	}
 
-	public double getBalance() {
-		// TODO Auto-generated method stub
-		return 0;
+	public double getBalance(String accountNr) {
+		UserService userService = UserServiceFactory.getUserService();
+	    User user = userService.getCurrentUser();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+	      String query=" SELECT FROM "+Account.class.getName()+" WHERE owner =='"+user.getEmail()+"' && accountNr=='"+accountNr+"'";
+	      log.info("geTAccounts Query: "+query);
+	      List<Account> accounts=    (List<Account>)pm.newQuery(query).execute();
+	      if(accounts.size()!=1){
+	    	  throw new RuntimeException ("Anzahl Accounts mit Nr '"+accountNr+"' ist "+accounts.size() );
+	      }
+	      return accounts.get(0).getBalance();
 	}
 
-	public List<MoneyTransferDTO> getTransaction() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<MoneyTransferDTO> getTransaction(String accountNr) {
+		UserService userService = UserServiceFactory.getUserService();
+	    User user = userService.getCurrentUser();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+	      String query=" SELECT FROM "+MoneyTransfer.class.getName() +" WHERE senderAccountNr =='"+accountNr+"'";
+	    List<MoneyTransfer> moneyTransfers=(List<MoneyTransfer>) pm.newQuery(query).execute();
+	    List<MoneyTransferDTO> mtDTOs=new ArrayList<MoneyTransferDTO>();
+	      for (MoneyTransfer mtransfer:moneyTransfers){
+	    	  MoneyTransferDTO dto=mtransfer.getDTO();
+	    	  mtDTOs.add(dto);
+	    	  log.info(dto.toString());
+	      }
+	      return mtDTOs;
 	}
 
 	public IdentityDTO login(String requestUri) {
@@ -61,7 +79,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	      
 	      
 	      log.fine("Login: "+user);
-	      String email=user.getEmail();
+	      
 	      identityInfo = getIdentity(user);
 	      
 	      identityInfo.setLoggedIn(true);
@@ -122,6 +140,34 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	        }
 	        log.info("account neu geoeffnet : "+acc);
 		    
+		
+	}
+
+	public void sendMoney(String senderAccountNr, String blz, String accountNr, double amount) {
+		String accQuery=" SELECT FROM "+Account.class.getName()+" WHERE accountNr=='"+senderAccountNr+"'";
+		Log.info(accQuery);
+		List<Account> accounts= (List<Account>) pm.newQuery(accQuery).execute();
+		if (accounts==null){
+			throw new RuntimeException("No account. Bug!");
+		}
+		if (accounts.size()!=1){
+			throw new RuntimeException("There must be exactly one account with the number: '"+senderAccountNr+"'. Instead there is : "+accounts.size());
+		}
+		Account senderAccount=accounts.get(0);
+		try{
+		MoneyTransfer transfer=new MoneyTransfer(amount,senderAccount, accountNr, blz);
+		log.warning("Sender Account bevor:"+senderAccount.toString());
+		pm.makePersistent(transfer);
+		pm.currentTransaction().begin();
+		senderAccount.setBalance(senderAccount.getBalance()-amount);
+			pm.currentTransaction().commit();
+			log.warning("Sender Account after:"+senderAccount.toString());
+			
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			Log.error("error sending money ",e);			
+		}
 		
 	}
 

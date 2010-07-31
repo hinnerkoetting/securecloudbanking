@@ -4,13 +4,11 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import de.mrx.shared.Transaction;
-
 public interface BankingServiceAsync {
 
-	void getBalance(AsyncCallback<Double> callback);
+	
 
-	void getTransaction(AsyncCallback<List<MoneyTransferDTO>> callback);
+	void getTransaction(String accountNr,AsyncCallback<List<MoneyTransferDTO>> callback);
 
 	void  login(String requestUri,
 			AsyncCallback<IdentityDTO> callback);
@@ -18,5 +16,10 @@ public interface BankingServiceAsync {
 	void getAccounts(AsyncCallback<List<AccountDTO>> callback);
 
 	void openNewAccount(AsyncCallback<Void> callback);
+
+	void getBalance(String accountNr, AsyncCallback<Double> callback);
+
+	void sendMoney(String senderAccountNr, String blz, String accountNr, double amount,
+			AsyncCallback<Void> callback);
 
 }
