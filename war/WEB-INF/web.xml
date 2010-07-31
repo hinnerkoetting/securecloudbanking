@@ -5,11 +5,7 @@
 
 <web-app>
   
-  <!-- Servlets -->
-  <servlet>
-    <servlet-name>greetServlet</servlet-name>
-    <servlet-class>de.mrx.server.GreetingServiceImpl</servlet-class>
-  </servlet>
+  
   
   <servlet>
     <servlet-name>registerServlet</servlet-name>
@@ -42,10 +38,6 @@
     <url-pattern>/scb/register</url-pattern>
   </servlet-mapping>
   
-  <servlet-mapping>
-    <servlet-name>greetServlet</servlet-name>
-    <url-pattern>/scb/greet</url-pattern>
-  </servlet-mapping>
   
   <!-- Default page to serve -->
   <welcome-file-list>
