@@ -230,9 +230,16 @@ public class Identity implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "Identity [city=" + city + ", houseNr=" + houseNr + ", id=" + id
-				+ ", name=" + name + ", phone=" + phone + ", plz=" + plz
-				+ ", street=" + street + ", email=" + email + "]";
+		return "Identity [activated=" + activated + ", "
+				+ (city != null ? "city=" + city + ", " : "")
+				+ (email != null ? "email=" + email + ", " : "")
+				+ (houseNr != null ? "houseNr=" + houseNr + ", " : "")
+				+ (nickName != null ? "nickName=" + nickName + ", " : "")
+				+ "loggedIn=" + loggedIn + ", "
+				+ (name != null ? "name=" + name + ", " : "")
+				+ (phone != null ? "phone=" + phone + ", " : "")
+				+ (plz != null ? "plz=" + plz + ", " : "")
+				+ (street != null ? "street=" + street : "") + "]";
 	}
 	
 

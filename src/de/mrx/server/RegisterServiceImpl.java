@@ -2,6 +2,8 @@ package de.mrx.server;
 
 
 
+import java.util.logging.Logger;
+
 import javax.jdo.PersistenceManager;
 
 import com.google.gwt.core.client.GWT;
@@ -11,15 +13,17 @@ import de.mrx.client.IdentityDTO;
 import de.mrx.client.RegisterService;
 
 public class RegisterServiceImpl extends RemoteServiceServlet implements RegisterService{
+	
+	private final Logger log=Logger.getLogger(RegisterServiceImpl.class.getName());
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1791669577170197531L;
-	public void register(IdentityDTO identity){
-		System.out.println("Transfer: "+identity);
+	public void register(IdentityDTO identity){	
 		Identity id=new Identity(identity);
-		System.out.println("Register ID: "+id);
+		//At the moment, directly activate the user
+		id.setActivated(true);
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
         try {
@@ -27,6 +31,6 @@ public class RegisterServiceImpl extends RemoteServiceServlet implements Registe
         } finally {
             pm.close();
         }
-		GWT.log("Registration received");
+        log.info("Registration received: "+id);
 	}
 }

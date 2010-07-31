@@ -17,5 +17,7 @@ public interface BankingService extends RemoteService {
 	public List<AccountDTO> getAccounts();
 	
 	public List<MoneyTransferDTO> getTransaction();
+	
+	public void openNewAccount();
 
 }

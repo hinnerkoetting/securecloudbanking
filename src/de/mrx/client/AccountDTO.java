@@ -12,6 +12,11 @@ public class AccountDTO implements Serializable{
 	private String accountNr;
 	private double balance;//current money
 	private String owner;
+	
+	public AccountDTO(){
+		
+	}
+	
 	public AccountDTO(String owner, String accountNr, double balance) {
 		super();
 		this.owner = owner;

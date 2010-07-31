@@ -17,4 +17,6 @@ public interface BankingServiceAsync {
 
 	void getAccounts(AsyncCallback<List<AccountDTO>> callback);
 
+	void openNewAccount(AsyncCallback<Void> callback);
+
 }

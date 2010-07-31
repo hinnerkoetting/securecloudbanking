@@ -139,7 +139,15 @@ public class IdentityDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "IdentityDTO [name=" + name + ", city=" + city + ", houseNr="
-				+ houseNr + ", phone=" + phone + ", plz=" + plz + "]";
+		return "IdentityDTO [activated=" + activated + ", "
+				+ (city != null ? "city=" + city + ", " : "")
+				+ (email != null ? "email=" + email + ", " : "")
+				+ (houseNr != null ? "houseNr=" + houseNr + ", " : "")
+				+ "loggedIn=" + loggedIn + ", "
+				+ (nickName != null ? "nickName=" + nickName + ", " : "")
+				+ (name != null ? "name=" + name + ", " : "")
+				+ (phone != null ? "phone=" + phone + ", " : "")
+				+ (plz != null ? "plz=" + plz + ", " : "")
+				+ (street != null ? "street=" + street : "") + "]";
 	}
 }
