@@ -1,6 +1,8 @@
 package de.mrx.server;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -10,6 +12,7 @@ import javax.jdo.annotations.PrimaryKey;
 import com.google.appengine.api.datastore.Key;
 
 import de.mrx.client.AccountDTO;
+import de.mrx.client.MoneyTransferDTO;
 
 @PersistenceCapable
 public class Account implements Serializable{
@@ -24,8 +27,20 @@ public class Account implements Serializable{
 	@PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
+	
+	
+	@Persistent
+	List<MoneyTransfer> transfers=new ArrayList<MoneyTransfer>();
     
-    @Persistent
+    public List<MoneyTransfer> getTransfers() {
+		return transfers;
+	}
+
+	public void setTransfers(List<MoneyTransfer> transfers) {
+		this.transfers = transfers;
+	}
+
+	@Persistent
     private String owner;
 
 	@Persistent
@@ -39,6 +54,10 @@ public class Account implements Serializable{
 		this.owner = owner;
 		this.accountNr = accountNr;
 		this.balance = balance;
+		MoneyTransferDTO dto=new MoneyTransferDTO();
+		dto.setAmount(20);
+		dto.setReceiverBankNr("1212");
+		transfers.add(new MoneyTransfer(dto));
 	}
     
     public Account(AccountDTO dto){
@@ -82,12 +101,16 @@ public class Account implements Serializable{
     @Override
 	public String toString() {
 		return "Account [accountNr=" + accountNr + ", balance=" + balance
-				+ ", " + (owner != null ? "owner=" + owner : "") + "]";
+				+ ", " + (owner != null ? "owner=" + owner : "") + "Transfers: "+getTransfers().size()+ "]";
 	}
     
     public AccountDTO getDTO(){
     	AccountDTO dto=new AccountDTO(getOwner(), getAccountNr(), getBalance());
     	return dto;
+    }
+    
+    public void addMoneyTransfer(MoneyTransfer transfer){
+    	transfers.add(transfer);
     }
 
 }

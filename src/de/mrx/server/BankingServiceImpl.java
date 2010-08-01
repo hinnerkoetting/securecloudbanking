@@ -155,10 +155,12 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		}
 		Account senderAccount=accounts.get(0);
 		try{
+			pm.currentTransaction().begin();
 		MoneyTransfer transfer=new MoneyTransfer(amount,senderAccount, accountNr, blz);
+		senderAccount.addMoneyTransfer(transfer);
 		log.warning("Sender Account bevor:"+senderAccount.toString());
-		pm.makePersistent(transfer);
-		pm.currentTransaction().begin();
+//		pm.makePersistent(transfer);
+		
 		senderAccount.setBalance(senderAccount.getBalance()-amount);
 			pm.currentTransaction().commit();
 			log.warning("Sender Account after:"+senderAccount.toString());
