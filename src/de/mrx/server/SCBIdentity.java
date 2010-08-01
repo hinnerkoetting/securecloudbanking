@@ -1,18 +1,29 @@
 package de.mrx.server;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.jdo.Extent;
+import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Query;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.users.User;
+import com.google.gwt.core.client.GWT;
 
-import de.mrx.client.IdentityDTO;
+import de.mrx.client.SCBIdentityDTO;
 
+
+/**
+ * Identity known to Secure Cloud Banking
+ *
+ */
 @PersistenceCapable
-public class Identity implements Serializable{
+public class SCBIdentity implements Serializable{
 	
 	/**
 	 * 
@@ -50,6 +61,24 @@ public class Identity implements Serializable{
 	public void setNickName(String nickName) {
 		this.nickName = nickName;
 	}
+	
+	public static SCBIdentity getIdentity(User user) {
+		
+//		String query = "select from " + Identity.class.getName()
+//				+ " WHERE email=='" + user.getEmail() + "'";
+//		
+		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Extent<SCBIdentity> identityExtent=pm.getExtent(SCBIdentity.class);
+		javax.jdo.Query query=pm.newQuery(identityExtent);
+		List<SCBIdentity> ids = (List<SCBIdentity>) pm.newQuery(query).execute();
+		query.setFilter("email== emailParam");
+		query.declareParameters("String emailParam");
+		query.setUnique(true);
+		SCBIdentity id=(SCBIdentity) query.execute(user.getEmail());
+		 		return id;
+	}
+
 
 
 	@PrimaryKey
@@ -80,7 +109,7 @@ public class Identity implements Serializable{
 	private String street;
 
 
-	public Identity(IdentityDTO dto){
+	public SCBIdentity(SCBIdentityDTO dto){
 		this.name=dto.getName();	
 		setCity(dto.getCity());
 		setHouseNr(dto.getHouseNr());
@@ -94,9 +123,10 @@ public class Identity implements Serializable{
 	}
 
 
-	public Identity(String name) {
+	public SCBIdentity(String email) {
 		super();
-		this.name = name;
+		this.email=email;
+		
 	}
 
 
@@ -105,8 +135,8 @@ public class Identity implements Serializable{
 	}
 
 
-	public IdentityDTO getDTO(){
-		IdentityDTO dto=new IdentityDTO(getName());
+	public SCBIdentityDTO getDTO(){
+		SCBIdentityDTO dto=new SCBIdentityDTO(getName());
 		dto.setCity(getCity());
 		dto.setHouseNr(getHouseNr());
 		dto.setName(getName());

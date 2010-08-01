@@ -5,9 +5,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
+import javax.jdo.annotations.Key;
 
 import com.allen_sauer.gwt.log.client.Log;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -16,162 +20,199 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankingService;
-import de.mrx.client.IdentityDTO;
+import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.MoneyTransferDTO;
 
 @SuppressWarnings("serial")
 public class BankingServiceImpl extends RemoteServiceServlet implements
 		BankingService {
-	
-	Logger log=Logger.getLogger(BankingServiceImpl.class.getName());
+
+	private static final String SCB_BLZ = "1502222";
+	Logger log = Logger.getLogger(BankingServiceImpl.class.getName());
 	PersistenceManager pm = PMF.get().getPersistenceManager();
+
+	Bank ownBank;
+
+	public BankingServiceImpl() {
+		loadInitialData();
+	}
 
 	public List<AccountDTO> getAccounts() {
 		UserService userService = UserServiceFactory.getUserService();
-	    User user = userService.getCurrentUser();
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-	      String query=" SELECT FROM "+Account.class.getName()+" WHERE owner =='"+user.getEmail()+"'";
-	      Log.info("geTAccounts Query: "+query);
-	      List<Account> accounts=    (List<Account>)pm.newQuery(query).execute();
-	      List<AccountDTO> accountDTOs=new ArrayList<AccountDTO>();
-	      for (Account acc:accounts){
-	    	  AccountDTO dto=acc.getDTO();
-	    	  accountDTOs.add(dto);
-	    	  log.info(dto.toString());
-	      }
-	      return accountDTOs;
+		User user = userService.getCurrentUser();
+
+		// Extent<Account> e=pm.getExtent(Account.class,true);
+		// for ( Account acc: e){
+		// log.info( acc.toString());
+		// }
+		String query = " SELECT FROM " + Account.class.getName()
+				+ " WHERE owner =='" + user.getEmail() + "'";
+		log.info("geTAccounts Query: " + query);
+		List<Account> accounts = (List<Account>) pm.newQuery(query).execute();
+		List<AccountDTO> accountDTOs = new ArrayList<AccountDTO>();
+		for (Account acc : accounts) {
+			AccountDTO dto = acc.getDTO();
+			accountDTOs.add(dto);
+			log.info(dto.toString());
+		}
+		return accountDTOs;
+	}
+
+	private void loadInitialData() {
+		String query = "SELECT FROM " + Bank.class.getName() + " WHERE blz=='"
+				+ SCB_BLZ + "'";
+
+		List<Bank> ownBanks = (List<Bank>) pm.newQuery(query).execute();
+		if (ownBanks.size() == 0) {
+			ownBank = new Bank(SCB_BLZ, "Secure Cloud Bank");
+			pm.makePersistent(ownBank);
+		} else {
+			ownBank = ownBanks.get(0);
+		}
 	}
 
 	public double getBalance(String accountNr) {
 		UserService userService = UserServiceFactory.getUserService();
-	    User user = userService.getCurrentUser();
+		User user = userService.getCurrentUser();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-	      String query=" SELECT FROM "+Account.class.getName()+" WHERE owner =='"+user.getEmail()+"' && accountNr=='"+accountNr+"'";
-	      log.info("geTAccounts Query: "+query);
-	      List<Account> accounts=    (List<Account>)pm.newQuery(query).execute();
-	      if(accounts.size()!=1){
-	    	  throw new RuntimeException ("Anzahl Accounts mit Nr '"+accountNr+"' ist "+accounts.size() );
-	      }
-	      return accounts.get(0).getBalance();
+		String query = " SELECT FROM " + Account.class.getName()
+				+ " WHERE owner =='" + user.getEmail() + "' && accountNr=='"
+				+ accountNr + "'";
+		// Extent<Account> e=pm.getExtent(Account.class,true);
+		// for ( Account acc: e){
+		// log.info( acc.toString());
+		// }
+		// log.info("geTAccounts Query: "+query);
+		List<Account> accounts = (List<Account>) pm.newQuery(query).execute();
+		if (accounts.size() != 1) {
+			throw new RuntimeException("Anzahl Accounts mit Nr '" + accountNr
+					+ "' ist " + accounts.size());
+		}
+		return accounts.get(0).getBalance();
 	}
 
 	public List<MoneyTransferDTO> getTransaction(String accountNr) {
 		UserService userService = UserServiceFactory.getUserService();
-	    User user = userService.getCurrentUser();
+		User user = userService.getCurrentUser();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-	      String query=" SELECT FROM "+MoneyTransfer.class.getName() +" WHERE senderAccountNr =='"+accountNr+"'";
-	    List<MoneyTransfer> moneyTransfers=(List<MoneyTransfer>) pm.newQuery(query).execute();
-	    List<MoneyTransferDTO> mtDTOs=new ArrayList<MoneyTransferDTO>();
-	      for (MoneyTransfer mtransfer:moneyTransfers){
-	    	  MoneyTransferDTO dto=mtransfer.getDTO();
-	    	  mtDTOs.add(dto);
-	    	  log.info(dto.toString());
-	      }
-	      return mtDTOs;
+		GeneralAccount acc = Account.getOwnByAccountNr(accountNr);
+		// String query = " SELECT FROM " + MoneyTransfer.class.getName()
+		// + " WHERE senderAccountNr =='" + accountNr + "'";
+		// List<MoneyTransfer> moneyTransfers = (List<MoneyTransfer>)
+		// pm.newQuery(
+		// query).execute();
+		List<MoneyTransferDTO> mtDTOs = new ArrayList<MoneyTransferDTO>();
+		for (MoneyTransfer mtransfer : acc.getTransfers()) {
+			MoneyTransferDTO dto = mtransfer.getDTO();
+			mtDTOs.add(dto);
+			log.info(dto.toString());
+		}
+		return mtDTOs;
 	}
 
-	public IdentityDTO login(String requestUri) {
-	    UserService userService = UserServiceFactory.getUserService();
-	    User user = userService.getCurrentUser();
-	    IdentityDTO identityInfo;
+	public SCBIdentityDTO login(String requestUri) {
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		SCBIdentityDTO identityInfo;
 
-	    if (user != null) {
-	      
-	      
-	      log.fine("Login: "+user);
-	      
-	      identityInfo = getIdentity(user);
-	      
-	      identityInfo.setLoggedIn(true);
-	      identityInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
-	      
-	    } else {
-	    	identityInfo=new IdentityDTO();
-	      identityInfo.setLoggedIn(false);
-	      identityInfo.setLoginUrl(userService.createLoginURL(requestUri));
-	    }
-	    return identityInfo;
-	  }
+		if (user != null) {
 
-	private IdentityDTO getIdentity(User user) {
-		IdentityDTO identityInfo;
-		String query = "select from " + Identity.class.getName()+" WHERE email=='"+user.getEmail()+"'";
-	      log.info("Query: "+query);
-	      System.out.println("Query: "+query);
-	      PersistenceManager pm = PMF.get().getPersistenceManager();
-	      List<Identity> ids=(List<Identity>) pm.newQuery(query).execute();
-	      
-	      System.out.println("RESULS  :"+ids.size());
-	      log.info("RESULS  :"+ids.size());
-	      for (Identity i:ids){
-	    	  GWT.log("ID : "+i);
-	    	  System.out.println("Gefundene ID"+i);
-	      }
-	      if (ids.size()==0){
-	    	  identityInfo=new IdentityDTO();	    	  
-		      identityInfo.setEmail(user.getEmail());
-		      identityInfo.setNickName(user.getNickname());  
-	      }
-	      else if (ids.size()>1){
-	    	  throw new RuntimeException("Für den User: '"+user.getEmail()+"' sind mehrere Identitaeten hinterlegt!");
-	      }
-	      else{
-	    	  identityInfo=ids.get(0).getDTO();
-	    	  
-	      }
+			log.fine("Login: " + user);
+
+			identityInfo = getIdentity(user);
+
+			identityInfo.setLoggedIn(true);			
+			identityInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
+
+		} else {
+			identityInfo = new SCBIdentityDTO();
+			identityInfo.setLoggedIn(false);
+			identityInfo.setLoginUrl(userService.createLoginURL(requestUri));
+		}
 		return identityInfo;
 	}
 
-	public void openNewAccount() {
-		 UserService userService = UserServiceFactory.getUserService();
-		    User user = userService.getCurrentUser();
-		    if (user==null){
-		    	throw new RuntimeException("Nicht eingeloggt. Zugriff unterbunden");
-		    }
-		    IdentityDTO identityInfo=getIdentity(user);
-		    Random rd=new Random();
-		    int kontoNr=rd.nextInt(100000)+10000;
-		    Account acc=new Account(identityInfo.getEmail(),""+kontoNr,5);
-		    PersistenceManager pm = PMF.get().getPersistenceManager();
-		    try {
-	            pm.makePersistent(acc);
-	        } finally {
-	            pm.close();
-	        }
-	        log.info("account neu geoeffnet : "+acc);
-		    
+	private SCBIdentityDTO getIdentity(User user) {
+		SCBIdentity id=SCBIdentity.getIdentity(user);
+		if (id==null){
+			id= new SCBIdentity(user.getEmail());
+			id.setNickName(user.getNickname());			
+		}
+		return id.getDTO();
+
+		
 		
 	}
 
-	public void sendMoney(String senderAccountNr, String blz, String accountNr, double amount) {
-		String accQuery=" SELECT FROM "+Account.class.getName()+" WHERE accountNr=='"+senderAccountNr+"'";
-		Log.info(accQuery);
-		List<Account> accounts= (List<Account>) pm.newQuery(accQuery).execute();
-		if (accounts==null){
-			throw new RuntimeException("No account. Bug!");
+	public void openNewAccount() {
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			throw new RuntimeException("Nicht eingeloggt. Zugriff unterbunden");
 		}
-		if (accounts.size()!=1){
-			throw new RuntimeException("There must be exactly one account with the number: '"+senderAccountNr+"'. Instead there is : "+accounts.size());
-		}
-		Account senderAccount=accounts.get(0);
-		try{
-			pm.currentTransaction().begin();
-		MoneyTransfer transfer=new MoneyTransfer(amount,senderAccount, accountNr, blz);
-		senderAccount.addMoneyTransfer(transfer);
-		log.warning("Sender Account bevor:"+senderAccount.toString());
-//		pm.makePersistent(transfer);
+		SCBIdentityDTO identityInfo = getIdentity(user);
+		Random rd = new Random();
+		int kontoNr = rd.nextInt(100000) + 10000;
+		Account acc = new Account(identityInfo.getEmail(), "" + kontoNr, 5,
+				ownBank);
+		acc.setBank(ownBank);
+
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+
+		pm.makePersistent(acc);
+		ownBank.addAccount(acc);
+		log.info("account neu geoeffnet : " + acc);
+
+	}
+
+	public void sendMoney(String senderAccountNr, String blz,
+			String receiveraccountNr, double amount) {
 		
-		senderAccount.setBalance(senderAccount.getBalance()-amount);
-			pm.currentTransaction().commit();
-			log.warning("Sender Account after:"+senderAccount.toString());
+		Account senderAccount = Account.getOwnByAccountNr(senderAccountNr);
+
+		 
+
+		Bank receiverBank = Bank.getByBLZ(blz);
+		if (receiverBank == null) {
+			receiverBank = new Bank(blz.trim(), "Neue Bank");
+			
+			pm.makePersistent(receiverBank);
 			
 		}
-		catch (Exception e){
-			e.printStackTrace();
-			Log.error("error sending money ",e);			
-		}
-		
-	}
 
+		GeneralAccount recAccount;
+		if (receiverBank.equals(ownBank)) {
+			recAccount = Account.getOwnByAccountNr(receiveraccountNr);
+			if (recAccount==null){
+				throw new RuntimeException("Dieser Account existiert nicht bei der Bank "+receiveraccountNr);
+			}
+
+		} else {
+			recAccount=ExternalAccount.getAccountByBLZAndAccountNr(receiverBank, receiveraccountNr);
+			
+			if (recAccount == null) {
+				log.info("Account"+ receiveraccountNr+" is not yet known at "+receiverBank.getName()+"("+receiverBank.getBlz()+"). Create it.");
+//				pm.currentTransaction().begin();
+				recAccount = new ExternalAccount("Unbekannt",
+						receiveraccountNr, receiverBank);
+				pm.makePersistent(recAccount);
+				receiverBank.addAccount(recAccount);
+				
+//				pm.currentTransaction().commit();
+			}
+		}
+
+		MoneyTransfer transfer = new MoneyTransfer(senderAccount, recAccount,
+				amount);
+		pm.makePersistent(transfer);
+		senderAccount.addMoneyTransfer(transfer);
+		recAccount.addMoneyTransfer(transfer);
+		
+
+		senderAccount.setBalance(senderAccount.getBalance() - amount);
+//		 pm.currentTransaction().commit();
+		
+
+	}
 
 }

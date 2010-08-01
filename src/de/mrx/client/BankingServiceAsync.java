@@ -11,7 +11,7 @@ public interface BankingServiceAsync {
 	void getTransaction(String accountNr,AsyncCallback<List<MoneyTransferDTO>> callback);
 
 	void  login(String requestUri,
-			AsyncCallback<IdentityDTO> callback);
+			AsyncCallback<SCBIdentityDTO> callback);
 
 	void getAccounts(AsyncCallback<List<AccountDTO>> callback);
 

@@ -2,7 +2,7 @@ package de.mrx.client;
 
 import java.io.Serializable;
 
-public class IdentityDTO implements Serializable {
+public class SCBIdentityDTO implements Serializable {
 	/**
 	 * 
 	 */
@@ -39,11 +39,11 @@ public class IdentityDTO implements Serializable {
 	  private String street;
 	
 	
-	public IdentityDTO(){
+	public SCBIdentityDTO(){
 		
 	}
 
-	public IdentityDTO(String name) {
+	public SCBIdentityDTO(String name) {
 		super();
 		this.name = name;
 	}

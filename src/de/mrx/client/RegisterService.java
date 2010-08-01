@@ -6,6 +6,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("register")
 public interface RegisterService extends RemoteService{
-	public void register(IdentityDTO identity);
+	public void register(SCBIdentityDTO identity);
 
 }

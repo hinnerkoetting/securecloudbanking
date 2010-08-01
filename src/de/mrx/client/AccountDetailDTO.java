@@ -1,6 +1,5 @@
 package de.mrx.client;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class AccountDetailDTO extends AccountDTO {

@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("banking")
 public interface BankingService extends RemoteService {
 	
-	public IdentityDTO  login(String requestUri);
+	public SCBIdentityDTO  login(String requestUri);
 	
 	public double getBalance(String accountNr);
 	

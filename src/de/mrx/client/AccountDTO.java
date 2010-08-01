@@ -17,11 +17,11 @@ public class AccountDTO implements Serializable{
 		
 	}
 	
-	public AccountDTO(String owner, String accountNr, double balance) {
+	public AccountDTO(String owner, String accountNr) {
 		super();
 		this.owner = owner;
 		this.accountNr = accountNr;
-		this.balance = balance;
+	
 	}
 	public String getAccountNr() {
 		return accountNr;

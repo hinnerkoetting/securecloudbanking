@@ -5,16 +5,43 @@ import java.io.Serializable;
 
 public class MoneyTransferDTO implements Serializable{
 
+	
+	private boolean selfSended=false;
 	private double amount;
 
 
+	public boolean isSelfSended() {
+		return selfSended;
+	}
+
+
+	public void setSelfSended(boolean selfSended) {
+		this.selfSended = selfSended;
+	}
+
+
+
+
 	private String receiverAccountNr;
+
+
+	public String getSenderBankNr() {
+		return senderBankNr;
+	}
+
+
+	public void setSenderBankNr(String senderBankNr) {
+		this.senderBankNr = senderBankNr;
+	}
+
+
 
 
 	private String receiverBankNr;
 
 
 	private String senderAccountNr;
+	private String senderBankNr;
 
 
 	public String getSenderAccountNr() {
@@ -30,13 +57,15 @@ public class MoneyTransferDTO implements Serializable{
 		
 	}
 	
-	public MoneyTransferDTO(double amount, String senderAccountNr,
-			String receiverAccountNr, String receiverBankNr) {
+	public MoneyTransferDTO(String senderBLZ, String senderAccountNr,String receiverBLZ,
+			String receiverAccountNr, double amount) {
 		super();
 		this.amount = amount;
 		this.senderAccountNr = senderAccountNr;
 		this.receiverAccountNr = receiverAccountNr;
-		this.receiverBankNr = receiverBankNr;
+		this.receiverBankNr = receiverBLZ;
+		this.senderBankNr=senderBLZ;
+		
 	}
 
 
@@ -76,14 +105,10 @@ public class MoneyTransferDTO implements Serializable{
 
 	@Override
 	public String toString() {
-		return "MoneyTransferDTO [amount="
-				+ amount
-				+ ", receiverAccountNr="
-				+ receiverAccountNr
-				+ ", "
-				+ (receiverBankNr != null ? "receiverBankNr=" + receiverBankNr
-						+ ", " : "")
-				+ (senderAccountNr != null ? "sender=" + senderAccountNr : "") + "]";
+		return "MoneyTransferDTO [selfSended=" + selfSended + ", amount="
+				+ amount + ", receiverAccountNr=" + receiverAccountNr
+				+ ", receiverBankNr=" + receiverBankNr + ", senderAccountNr="
+				+ senderAccountNr + ", senderBankNr=" + senderBankNr + "]";
 	}
 
 	

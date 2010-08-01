@@ -2,6 +2,7 @@ package de.mrx.server;
 
 import java.io.Serializable;
 
+import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -23,36 +24,47 @@ public class MoneyTransfer implements Serializable{
 	 @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
 
+	
+	@Persistent
+	private Key sender;
+	
+	@Persistent
+	private Key receiver;
+	
 	@Persistent
 	private double amount;
 	
-	@Persistent
-	private String senderAccountNr;
+//	@Persistent
+//	private String senderAccountNr;
 	
-	public String getSenderAccountNr() {
-		return senderAccountNr;
-	}
+//	public String getSenderAccountNr() {
+//		return senderAccountNr;
+//	}
 
 
 
-	public void setSenderAccountNr(String senderAccountNr) {
-		this.senderAccountNr = senderAccountNr;
-	}
-	@Persistent
-	private String receiverAccountNr;
+//	public void setSenderAccountNr(String senderAccountNr) {
+//		this.senderAccountNr = senderAccountNr;
+//	}
+//	@Persistent
+//	private String receiverAccountNr;
+//	
+//	@Persistent
+//	private String receiverBankNr;
+
 	
-	@Persistent
-	private String receiverBankNr;
 
-	
-
-	public MoneyTransfer(double amount, Account sender, String receiverAccountNr,
-			String receiverBankNr) {
+	public MoneyTransfer( GeneralAccount sender, GeneralAccount receiver, double amount) {
 		super();
+		if (sender==null){
+			throw new RuntimeException("Sender may not be null");
+		}
+		if (receiver==null){
+			throw new RuntimeException("Receiver may not be null");
+		}
 		this.amount = amount;
-		this.senderAccountNr = sender.getAccountNr();
-		this.receiverAccountNr = receiverAccountNr;
-		this.receiverBankNr = receiverBankNr;
+		this.sender=sender.getId();
+		this.receiver=receiver.getId();
 	}
 
 
@@ -65,49 +77,27 @@ public class MoneyTransfer implements Serializable{
 		return id;
 	}
 
-	public String getReceiverAccountNr() {
-		return receiverAccountNr;
-	}
-
-	public String getReceiverBankNr() {
-		return receiverBankNr;
-	}
-
+	
 	
 
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
 
-	public void setReceiverAccountNr(String receiverAccountNr) {
-		this.receiverAccountNr = receiverAccountNr;
-	}
-
-	public void setReceiverBankNr(String receiverBankNr) {
-		this.receiverBankNr = receiverBankNr;
-	}
-
 	
-	@Override
-	public String toString() {
-		return "MoneyTransfer [amount="
-				+ amount
-				+ ", receiverAccountNr="
-				+ receiverAccountNr
-				+ ", "
-				+ (receiverBankNr != null ? "receiverBankNr=" + receiverBankNr
-						+ ", " : "")
-				+ (senderAccountNr != null ? "sender=" + senderAccountNr : "") + "]";
-	}
 	
-	public MoneyTransfer(MoneyTransferDTO dto){
-		setAmount(dto.getAmount());
-		setReceiverAccountNr(dto.getReceiverAccountNr());
-		setReceiverBankNr(dto.getReceiverBankNr());
-		setSenderAccountNr(dto.getSenderAccountNr());
-	}
 	public MoneyTransferDTO getDTO(){
-		MoneyTransferDTO dto=new MoneyTransferDTO(getAmount(),getSenderAccountNr(),getReceiverAccountNr(),getReceiverBankNr());
+		if (sender==null){
+			throw new RuntimeException("getDTO: Sender may not be null");
+		}
+		if (receiver==null){
+			throw new RuntimeException("getDTO: Receiver may not be null");
+		}
+		PersistenceManager pm= PMF.get().getPersistenceManager();
+		Account s=(Account)pm.getObjectById(sender);
+		Account r=(Account)pm.getObjectById(receiver);
+		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank().getBlz(),s.getAccountNr(),r.getBank().getBlz(),r.getAccountNr(),getAmount());
+		
 		return dto;
 	}
 	

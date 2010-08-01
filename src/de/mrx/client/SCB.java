@@ -39,6 +39,7 @@ public class SCB implements EntryPoint {
 	private static final String PAGEID_FEHLER = "fehler";
 	private static final String PAGEID_SIGN = "signInOut";
 
+	
 	RegisterServiceAsync registerSvc;
 	private BankingServiceAsync bankingService;
 	/**
@@ -50,12 +51,9 @@ public class SCB implements EntryPoint {
 			+ "connection and try again.";
 
 	private CheckBox agbBox;;
-//	private HorizontalPanel buttonPanel = new HorizontalPanel();
 	MenuBar generalMenu = new MenuBar(true);
 	
-//	private Button loginButton = new Button("Login");
-	// private Label status = new Label("Welcome to Cloud Banking");
-	private VerticalPanel mainPanel = new VerticalPanel();
+	private VerticalPanel mainPanel=new VerticalPanel();
 
 	private HorizontalPanel accountOverviewPanel = new HorizontalPanel();
 	private VerticalPanel accountsListPanel = new VerticalPanel();
@@ -72,8 +70,6 @@ public class SCB implements EntryPoint {
 	private Label plzLbl;
 	private Label cityLbl;
 	private Label emailLbl;
-//	private Label onlyGoogleAllowedLabel = new Label(
-//			"As a bank we need to rely on highest security standards. Therefore we need to require you having an google account. ");
 
 	private PasswordTextBox password;
 	private Label passwordLbl;
@@ -85,10 +81,8 @@ public class SCB implements EntryPoint {
 	
 	private HTMLTable registrationTable;
 
-	private IdentityDTO identityInfo = null;
+	private SCBIdentityDTO identityInfo = null;
 	private VerticalPanel loginPanel = new VerticalPanel();
-//	private Label loginLabel = new Label(
-//			"Please sign in to your Google Account to access the banking application.");
 
 	private Anchor signInLink = new Anchor("Sign In");
 	private Anchor signOutLink = new Anchor("Sign Out");
@@ -109,7 +103,7 @@ public class SCB implements EntryPoint {
 
 	private void doShowNoService() {
 
-		Window.alert("Our business will soon offer service. Please return! Soon!");
+		Window.alert("Our business will soon offer service. Please try again the other day!");
 
 	}
 
@@ -137,6 +131,10 @@ public class SCB implements EntryPoint {
 		plzTxt = new TextBox();
 		cityTxt = new TextBox();
 		emailTxt = new TextBox();
+		if (identityInfo!=null){
+			emailTxt.setText(identityInfo.getEmail());
+			emailTxt.setReadOnly(true);
+		}
 		password = new PasswordTextBox();
 		agbBox = new CheckBox("I accept the Terms Of Services");
 		registrationTable.setWidget(0, 0, nameLbl);
@@ -150,7 +148,7 @@ public class SCB implements EntryPoint {
 		registrationTable.setWidget(2, 2, cityLbl);
 		registrationTable.setWidget(2, 3, cityTxt);
 		registrationTable.setWidget(3, 0, passwordLbl);
-		registrationTable.setWidget(3, 1, password);
+//		registrationTable.setWidget(3, 1, password);
 		registrationTable.setWidget(4, 0, agbBox);
 		registrationTable.setWidget(4, 1, registerButton);
 
@@ -189,7 +187,7 @@ public class SCB implements EntryPoint {
 		String plz = plzTxt.getText();
 		String email = emailTxt.getText();
 
-		IdentityDTO id = new IdentityDTO(n);
+		SCBIdentityDTO id = new SCBIdentityDTO(n);
 		id.setStreet(str);
 		id.setCity(city);
 		id.setPlz(plz);
@@ -201,21 +199,21 @@ public class SCB implements EntryPoint {
 		AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
 			public void onFailure(Throwable caught) {
-				Window.alert("Shit happens");
-				GWT.log(caught.getMessage());
+				
+				
+				Window.alert("Registration fails! ");				
 
 			}
 
 			public void onSuccess(Void result) {
-				Window.alert("Register succesful");
-				// RootPanel
+				Window.alert("Gratulation. You have registered! We will progress your request as soon as we are able to!");
 				getRegistrationPanel().removeFromParent();
-
 			}
 		};
-		Log.info("CLIENT: ID :" + id);
+		
 		registerSvc.register(id, callback);
-		// TODO Auto-generated method stub
+		Window.Location.reload();
+
 
 	}
 
@@ -228,11 +226,10 @@ public class SCB implements EntryPoint {
 			GWT.log("On Module Load");
 			RootPanel r = RootPanel.get(PAGEID_HEADER);
 			if (r == null) {
-				GWT.log("Root nicht gefunden: '" + PAGEID_HEADER + "'");
+				GWT.log("Root not found: '" + PAGEID_HEADER + "'");
 				return;
 			}
-			GWT.log("Root gefunden");
-
+			
 			RootPanel.get(PAGEID_FEHLER).add(divLogger);
 			Log.setUncaughtExceptionHandler();
 
@@ -271,22 +268,11 @@ public class SCB implements EntryPoint {
 				}
 			};
 
-			Command cmdLogin = new Command() {
-				public void execute() {
-					GWT.log("Login starts. TODO");
-					// checkGoogleStatus();
 
-				}
-
-			};
 
 			MenuBar bankingMenu = new MenuBar(true);
-			bankingMenu.addItem("Private Banking", cmdLogin);
-			// bankingMenu.addItem("Institutional Banking", cmdShowNoService);
-			// bankingMenu.addItem("Depot ", cmdShowNoService);
 
 			informationMenu = new MenuBar(true);
-			// informationMenu.addItem("Partner", cmdShowNoService);
 			informationMenu.addItem("Impressum", cmdShowImpressum);
 			informationMenu.addItem("About Secure Cloud Computing",
 					cmdShowInfoSCB);
@@ -375,6 +361,9 @@ public class SCB implements EntryPoint {
 
 	}
 
+	/**
+	 * Initialize personalization
+	 */
 	private void checkGoogleStatus() {
 
 		if (bankingService == null) {
@@ -382,13 +371,14 @@ public class SCB implements EntryPoint {
 		}
 		GWT.log(GWT.getHostPageBaseURL());
 		bankingService.login(GWT.getHostPageBaseURL(),
-				new AsyncCallback<IdentityDTO>() {
+				new AsyncCallback<SCBIdentityDTO>() {
 					public void onFailure(Throwable error) {
 						error.printStackTrace();
-
+						Log.error("Login state can not be retrieved! ",error);
+						Window.alert("Login state can not be retrieved! Detail: "+error.getMessage());
 					}
 
-					public void onSuccess(IdentityDTO result) {
+					public void onSuccess(SCBIdentityDTO result) {
 						identityInfo = result;
 						if (identityInfo.isLoggedIn()) {
 							Log.info("Eingeloggt");
@@ -455,8 +445,9 @@ public class SCB implements EntryPoint {
 			}
 
 			public void onSuccess(Void result) {
-				Log.info("Account eröffnet");
-				Window.alert("You have opened a new account");
+				Log.info("Account created");
+				Window.alert("Your saving account is ready for service");
+				Window.Location.reload();
 
 			}
 		});
@@ -572,6 +563,7 @@ public class SCB implements EntryPoint {
 			
 			public void onSuccess(Void result) {
 				Window.alert("Money sent sucessfully");
+				Window.Location.reload();
 				
 			}
 		});

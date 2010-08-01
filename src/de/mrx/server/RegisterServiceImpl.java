@@ -8,7 +8,7 @@ import javax.jdo.PersistenceManager;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import de.mrx.client.IdentityDTO;
+import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.RegisterService;
 
 public class RegisterServiceImpl extends RemoteServiceServlet implements RegisterService{
@@ -19,8 +19,8 @@ public class RegisterServiceImpl extends RemoteServiceServlet implements Registe
 	 * 
 	 */
 	private static final long serialVersionUID = -1791669577170197531L;
-	public void register(IdentityDTO identity){	
-		Identity id=new Identity(identity);
+	public void register(SCBIdentityDTO identity){	
+		SCBIdentity id=new SCBIdentity(identity);
 		//At the moment, directly activate the user
 		id.setActivated(true);
 		
