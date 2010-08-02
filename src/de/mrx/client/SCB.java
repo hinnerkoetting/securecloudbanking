@@ -469,41 +469,28 @@ public class SCB implements EntryPoint {
 			}
 		});
 		accountsDetailsPanel.add(transferMoneyButton);
-		bankingService.getBalance(accNr,new AsyncCallback<Double>() {
+		bankingService.getAccountDetails(accNr,new AsyncCallback<AccountDetailDTO>() {
 
 			public void onFailure(Throwable caught) {
 				Log.error("Error loading balance", caught);
 				
 			}
 
-			public void onSuccess(Double result) {
-				Log.info("Balance: "+result);
-				accountsDetailsPanel.add(new Label("Your balance: "+result+" Dollar"));
-				
-			}
 			
-		});
-		bankingService.getTransaction(currentAccount, new AsyncCallback<List<MoneyTransferDTO>>() {
-
 			private HTMLTable accountDetailTable;
-
-			public void onFailure(Throwable caught) {
-				Log.error("Error loading transactions", caught);				
-			}
-
-			public void onSuccess(List<MoneyTransferDTO> result) {
-				if (result==null){
-					Log.error("No transactions");
-					accountsDetailsPanel.add(new Label("No transactions"));
-					return;
-				}
+			
+			public void onSuccess(AccountDetailDTO result) {
+				Log.info("Balance: "+result);
+				accountsDetailsPanel.add(new Label("Your balance: "+result.getBalance()+" Dollar"));
+				
 				if (accountDetailTable!=null){
 					accountsDetailsPanel.remove(accountDetailTable);
 				}
-				accountDetailTable = new Grid(result.size(),4);
+				List<MoneyTransferDTO> transfers=result.getTransfers();
+				accountDetailTable = new Grid(transfers.size(),4);
 				int pos=0;
-				Log.info("Einträge: "+result.size());
-				for (MoneyTransferDTO transfer: result){
+				Log.info("Eintraege: "+transfers.size());
+				for (MoneyTransferDTO transfer: transfers){
 					Log.info("Transfer: "+transfer);
 					accountDetailTable.setWidget(pos,0,new Label(transfer.getSenderAccountNr()));
 					accountDetailTable.setWidget(pos,1,new Label(transfer.getReceiverAccountNr()));
@@ -513,9 +500,58 @@ public class SCB implements EntryPoint {
 				}
 				accountsDetailsPanel.add(accountDetailTable);
 
+			
 				
 			}
 		});
+		
+//		bankingService.getBalance(accNr,new AsyncCallback<Double>() {
+//
+//			public void onFailure(Throwable caught) {
+//				Log.error("Error loading balance", caught);
+//				
+//			}
+//
+//			public void onSuccess(Double result) {
+//				Log.info("Balance: "+result);
+//				accountsDetailsPanel.add(new Label("Your balance: "+result+" Dollar"));
+//				
+//			}
+//			
+//		});
+//		bankingService.getTransaction(currentAccount, new AsyncCallback<List<MoneyTransferDTO>>() {
+//
+//			private HTMLTable accountDetailTable;
+//
+//			public void onFailure(Throwable caught) {
+//				Log.error("Error loading transactions", caught);				
+//			}
+//
+//			public void onSuccess(List<MoneyTransferDTO> result) {
+//				if (result==null){
+//					Log.error("No transactions");
+//					accountsDetailsPanel.add(new Label("No transactions"));
+//					return;
+//				}
+//				if (accountDetailTable!=null){
+//					accountsDetailsPanel.remove(accountDetailTable);
+//				}
+//				accountDetailTable = new Grid(result.size(),4);
+//				int pos=0;
+//				Log.info("Einträge: "+result.size());
+//				for (MoneyTransferDTO transfer: result){
+//					Log.info("Transfer: "+transfer);
+//					accountDetailTable.setWidget(pos,0,new Label(transfer.getSenderAccountNr()));
+//					accountDetailTable.setWidget(pos,1,new Label(transfer.getReceiverAccountNr()));
+//					accountDetailTable.setWidget(pos,2,new Label(""+transfer.getAmount()));
+//					pos++;
+//					
+//				}
+//				accountsDetailsPanel.add(accountDetailTable);
+//
+//				
+//			}
+//		});
 	}
 
 	protected void sendMoney(String accNr) {

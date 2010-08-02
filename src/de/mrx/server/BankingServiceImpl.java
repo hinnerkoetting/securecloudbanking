@@ -19,6 +19,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import de.mrx.client.AccountDTO;
+import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.BankingService;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.MoneyTransferDTO;
@@ -213,6 +214,11 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 //		 pm.currentTransaction().commit();
 		
 
+	}
+
+	public AccountDetailDTO getAccountDetails(String accountNr) {
+		Account acc=Account.getOwnByAccountNr(accountNr);
+		return acc.getDetailedDTO();
 	}
 
 }

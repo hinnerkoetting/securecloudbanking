@@ -16,6 +16,8 @@ public interface BankingService extends RemoteService {
 	
 	public List<MoneyTransferDTO> getTransaction(String accountNr);
 	
+	public AccountDetailDTO getAccountDetails(String accountNr);
+	
 	public void openNewAccount();
 	
 	public void sendMoney(String senderAccountNr, String blz, String accountNr, double amount);

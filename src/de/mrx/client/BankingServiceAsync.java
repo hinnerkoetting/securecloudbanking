@@ -22,4 +22,7 @@ public interface BankingServiceAsync {
 	void sendMoney(String senderAccountNr, String blz, String accountNr, double amount,
 			AsyncCallback<Void> callback);
 
+	void getAccountDetails(String accountNr,
+			AsyncCallback<AccountDetailDTO> callback);
+
 }

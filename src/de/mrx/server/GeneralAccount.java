@@ -17,6 +17,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 import javax.jdo.annotations.InheritanceStrategy;
 import de.mrx.client.AccountDTO;
+import de.mrx.client.AccountDetailDTO;
 
 
 @PersistenceCapable
@@ -69,6 +70,17 @@ public abstract class GeneralAccount {
 		AccountDTO dto = new AccountDTO(getOwner(), getAccountNr());
 		return dto;
 	}
+	
+	
+	public AccountDetailDTO getDetailedDTO() {
+		AccountDetailDTO dto = new AccountDetailDTO(getOwner(), getAccountNr());
+		for (MoneyTransfer m:getTransfers()){
+			dto.addTranfer(m.getDTO());
+		}
+		
+		return dto;
+	}
+	
 
 	public Key getId() {
 		return id;
