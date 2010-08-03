@@ -4,6 +4,9 @@ import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+
 import de.mrx.client.AccountDTO;
 
 @PersistenceCapable
@@ -11,6 +14,9 @@ public class ExternalAccount extends GeneralAccount {
 
 	public ExternalAccount(String owner, String accountNr, Bank bank) {
 		super(owner, accountNr, bank);
+		Key key = KeyFactory.createKey(ExternalAccount.class.getSimpleName(), accountNr);
+		setId(key);
+
 	}
 
 	public static ExternalAccount getAccountByBLZAndAccountNr(Bank bank, String accountNr){

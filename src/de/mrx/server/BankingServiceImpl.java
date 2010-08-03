@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.Key;
+import javax.jdo.annotations.PersistenceAware;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -25,6 +26,7 @@ import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.MoneyTransferDTO;
 
 @SuppressWarnings("serial")
+@PersistenceAware
 public class BankingServiceImpl extends RemoteServiceServlet implements
 		BankingService {
 
@@ -170,14 +172,18 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			String receiveraccountNr, double amount) {
 		
 		Account senderAccount = Account.getOwnByAccountNr(senderAccountNr);
+		if (senderAccount==null){
+			throw new RuntimeException("Sender Account "+senderAccountNr+" existiert nicht!");
+		}
 
 		 
 
 		Bank receiverBank = Bank.getByBLZ(blz);
 		if (receiverBank == null) {
 			receiverBank = new Bank(blz.trim(), "Neue Bank");
-			
+			pm.currentTransaction().begin();
 			pm.makePersistent(receiverBank);
+			pm.currentTransaction().commit();
 			
 		}
 
@@ -193,25 +199,27 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			
 			if (recAccount == null) {
 				log.info("Account"+ receiveraccountNr+" is not yet known at "+receiverBank.getName()+"("+receiverBank.getBlz()+"). Create it.");
-//				pm.currentTransaction().begin();
+				pm.currentTransaction().begin();
 				recAccount = new ExternalAccount("Unbekannt",
-						receiveraccountNr, receiverBank);
-				pm.makePersistent(recAccount);
+						receiveraccountNr, receiverBank);				
 				receiverBank.addAccount(recAccount);
 				
-//				pm.currentTransaction().commit();
+				pm.currentTransaction().commit();
 			}
 		}
-
+//		pm.currentTransaction().commit();
 		MoneyTransfer transfer = new MoneyTransfer(senderAccount, recAccount,
 				amount);
-		pm.makePersistent(transfer);
+		pm.currentTransaction().begin();
+		
+//		pm.makePersistent(transfer);
 		senderAccount.addMoneyTransfer(transfer);
-		recAccount.addMoneyTransfer(transfer);
+//		recAccount.addMoneyTransfer(transfer);
 		
 
 		senderAccount.setBalance(senderAccount.getBalance() - amount);
-//		 pm.currentTransaction().commit();
+
+		 pm.currentTransaction().commit();
 		
 
 	}

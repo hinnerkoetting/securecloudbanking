@@ -7,6 +7,7 @@ import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.PersistenceAware;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -30,6 +31,14 @@ public abstract class GeneralAccount {
 	private Key bankID;
 
 	
+	public Key getBankID() {
+		return bankID;
+	}
+
+	public void setBankID(Key bankID) {
+		this.bankID = bankID;
+	}
+
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
@@ -38,12 +47,21 @@ public abstract class GeneralAccount {
 	private String owner;
 
 	@Persistent
-	List<Key> transfers = new ArrayList<Key>();
+	List<MoneyTransfer> transfers;
 
+	public void setTransfers(List<MoneyTransfer> transfers) {
+		this.transfers = transfers;
+	}
+
+	public GeneralAccount(){
+		 transfers=new ArrayList<MoneyTransfer>();
+	}
+	
 	public GeneralAccount(AccountDTO dto, Bank bank) {
 		this.owner = dto.getOwner();
 		this.accountNr = dto.getAccountNr();
 		this.bankID=bank.getId();
+		transfers= new ArrayList<MoneyTransfer>();
 
 	}
 
@@ -51,11 +69,12 @@ public abstract class GeneralAccount {
 		this.owner=owner;
 		this.accountNr=accountNr;
 		this.bankID=bank.getId();
+		transfers= new ArrayList<MoneyTransfer>();
 		
 	}
 
 	public void addMoneyTransfer(MoneyTransfer transfer) {
-		transfers.add(transfer.getId());
+		transfers.add(transfer);
 	}
 
 	public String getAccountNr() {
@@ -63,7 +82,7 @@ public abstract class GeneralAccount {
 	}
 
 	public Bank getBank() {
-		Bank bank=PMF.get().getPersistenceManager().getObjectById(Bank.class,getId());
+		Bank bank=PMF.get().getPersistenceManager().getObjectById(Bank.class,getBankID());
 		return bank;
 	}
 	public AccountDTO getDTO() {
@@ -91,12 +110,7 @@ public abstract class GeneralAccount {
 	}
 
 	public List<MoneyTransfer> getTransfers() {
-		List<MoneyTransfer> result=new ArrayList<MoneyTransfer>();
-		PersistenceManager pm=PMF.get().getPersistenceManager();
-		for (Key k:transfers){
-			result.add((MoneyTransfer) pm.getObjectById(k));
-		}
-		return result;
+		return transfers;
 	}
 
 	public void setAccountNr(String accountNr) {

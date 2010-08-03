@@ -24,6 +24,10 @@ public class Account extends GeneralAccount implements Serializable{
     @Persistent
 	private double balance;//current money
     
+    public Account(){
+    	
+    }
+    
     public Account( String owner, String accountNr, double balance, Bank bank) {
 		super(owner,accountNr, bank);
 		this.balance = balance;		
