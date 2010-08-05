@@ -1,5 +1,6 @@
 package de.mrx.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.allen_sauer.gwt.log.client.DivLogger;
@@ -8,6 +9,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -100,6 +103,8 @@ public class SCB implements EntryPoint {
 	private TextBox receiverBankNrTxt;
 
 	private TextBox amountTxt;
+
+	private List <String > hints= new ArrayList<String>();
 
 	private void doShowNoService() {
 
@@ -554,6 +559,49 @@ public class SCB implements EntryPoint {
 //		});
 	}
 
+	private boolean isSendMoneyFormValid(){
+		boolean result=true;
+		Log.info("Text: "+receiverAccountNrTxt.getText());
+		hints.clear() ;
+		if (receiverAccountNrTxt.getText().trim().toUpperCase().matches("^[0-9]{1,10}$")) {
+			 
+			receiverAccountNrTxt.setStyleName("ValueOkay");
+
+		}		
+		else{		 
+			 receiverAccountNrTxt.setStyleName("ValueNotOkay");
+				hints.add("Account may only contain numbers");
+			result=false;
+			
+		}
+		
+		if (receiverBankNrTxt.getText().trim().toUpperCase().matches("^[0-9]{1,10}$")) {
+			 
+			receiverBankNrTxt.setStyleName("ValueOkay");
+			hints.add("BLZ may only contain numbers");
+		}		
+		else{
+		 
+			receiverBankNrTxt.setStyleName("ValueNotOkay");			
+			result=false;
+			
+		}
+		
+		if (amountTxt.getText().trim().toUpperCase().matches("^[0-9]{1,5}[\\.]?[0-9]{0,2}$")) {
+			 
+			amountTxt.setStyleName("ValueOkay");
+			hints.add("Amount may only contain a value between 0.00 and 9999.99.");
+		}		
+		else{
+		 
+			amountTxt.setStyleName("ValueNotOkay");			
+			result=false;
+			
+		}
+
+		return result;
+	}
+	
 	protected void sendMoney(String accNr) {
 		accountsDetailsPanel.clear();
 		HTMLTable transferForm = new Grid(6, 4);
@@ -567,7 +615,10 @@ public class SCB implements EntryPoint {
 		sendMoneyBtn.addClickHandler(new ClickHandler() {
 			
 			public void onClick(ClickEvent event) {
-				doSendMoney();
+				boolean formOkay=isSendMoneyFormValid();
+				if (isSendMoneyFormValid()){
+					doSendMoney();
+				}
 				
 			}
 		});
