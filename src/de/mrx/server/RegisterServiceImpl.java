@@ -40,11 +40,9 @@ public class RegisterServiceImpl extends RemoteServiceServlet implements Registe
 		 Session session = Session.getDefaultInstance(props, null);
 
 		Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress("JanOettting@googlemail.com", "Secure Cloud Banking Service"));
+        msg.setFrom(new InternetAddress("activation@securecloudbanking.appspotmail.com", "support@securecloudbanking.appspotmail.com"));
         msg.addRecipient(Message.RecipientType.TO,
                          new InternetAddress(id.getEmail(),id.getName()));
-        log.severe("Sender: "+msg.getFrom());
-//        log.info("Receiver: "+msg.getRecipie);
         msg.setSubject("Your Example.com account has been activated");
         msg.setText("Congratulations. You have activated your account at Secure Cloud Banking");
         Transport.send(msg);
@@ -60,11 +58,7 @@ public class RegisterServiceImpl extends RemoteServiceServlet implements Registe
 		catch (UnsupportedEncodingException e){
 			throw new SCBException("Registration currently not possible",e);
 		}
-		catch (Exception e){
-			log.severe(e.getMessage());
-			e.printStackTrace();
-			
-		}
+		
 		  finally {
             pm.close();
         }
