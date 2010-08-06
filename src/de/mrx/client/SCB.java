@@ -17,6 +17,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -28,6 +29,8 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+
+import de.mrx.shared.SCBException;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -41,6 +44,9 @@ public class SCB implements EntryPoint {
 	private static final String PAGEID_CONTENT = "content";
 	private static final String PAGEID_FEHLER = "fehler";
 	private static final String PAGEID_SIGN = "signInOut";
+	
+	private final static String STYLE_VALUE_NOT_OKAY="ValueNotOkay";
+	private final static String STYLE_VALUE_OKAY="ValueOkay";
 
 	
 	RegisterServiceAsync registerSvc;
@@ -61,6 +67,8 @@ public class SCB implements EntryPoint {
 	private HorizontalPanel accountOverviewPanel = new HorizontalPanel();
 	private VerticalPanel accountsListPanel = new VerticalPanel();
 	private VerticalPanel accountsDetailsPanel = new VerticalPanel();
+	
+	FlexTable validateErrorTable=new FlexTable();
 
 	private TextBox nameTxt;
 	private TextBox streetTxt;
@@ -128,17 +136,20 @@ public class SCB implements EntryPoint {
 		streetLbl = new Label("Your street: ");
 		plzLbl = new Label("Postal Code: ");
 		cityLbl = new Label("City: ");
-		emailLbl = new Label("Email: ");
+		emailLbl = new Label("Email (currently only Googlemail accepted): ");
 
 		passwordLbl = new Label("Your desired password: ");
 		nameTxt = new TextBox();
 		streetTxt = new TextBox();
 		plzTxt = new TextBox();
 		cityTxt = new TextBox();
-		emailTxt = new TextBox();
-		if (identityInfo!=null){
+		emailTxt = new TextBox();		
+		if (identityInfo!=null && (identityInfo.getEmail()!=null)){
 			emailTxt.setText(identityInfo.getEmail());
 			emailTxt.setReadOnly(true);
+		}
+		else{
+			Log.info("Email ist editierbar");
 		}
 		password = new PasswordTextBox();
 		agbBox = new CheckBox("I accept the Terms Of Services");
@@ -152,33 +163,30 @@ public class SCB implements EntryPoint {
 		registrationTable.setWidget(2, 1, plzTxt);
 		registrationTable.setWidget(2, 2, cityLbl);
 		registrationTable.setWidget(2, 3, cityTxt);
-		registrationTable.setWidget(3, 0, passwordLbl);
+//		registrationTable.setWidget(3, 0, passwordLbl);
 //		registrationTable.setWidget(3, 1, password);
-		registrationTable.setWidget(4, 0, agbBox);
+//		registrationTable.setWidget(4, 0, agbBox);
 		registrationTable.setWidget(4, 1, registerButton);
 
 		registerButton.addClickHandler(new ClickHandler() {
 
 			public void onClick(ClickEvent event) {
-				register();
+				validateErrorTable.clear();
+				
+				if (isRegisterFormValid()){
+					register();
+				}
+				else{
+					
+					createHintTable();
+					registrationPanel.add(validateErrorTable);
+				}
+				
 
 			}
 		});
 		registrationPanel.add(registrationTable);
 
-		// if (identityInfo==null){
-		// Window.alert("Logininformation not available!");
-		//
-		// }
-		// if (!identityInfo.isLoggedIn()){
-		// Label registrationOnlyWithLogin=new
-		// Label("Remember: SCB only offers its services to Google customer. Please sign in!");
-		// RootPanel.get(PAGEID_CONTENT).insert(registrationOnlyWithLogin, 0);
-		//
-		// }
-		// else{
-		// GWT.log("Eingeloggt");
-		// }
 
 		return registrationPanel;
 	}
@@ -186,7 +194,6 @@ public class SCB implements EntryPoint {
 	protected void register() {
 
 		String n = nameTxt.getText();
-//		String pw = password.getText();
 		String str = streetTxt.getText();
 		String city = cityTxt.getText();
 		String plz = plzTxt.getText();
@@ -205,19 +212,26 @@ public class SCB implements EntryPoint {
 
 			public void onFailure(Throwable caught) {
 				
-				
-				Window.alert("Registration fails! ");				
+				if (caught instanceof SCBException ){
+					SCBException scbE=(SCBException) caught;
+					Window.alert(caught.getMessage()+": "+((SCBException) caught).getDetailMessage());
+				}
+				else{				
+					Window.alert("Registration fails! Reason: "+caught.getMessage());		
+					caught.printStackTrace();
+				}
 
 			}
 
 			public void onSuccess(Void result) {
 				Window.alert("Gratulation. You have registered! We will progress your request as soon as we are able to!");
 				getRegistrationPanel().removeFromParent();
+				checkGoogleStatus();
 			}
 		};
 		
 		registerSvc.register(id, callback);
-		Window.Location.reload();
+//		Window.Location.reload();
 
 
 	}
@@ -354,12 +368,8 @@ public class SCB implements EntryPoint {
 				});
 				Log.info("Vor einbinden in oberpanel");
 				accountsListPanel.add(neuerAccountBtn);
-//				RootPanel.get(PAGEID_CONTENT).remove(0);
-//				RootPanel.get(PAGEID_CONTENT).remove(0);
-//				RootPanel.get(PAGEID_CONTENT).remove(0);
-//				RootPanel.get(PAGEID_CONTENT).remove(0);
 				RootPanel.get(PAGEID_CONTENT).add(accountOverviewPanel);
-				Log.info("Account√ºbersicht fertig geladen");
+				Log.info("Account Uebersicht fertig geladen");
 
 			}
 		});
@@ -559,48 +569,65 @@ public class SCB implements EntryPoint {
 //		});
 	}
 
+	
+	private boolean isFieldConfirmToExpresion(TextBox input, String expression, String errorMessage){
+		if (input.getText().trim().toUpperCase().matches(expression)) {
+			input.setStyleName(STYLE_VALUE_OKAY);
+			return true;
+		}
+		else{
+			input.setStyleName(STYLE_VALUE_NOT_OKAY);
+			Log.info("Text: '"+input.getText()+"'\tExpression: "+expression);
+			hints.add(errorMessage);
+			return false;
+		}
+		
+		
+	}
+	
 	private boolean isSendMoneyFormValid(){
 		boolean result=true;
 		Log.info("Text: "+receiverAccountNrTxt.getText());
 		hints.clear() ;
-		if (receiverAccountNrTxt.getText().trim().toUpperCase().matches("^[0-9]{1,10}$")) {
-			 
-			receiverAccountNrTxt.setStyleName("ValueOkay");
-
-		}		
-		else{		 
-			 receiverAccountNrTxt.setStyleName("ValueNotOkay");
-				hints.add("Account may only contain numbers");
+		if (!isFieldConfirmToExpresion(receiverAccountNrTxt,"^[0-9]{1,10}$","Account may only contain numbers")){
 			result=false;
-			
 		}
-		
-		if (receiverBankNrTxt.getText().trim().toUpperCase().matches("^[0-9]{1,10}$")) {
-			 
-			receiverBankNrTxt.setStyleName("ValueOkay");
-			hints.add("BLZ may only contain numbers");
-		}		
-		else{
-		 
-			receiverBankNrTxt.setStyleName("ValueNotOkay");			
+		if (!isFieldConfirmToExpresion(receiverBankNrTxt,"^[0-9]{1,10}$","BLZ may only contain numbers")){
 			result=false;
-			
 		}
-		
-		if (amountTxt.getText().trim().toUpperCase().matches("^[0-9]{1,5}[\\.]?[0-9]{0,2}$")) {
-			 
-			amountTxt.setStyleName("ValueOkay");
-			hints.add("Amount may only contain a value between 0.00 and 9999.99.");
-		}		
-		else{
-		 
-			amountTxt.setStyleName("ValueNotOkay");			
+		if (!isFieldConfirmToExpresion(amountTxt,"^[0-9]{1,5}[\\.]?[0-9]{0,2}$","Amount may only contain a value between 0.00 and 9999.99.")){
 			result=false;
-			
 		}
-
 		return result;
 	}
+	
+	
+	private boolean isRegisterFormValid(){
+		boolean result=true;
+		
+		hints.clear() ;
+		
+		if (!isFieldConfirmToExpresion(nameTxt,"[\\w]+","Please enter a valid name!")){
+			result=false;
+		}
+		if (!isFieldConfirmToExpresion(emailTxt,"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b","Please enter a valid email address!")){
+			result=false;
+		}
+		if (!isFieldConfirmToExpresion(streetTxt,"[\\w \\d‰ƒˆ÷¸‹]+","Please enter a valid street name!")){
+			result=false;
+		}		
+		if (!isFieldConfirmToExpresion(plzTxt,"[\\d]+","Please enter a valid postal code!")){
+			result=false;
+		}
+
+		if (!isFieldConfirmToExpresion(cityTxt,"[\\w]+","Please enter a city! ")){
+			result=false;
+		}
+
+		
+		return result;
+	}
+	
 	
 	protected void sendMoney(String accNr) {
 		accountsDetailsPanel.clear();
@@ -615,12 +642,20 @@ public class SCB implements EntryPoint {
 		sendMoneyBtn.addClickHandler(new ClickHandler() {
 			
 			public void onClick(ClickEvent event) {
-				boolean formOkay=isSendMoneyFormValid();
+				validateErrorTable.clear();
+				
 				if (isSendMoneyFormValid()){
 					doSendMoney();
 				}
+				else{
+					
+					createHintTable();
+					accountsDetailsPanel.add(validateErrorTable);
+				}
 				
 			}
+
+			
 		});
 		transferForm.setWidget(0,0,receiverAccountNrLbl);
 		transferForm.setWidget(0,1,receiverAccountNrTxt);
@@ -656,4 +691,13 @@ public class SCB implements EntryPoint {
 		});
 		
 	}
+	
+	private void createHintTable() {
+		for (int i=0;i<hints.size();i++){
+			String currentMessage=hints.get(i);			
+			Label hintLabel=new Label(currentMessage);
+			hintLabel.setStyleName(STYLE_VALUE_NOT_OKAY);
+			validateErrorTable.setWidget(i,1,hintLabel);
+		}
+	}	
 }
