@@ -11,6 +11,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -111,6 +112,7 @@ public class SCB implements EntryPoint {
 	private TextBox receiverBankNrTxt;
 
 	private TextBox amountTxt;
+	private TextBox remarkTxt;
 
 	private List <String > hints= new ArrayList<String>();
 
@@ -502,18 +504,23 @@ public class SCB implements EntryPoint {
 					accountsDetailsPanel.remove(accountDetailTable);
 				}
 				List<MoneyTransferDTO> transfers=result.getTransfers();
-				accountDetailTable = new Grid(transfers.size(),4);
-				int pos=0;
+				accountDetailTable = new Grid(transfers.size()+1,4);
+				accountDetailTable.setWidget(0,0,new Label("Date"));
+				accountDetailTable.setWidget(0,1,new Label("Comment"));
+				accountDetailTable.setWidget(0,2,new Label("Account"));
+				accountDetailTable.setWidget(0,3,new Label("Amount"));
+				int pos=1;
 				Log.info("Eintraege: "+transfers.size());
 				for (MoneyTransferDTO transfer: transfers){
 					Log.info("Transfer: "+transfer);
-					accountDetailTable.setWidget(pos,0,new Label(transfer.getSenderAccountNr()));
-					accountDetailTable.setWidget(pos,1,new Label(transfer.getReceiverAccountNr()));
-					accountDetailTable.setWidget(pos,2,new Label(""+transfer.getAmount()));
+					accountDetailTable.setWidget(pos,0,new Label(DateTimeFormat.getMediumDateFormat().format(transfer.getTimestamp())));
+					accountDetailTable.setWidget(pos,1,new Label(transfer.getRemark()));
+					accountDetailTable.setWidget(pos,2,new Label(transfer.getReceiverBankNr()+": "+ transfer.getReceiverAccountNr()));
+					accountDetailTable.setWidget(pos,3,new Label(""+transfer.getAmount()));
 					pos++;
 					
 				}
-				accountsDetailsPanel.add(accountDetailTable);
+				accountsDetailsPanel.insert(accountDetailTable,0);
 
 			
 				
@@ -635,9 +642,11 @@ public class SCB implements EntryPoint {
 		Label receiverAccountNrLbl=new Label("Receiver Account Nr:");
 		Label receiverBankNrLbl=new Label("Receiver Bank number");
 		Label amountLbl=new Label("Amount");
+		Label remarkLbl=new Label("Remark");
 		receiverAccountNrTxt = new TextBox();
 		receiverBankNrTxt = new TextBox();
 		amountTxt = new TextBox();
+		remarkTxt=new TextBox();
 		Button sendMoneyBtn=new Button("Send Money");
 		sendMoneyBtn.addClickHandler(new ClickHandler() {
 			
@@ -663,7 +672,9 @@ public class SCB implements EntryPoint {
 		transferForm.setWidget(1,1,receiverBankNrTxt);
 		transferForm.setWidget(2,0,amountLbl);
 		transferForm.setWidget(2,1,amountTxt);
-		transferForm.setWidget(3,1,sendMoneyBtn);
+		transferForm.setWidget(3,0,remarkLbl);
+		transferForm.setWidget(3,1,remarkTxt);
+		transferForm.setWidget(4,1,sendMoneyBtn);
 		
 		accountsDetailsPanel.add(transferForm);
 		
@@ -675,7 +686,8 @@ public class SCB implements EntryPoint {
 		}
 		
 		Double amount=Double.parseDouble( amountTxt.getText());
-		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,new AsyncCallback<Void>() {
+		String remark=remarkTxt.getText();
+		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,new AsyncCallback<Void>() {
 
 			public void onFailure(Throwable caught) {
 				Log.error("Sending money failed",caught);

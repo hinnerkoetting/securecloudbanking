@@ -19,7 +19,7 @@ public interface BankingServiceAsync {
 
 	void getBalance(String accountNr, AsyncCallback<Double> callback);
 
-	void sendMoney(String senderAccountNr, String blz, String accountNr, double amount,
+	void sendMoney(String senderAccountNr, String blz, String accountNr, double amount, String remark,
 			AsyncCallback<Void> callback);
 
 	void getAccountDetails(String accountNr,

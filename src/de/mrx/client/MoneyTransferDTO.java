@@ -1,6 +1,7 @@
 package de.mrx.client;
 
 import java.io.Serializable;
+import java.util.Date;
 
 
 public class MoneyTransferDTO implements Serializable{
@@ -8,6 +9,28 @@ public class MoneyTransferDTO implements Serializable{
 	
 	private boolean selfSended=false;
 	private double amount;
+	private String remark;
+	private Date timestamp;
+
+
+	public String getRemark() {
+		return remark;
+	}
+
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
 
 
 	public boolean isSelfSended() {

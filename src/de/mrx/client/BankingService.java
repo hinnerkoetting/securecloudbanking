@@ -20,7 +20,7 @@ public interface BankingService extends RemoteService {
 	
 	public void openNewAccount();
 	
-	public void sendMoney(String senderAccountNr, String blz, String accountNr, double amount);
+	public void sendMoney(String senderAccountNr, String blz, String accountNr, double amount, String remark);
 
 	
 

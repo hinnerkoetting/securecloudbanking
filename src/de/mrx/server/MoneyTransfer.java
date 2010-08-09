@@ -1,6 +1,7 @@
 package de.mrx.server;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -22,75 +23,39 @@ public class MoneyTransfer implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	public String getReceiverAccountNr() {
-		return receiverAccountNr;
-	}
-
-
-	public void setReceiverAccountNr(String receiverAccountNr) {
-		this.receiverAccountNr = receiverAccountNr;
-	}
-
-
-	public String getReceiverBLZ() {
-		return receiverBLZ;
-	}
-
-
-	public void setReceiverBLZ(String receiverBLZ) {
-		this.receiverBLZ = receiverBLZ;
-	}
-
-
-	public String getSenderAccountNr() {
-		return senderAccountNr;
-	}
-
-
-	public void setSenderAccountNr(String senderAccountNr) {
-		this.senderAccountNr = senderAccountNr;
-	}
-
-
-	public String getSenderBLZ() {
-		return senderBLZ;
-	}
-
-
-	public void setSenderBLZ(String senderBLZ) {
-		this.senderBLZ = senderBLZ;
-	}
-
-
-
+	
 	@Persistent
 	private double amount;
-
 	
 	@PrimaryKey
 	 @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
-	
-	public void setId(Key id) {
-		this.id = id;
-	}
-
-
+ 
 
 	@Persistent
 	private String receiverAccountNr;
 
+
 	@Persistent
 	private String receiverBLZ;
+
+	@Persistent
+	private String remark;
 
 
 	@Persistent
 	private String senderAccountNr;
+
+
 	
+
 	@Persistent
 	private String senderBLZ;
-	
+
+	@Persistent
+	private Date timestamp;
+
+
 	public MoneyTransfer(){
 		
 	}
@@ -108,15 +73,15 @@ public class MoneyTransfer implements Serializable{
 		senderAccountNr=sender.getAccountNr();
 		senderBLZ=sender.getBank().getBlz();
 		receiverAccountNr=receiver.getAccountNr();
-		receiverBLZ=receiver.getBank().getBlz();		
+		receiverBLZ=receiver.getBank().getBlz();
+		timestamp=new Date();
+		
 	}
-
 
 
 	public double getAmount() {
 		return amount;
 	}
-
 
 
 	public MoneyTransferDTO getDTO(){
@@ -130,6 +95,8 @@ public class MoneyTransfer implements Serializable{
 		ExternalAccount r=(ExternalAccount)ExternalAccount.getAccountByBLZAndAccountNr(b,receiverAccountNr);
 		if (r!=null){
 		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank().getBlz(),s.getAccountNr(),r.getBank().getBlz(),r.getAccountNr(),getAmount());
+		dto.setTimestamp(getTimestamp());
+		dto.setRemark(getRemark());
 		
 			return dto;
 		}
@@ -140,13 +107,80 @@ public class MoneyTransfer implements Serializable{
 			dto.setSenderBankNr(s.getBank().getBlz());
 			dto.setReceiverAccountNr("Unbekannt");
 			dto.setReceiverBankNr("Unbekannt");
+			dto.setRemark(getRemark());
+			dto.setTimestamp(getTimestamp());
 			return dto;
 			
 		}
 	}
-	
+
+
 	public Key getId() {
 		return id;
+	}
+
+
+	public String getReceiverAccountNr() {
+		return receiverAccountNr;
+	}
+
+
+
+	public String getReceiverBLZ() {
+		return receiverBLZ;
+	}
+
+	
+	public String getRemark() {
+		return remark;
+	}
+	
+	public String getSenderAccountNr() {
+		return senderAccountNr;
+	}
+
+
+
+	public String getSenderBLZ() {
+		return senderBLZ;
+	}
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
+	
+	public void setId(Key id) {
+		this.id = id;
+	}
+	
+	public void setReceiverAccountNr(String receiverAccountNr) {
+		this.receiverAccountNr = receiverAccountNr;
+	}
+
+
+	public void setReceiverBLZ(String receiverBLZ) {
+		this.receiverBLZ = receiverBLZ;
+	}
+
+
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+
+
+	public void setSenderAccountNr(String senderAccountNr) {
+		this.senderAccountNr = senderAccountNr;
+	}
+	
+	public void setSenderBLZ(String senderBLZ) {
+		this.senderBLZ = senderBLZ;
 	}
 	
 
@@ -154,8 +188,8 @@ public class MoneyTransfer implements Serializable{
 
 
 	
-	public void setAmount(double amount) {
-		this.amount = amount;
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	

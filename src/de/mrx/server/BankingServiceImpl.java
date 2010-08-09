@@ -148,6 +148,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	}
 
 	public void openNewAccount() {
+		try{
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		if (user == null) {
@@ -161,16 +162,23 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		acc.setBank(ownBank);
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-
+		pm.currentTransaction().begin();
 		pm.makePersistent(acc);
 		ownBank.addAccount(acc);
+		pm.currentTransaction().commit();
 		log.info("account neu geoeffnet : " + acc);
+		}
+		finally{
+			if (pm.currentTransaction().isActive()){
+				pm.currentTransaction().rollback();
+			}
+		}
 
 	}
 
 	public void sendMoney(String senderAccountNr, String blz,
-			String receiveraccountNr, double amount) {
-		
+			String receiveraccountNr, double amount, String remark) {
+		try{
 		Account senderAccount = Account.getOwnByAccountNr(senderAccountNr);
 		if (senderAccount==null){
 			throw new RuntimeException("Sender Account "+senderAccountNr+" existiert nicht!");
@@ -210,6 +218,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 //		pm.currentTransaction().commit();
 		MoneyTransfer transfer = new MoneyTransfer(senderAccount, recAccount,
 				amount);
+		transfer.setRemark(remark);
 		pm.currentTransaction().begin();
 		
 //		pm.makePersistent(transfer);
@@ -221,7 +230,12 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 
 		 pm.currentTransaction().commit();
 		
-
+		}
+		finally{
+			if (pm.currentTransaction().isActive()){
+				pm.currentTransaction().rollback();
+			}
+		}
 	}
 
 	public AccountDetailDTO getAccountDetails(String accountNr) {
