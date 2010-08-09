@@ -505,20 +505,44 @@ public class SCB implements EntryPoint {
 				}
 				List<MoneyTransferDTO> transfers=result.getTransfers();
 				accountDetailTable = new Grid(transfers.size()+1,4);
-				accountDetailTable.setWidget(0,0,new Label("Date"));
-				accountDetailTable.setWidget(0,1,new Label("Comment"));
-				accountDetailTable.setWidget(0,2,new Label("Account"));
-				accountDetailTable.setWidget(0,3,new Label("Amount"));
+				Label dateLbl=new Label("Date");
+				Label commentLbl=new Label("Comment");
+				Label accountLbl=new Label("Account");
+				Label amountLbl=new Label("Amount");
+				commentLbl.setStyleName("TransfersHeader");
+				dateLbl.setStyleName("TransfersHeader");
+				accountLbl.setStyleName("TransfersHeader");
+				amountLbl.setStyleName("TransfersHeader");
+				
+				accountDetailTable.setWidget(0,0,dateLbl);
+				accountDetailTable.setWidget(0,1,commentLbl);
+				accountDetailTable.setWidget(0,2,accountLbl);
+				accountDetailTable.setWidget(0,3,amountLbl);
 				int pos=1;
 				Log.info("Eintraege: "+transfers.size());
 				for (MoneyTransferDTO transfer: transfers){
 					Log.info("Transfer: "+transfer);
-					accountDetailTable.setWidget(pos,0,new Label(DateTimeFormat.getMediumDateFormat().format(transfer.getTimestamp())));
-					accountDetailTable.setWidget(pos,1,new Label(transfer.getRemark()));
-					accountDetailTable.setWidget(pos,2,new Label(transfer.getReceiverBankNr()+": "+ transfer.getReceiverAccountNr()));
-					accountDetailTable.setWidget(pos,3,new Label(""+transfer.getAmount()));
-					pos++;
-					
+					Label entryDateLbl=new Label(DateTimeFormat.getMediumDateFormat().format(transfer.getTimestamp()));
+					Label entryRemarkLbl=new Label(transfer.getRemark());
+					Label entryReceiverDetailsLbl=new Label(transfer.getReceiverBankNr()+": "+ transfer.getReceiverAccountNr());
+					Label entryAmountLbl=new Label(""+transfer.getAmount());
+					if (pos%2==0){
+						entryDateLbl.setStyleName("TransfersOdd");
+						entryRemarkLbl.setStyleName("TransfersOdd");
+						entryReceiverDetailsLbl.setStyleName("TransfersOdd");
+						entryAmountLbl.setStyleName("TransfersOdd");					
+					}
+					else{
+						entryDateLbl.setStyleName("TransfersEven");
+						entryRemarkLbl.setStyleName("TransfersEven");
+						entryReceiverDetailsLbl.setStyleName("TransfersEven");
+						entryAmountLbl.setStyleName("TransfersEven");
+					}
+					accountDetailTable.setWidget(pos,0,entryDateLbl);
+					accountDetailTable.setWidget(pos,1,entryRemarkLbl);
+					accountDetailTable.setWidget(pos,2,entryReceiverDetailsLbl);
+					accountDetailTable.setWidget(pos,3,entryAmountLbl);
+					pos++;					
 				}
 				accountsDetailsPanel.insert(accountDetailTable,0);
 

@@ -45,3 +45,22 @@ h1 {
   background:white;
   color: black;  
 }
+
+.TransfersHeader{
+  background:blue;
+  color: white;
+   font-style:italic; 
+}    
+
+
+.TransfersOdd{
+  background:white;
+  color: black;
+   font-style:normal;     
+}
+
+.TransfersEven{
+  background:#F2F2F2;
+  color: black;
+   font-style:normal;     
+}
