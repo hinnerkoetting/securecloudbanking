@@ -64,3 +64,12 @@ h1 {
   color: black;
    font-style:normal;     
 }
+
+
+.positiveMoney{
+color: blue;
+}
+
+.negativeMoney{
+color: red;
+}

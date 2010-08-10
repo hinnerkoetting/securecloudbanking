@@ -9,8 +9,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
@@ -319,6 +317,9 @@ public class SCB implements EntryPoint {
 	}
 
 	private void showAccountOverview() {
+		accountOverviewPanel.clear();
+		accountsDetailsPanel.clear();
+		accountsListPanel.clear();
 		Log.info("Show Account Overview");
 		accountOverviewPanel.add(accountsListPanel);
 		accountOverviewPanel.add(accountsDetailsPanel);
@@ -341,6 +342,15 @@ public class SCB implements EntryPoint {
 
 				} else {
 					Log.info("Anzahl Accounts: " + result.size());
+					Button overviewBtn=new Button("Overview");
+					overviewBtn.addClickHandler(new ClickHandler() {
+						
+						public void onClick(ClickEvent event) {
+							showAccountOverview();
+						}
+					});
+					accountsListPanel.add(overviewBtn);
+					showAccountOverviewInDetailPanel( result);
 					accountsListPanel.add(new Label("Your accounts "));
 					for (AccountDTO acc : result) {
 						Log.info(acc.toString());
@@ -376,6 +386,39 @@ public class SCB implements EntryPoint {
 			}
 		});
 
+	}
+
+	protected void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
+		accountsDetailsPanel.clear();
+		Label accHeaderLbl=new Label("Account Overview");
+		accountsDetailsPanel.add(accHeaderLbl);
+		Grid grid=new Grid(result.size()+1,2);
+		accountsDetailsPanel.add(grid);
+		Label accHeader=new Label("Account");
+		Label amountHeader=new Label("Balance");
+		accHeader.setStyleName("TransfersHeader");
+		amountHeader.setStyleName("TransfersHeader");
+		grid.setWidget(0,0, accHeader);
+		grid.setWidget(0,1, amountHeader);
+		grid.setBorderWidth(1);
+		
+		
+		
+		int row=1;
+		for (AccountDTO dto:result){
+			Label accountElement=new Label(dto.getAccountNr());
+			Label balanceElement=new Label(com.google.gwt.i18n.client.NumberFormat.getCurrencyFormat().format( dto.getBalance()));
+			if (dto.getBalance()>=0){
+				balanceElement.setStyleName("positiveMoney");
+			}
+			else{
+				balanceElement.setStyleName("negativeMoney");
+			}
+			grid.setWidget(row, 0,accountElement);
+			grid.setWidget(row, 1,balanceElement);
+			
+			row++;
+		}
 	}
 
 	/**
