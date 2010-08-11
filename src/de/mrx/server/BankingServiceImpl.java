@@ -5,25 +5,21 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import javax.jdo.Extent;
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-import javax.jdo.annotations.Key;
 import javax.jdo.annotations.PersistenceAware;
 
-import com.allen_sauer.gwt.log.client.Log;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.BankingService;
-import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.MoneyTransferDTO;
+import de.mrx.client.SCBIdentityDTO;
 
 @SuppressWarnings("serial")
 @PersistenceAware
@@ -35,6 +31,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	PersistenceManager pm = PMF.get().getPersistenceManager();
 
 	Bank ownBank;
+	AllBanks bankWrapper;
 
 	public BankingServiceImpl() {
 		loadInitialData();
@@ -48,6 +45,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		// for ( Account acc: e){
 		// log.info( acc.toString());
 		// }
+		pm=PMF.get().getPersistenceManager();
 		String query = " SELECT FROM " + Account.class.getName()
 				+ " WHERE owner =='" + user.getEmail() + "'";
 		log.info("geTAccounts Query: " + query);
@@ -62,16 +60,44 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	}
 
 	private void loadInitialData() {
-		String query = "SELECT FROM " + Bank.class.getName() + " WHERE blz=='"
-				+ SCB_BLZ + "'";
-
-		List<Bank> ownBanks = (List<Bank>) pm.newQuery(query).execute();
-		if (ownBanks.size() == 0) {
-			ownBank = new Bank(SCB_BLZ, "Secure Cloud Bank");
-			pm.makePersistent(ownBank);
-		} else {
-			ownBank = ownBanks.get(0);
+		try{
+		bankWrapper=AllBanks.getBankWrapper(PMF.get().getPersistenceManager());
+		pm.currentTransaction().begin();
+		if (bankWrapper==null){
+			
+			bankWrapper=new AllBanks();
+			pm.makePersistent(bankWrapper);
+			
 		}
+		ownBank=bankWrapper.getOwnBanks();
+		if (ownBank==null){
+			ownBank = new Bank(SCB_BLZ, "Secure Cloud Bank");
+			ownBank.setId(KeyFactory.createKey(bankWrapper.getId(),Bank.class.getSimpleName(), "SCB"));
+			bankWrapper.setOwnBanks(ownBank);
+			
+			
+		}
+		
+		pm.currentTransaction().commit();
+		
+		}
+		finally{
+			if (pm.currentTransaction().isActive()){
+				pm.currentTransaction().rollback();
+				
+			}
+			pm.close();
+		}
+//		String query = "SELECT FROM " + Bank.class.getName() + " WHERE blz=='"
+//				+ SCB_BLZ + "'";
+//
+//		List<Bank> ownBanks = (List<Bank>) pm.newQuery(query).execute();
+//		if (ownBanks.size() == 0) {
+//			ownBank = new Bank(SCB_BLZ, "Secure Cloud Bank");
+//			pm.makePersistent(ownBank);
+//		} else {
+//			ownBank = ownBanks.get(0);
+//		}
 	}
 
 	public double getBalance(String accountNr) {
@@ -98,7 +124,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		GeneralAccount acc = Account.getOwnByAccountNr(accountNr);
+		GeneralAccount acc = Account.getOwnByAccountNr(pm,accountNr);
 		// String query = " SELECT FROM " + MoneyTransfer.class.getName()
 		// + " WHERE senderAccountNr =='" + accountNr + "'";
 		// List<MoneyTransfer> moneyTransfers = (List<MoneyTransfer>)
@@ -160,6 +186,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		Account acc = new Account(identityInfo.getEmail(), "" + kontoNr, 5,
 				ownBank);
 		acc.setBank(ownBank);
+		acc.setId(  KeyFactory.createKey(ownBank.getId(),Account.class.getSimpleName(),kontoNr));
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.currentTransaction().begin();
@@ -167,11 +194,13 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		ownBank.addAccount(acc);
 		pm.currentTransaction().commit();
 		log.info("account neu geoeffnet : " + acc);
+
 		}
 		finally{
 			if (pm.currentTransaction().isActive()){
 				pm.currentTransaction().rollback();
 			}
+			pm.close();
 		}
 
 	}
@@ -179,25 +208,33 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	public void sendMoney(String senderAccountNr, String blz,
 			String receiveraccountNr, double amount, String remark) {
 		try{
-		Account senderAccount = Account.getOwnByAccountNr(senderAccountNr);
+			
+			pm=PMF.get().getPersistenceManager();
+			bankWrapper=AllBanks.getBankWrapper(pm);
+			ownBank=bankWrapper.getOwnBanks();
+		Account senderAccount = Account.getOwnByAccountNr(pm,senderAccountNr);
 		if (senderAccount==null){
 			throw new RuntimeException("Sender Account "+senderAccountNr+" existiert nicht!");
 		}
 
 		 
+		
 
-		Bank receiverBank = Bank.getByBLZ(blz);
+		Bank receiverBank = Bank.getByBLZ(pm,blz);
 		if (receiverBank == null) {
 			receiverBank = new Bank(blz.trim(), "Neue Bank");
+			receiverBank.setId(KeyFactory.createKey(bankWrapper.getId(),Bank.class.getSimpleName(),blz));
+			
+			bankWrapper.getOtherBanks().add(receiverBank);
 			pm.currentTransaction().begin();
-			pm.makePersistent(receiverBank);
+			pm.makePersistent(bankWrapper);
 			pm.currentTransaction().commit();
 			
 		}
 
 		GeneralAccount recAccount;
 		if (receiverBank.equals(ownBank)) {
-			recAccount = Account.getOwnByAccountNr(receiveraccountNr);
+			recAccount = Account.getOwnByAccountNr(pm,receiveraccountNr);
 			if (recAccount==null){
 				throw new RuntimeException("Dieser Account existiert nicht bei der Bank "+receiveraccountNr);
 			}
@@ -219,27 +256,33 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		MoneyTransfer transfer = new MoneyTransfer(senderAccount, recAccount,
 				amount);
 		transfer.setRemark(remark);
+//		transfer.setId(KeyFactory.createKey(senderAccount.getId(), MoneyTransfer.class.getSimpleName(), 1));
 		pm.currentTransaction().begin();
 		
 //		pm.makePersistent(transfer);
 		senderAccount.addMoneyTransfer(transfer);
 //		recAccount.addMoneyTransfer(transfer);
+		PersistenceManager pmf1=JDOHelper.getPersistenceManager(senderAccount);
+		PersistenceManager pmf2=JDOHelper.getPersistenceManager(transfer);
+		PersistenceManager pmf3=JDOHelper.getPersistenceManager(bankWrapper);
 		
-//		pm.makePersistent(senderAccount);
 		senderAccount.setBalance(senderAccount.getBalance() - amount);
-
+		pm.makePersistent(senderAccount);
 		 pm.currentTransaction().commit();
+		
 		
 		}
 		finally{
 			if (pm.currentTransaction().isActive()){
 				pm.currentTransaction().rollback();
 			}
+			 pm.close();
 		}
 	}
 
 	public AccountDetailDTO getAccountDetails(String accountNr) {
-		Account acc=Account.getOwnByAccountNr(accountNr);
+		PersistenceManager pm=PMF.get().getPersistenceManager();
+		Account acc=Account.getOwnByAccountNr(pm,accountNr);
 		return acc.getDetailedDTO();
 	}
 

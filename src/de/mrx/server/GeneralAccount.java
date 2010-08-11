@@ -41,8 +41,7 @@ public abstract class GeneralAccount {
 	
 	
 
-	@PrimaryKey
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+	@PrimaryKey	
 	private Key id;
 
 	@Persistent

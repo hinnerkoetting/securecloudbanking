@@ -24,7 +24,7 @@ public class MoneyTransfer implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@Persistent
+	@Persistent	
 	private double amount;
 	
 	@PrimaryKey
@@ -88,10 +88,10 @@ public class MoneyTransfer implements Serializable{
 		
 		PersistenceManager pm= PMF.get().getPersistenceManager();
 		
-		Account s=(Account)Account.getOwnByAccountNr(senderAccountNr);
+		Account s=(Account)Account.getOwnByAccountNr(pm,senderAccountNr);
 		
 
-		Bank b=Bank.getByBLZ(receiverBLZ);
+		Bank b=Bank.getByBLZ(pm,receiverBLZ);
 		ExternalAccount r=(ExternalAccount)ExternalAccount.getAccountByBLZAndAccountNr(b,receiverAccountNr);
 		if (r!=null){
 		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank().getBlz(),s.getAccountNr(),r.getBank().getBlz(),r.getAccountNr(),getAmount());

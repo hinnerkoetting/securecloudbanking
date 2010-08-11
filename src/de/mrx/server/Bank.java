@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.jdo.Extent;
+import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -20,12 +21,15 @@ public class Bank {
 
 	private final static Logger log = Logger.getLogger(Bank.class.getName());
 
-	@Persistent
+	@Persistent	
 	private String blz;
 
-	@PrimaryKey
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+	@PrimaryKey	
 	private Key id;
+
+	public void setId(Key id) {
+		this.id = id;
+	}
 
 	public Key getId() {
 		return id;
@@ -64,9 +68,9 @@ public class Bank {
 
 	private List<Key> accounts = new ArrayList<Key>();
 
-	public static Bank getByBLZ(String blz) {
-		Extent e = PMF.get().getPersistenceManager().getExtent(Bank.class);
-		Query query = PMF.get().getPersistenceManager().newQuery(e);
+	public static Bank getByBLZ(PersistenceManager pm, String blz) {
+		Extent e = pm.getExtent(Bank.class);
+		Query query = pm.newQuery(e);
 		query.setFilter("blz == blzParam");
 		query.declareParameters("String blzParam");
 		query.setUnique(true);
