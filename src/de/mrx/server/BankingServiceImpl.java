@@ -225,7 +225,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		senderAccount.addMoneyTransfer(transfer);
 //		recAccount.addMoneyTransfer(transfer);
 		
-
+//		pm.makePersistent(senderAccount);
 		senderAccount.setBalance(senderAccount.getBalance() - amount);
 
 		 pm.currentTransaction().commit();

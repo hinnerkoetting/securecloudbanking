@@ -38,6 +38,8 @@ public abstract class GeneralAccount {
 	public void setBankID(Key bankID) {
 		this.bankID = bankID;
 	}
+	
+	
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
