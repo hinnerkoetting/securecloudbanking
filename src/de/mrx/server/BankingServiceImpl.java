@@ -132,7 +132,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		// query).execute();
 		List<MoneyTransferDTO> mtDTOs = new ArrayList<MoneyTransferDTO>();
 		for (MoneyTransfer mtransfer : acc.getTransfers()) {
-			MoneyTransferDTO dto = mtransfer.getDTO();
+			MoneyTransferDTO dto = mtransfer.getDTO(pm);
 			mtDTOs.add(dto);
 			log.info(dto.toString());
 		}
@@ -206,7 +206,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	}
 
 	public void sendMoney(String senderAccountNr, String blz,
-			String receiveraccountNr, double amount, String remark) {
+			String receiveraccountNr, double amount, String remark, String receiverName, String bankName) {
 		try{
 			
 			pm=PMF.get().getPersistenceManager();
@@ -222,10 +222,14 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 
 		Bank receiverBank = Bank.getByBLZ(pm,blz);
 		if (receiverBank == null) {
-			receiverBank = new Bank(blz.trim(), "Neue Bank");
+			if (bankName==null || bankName.trim().equals("")){
+				bankName="Neue Bank";
+			}
+			receiverBank = new Bank(blz.trim(), bankName);
 			receiverBank.setId(KeyFactory.createKey(bankWrapper.getId(),Bank.class.getSimpleName(),blz));
 			
 			bankWrapper.getOtherBanks().add(receiverBank);
+			log.info("Create external bank");
 			pm.currentTransaction().begin();
 			pm.makePersistent(bankWrapper);
 			pm.currentTransaction().commit();
@@ -240,14 +244,17 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			}
 
 		} else {
-			recAccount=ExternalAccount.getAccountByBLZAndAccountNr(receiverBank, receiveraccountNr);
+			recAccount=ExternalAccount.getAccountByBLZAndAccountNr(pm,receiverBank, receiveraccountNr);
 			
 			if (recAccount == null) {
 				log.info("Account"+ receiveraccountNr+" is not yet known at "+receiverBank.getName()+"("+receiverBank.getBlz()+"). Create it.");
+				log.info("Create external account");
 				pm.currentTransaction().begin();
-				recAccount = new ExternalAccount("Unbekannt",
-						receiveraccountNr, receiverBank);				
+				recAccount = new ExternalAccount(receiverName,
+						receiveraccountNr, receiverBank);
+				recAccount.setId(KeyFactory.createKey(receiverBank.getId(),ExternalAccount.class.getSimpleName(),receiverBank.getBlz()+"_"+receiveraccountNr));
 				receiverBank.addAccount(recAccount);
+				pm.makePersistent(recAccount);
 				
 				pm.currentTransaction().commit();
 			}
@@ -256,15 +263,14 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		MoneyTransfer transfer = new MoneyTransfer(senderAccount, recAccount,
 				amount);
 		transfer.setRemark(remark);
+		transfer.setReceiverName(receiverName);
 //		transfer.setId(KeyFactory.createKey(senderAccount.getId(), MoneyTransfer.class.getSimpleName(), 1));
+		log.info("Save Moneytransfer");
 		pm.currentTransaction().begin();
 		
 //		pm.makePersistent(transfer);
 		senderAccount.addMoneyTransfer(transfer);
-//		recAccount.addMoneyTransfer(transfer);
-		PersistenceManager pmf1=JDOHelper.getPersistenceManager(senderAccount);
-		PersistenceManager pmf2=JDOHelper.getPersistenceManager(transfer);
-		PersistenceManager pmf3=JDOHelper.getPersistenceManager(bankWrapper);
+		recAccount.addMoneyTransfer(transfer);
 		
 		senderAccount.setBalance(senderAccount.getBalance() - amount);
 		pm.makePersistent(senderAccount);
@@ -280,10 +286,10 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public AccountDetailDTO getAccountDetails(String accountNr) {
+	public AccountDetailDTO getAccountDetails( String accountNr) {
 		PersistenceManager pm=PMF.get().getPersistenceManager();
 		Account acc=Account.getOwnByAccountNr(pm,accountNr);
-		return acc.getDetailedDTO();
+		return acc.getDetailedDTO(pm);
 	}
 
 }

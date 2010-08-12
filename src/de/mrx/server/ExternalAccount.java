@@ -19,8 +19,8 @@ public class ExternalAccount extends GeneralAccount {
 
 	}
 
-	public static ExternalAccount getAccountByBLZAndAccountNr(Bank bank, String accountNr){
-		PersistenceManager pm=PMF.get().getPersistenceManager();
+	public static ExternalAccount getAccountByBLZAndAccountNr(PersistenceManager pm, Bank bank, String accountNr){
+		
 	Extent<ExternalAccount> recAccExt = pm.getExtent(ExternalAccount.class, true);
 
 	javax.jdo.Query q = pm.newQuery(recAccExt);

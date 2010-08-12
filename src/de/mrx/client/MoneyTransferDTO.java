@@ -11,6 +11,17 @@ public class MoneyTransferDTO implements Serializable{
 	private double amount;
 	private String remark;
 	private Date timestamp;
+	private String receiverName;
+
+
+	public String getReceiverName() {
+		return receiverName;
+	}
+
+
+	public void setReceiverName(String receiverName) {
+		this.receiverName = receiverName;
+	}
 
 
 	public String getRemark() {

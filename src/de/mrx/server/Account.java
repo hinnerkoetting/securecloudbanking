@@ -11,6 +11,9 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import de.mrx.client.AccountDTO;
+import de.mrx.client.AccountDetailDTO;
+
 @PersistenceCapable
 public class Account extends GeneralAccount implements Serializable{
 	
@@ -41,12 +44,26 @@ public class Account extends GeneralAccount implements Serializable{
     	
     }
     
+    
     	public Account( String owner, String accountNr, double balance, Bank bank) {
 			super(owner,accountNr, bank);
 			this.balance = balance;		
 		}
 
 	
+    	public AccountDTO getDTO() {
+    		AccountDTO dto = super.getDTO();
+    		dto.setBalance(getBalance());    		
+    		return dto;
+    	}
+    	
+    	
+    	public AccountDetailDTO getDetailedDTO(PersistenceManager pm) {
+    		AccountDetailDTO dto=super.getDetailedDTO(pm);
+    		dto.setBalance(getBalance());    		
+    		return dto;
+    	}
+    	
 	public double getBalance() {
 	return balance;
 }

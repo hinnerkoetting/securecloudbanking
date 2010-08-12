@@ -111,6 +111,8 @@ public class SCB implements EntryPoint {
 
 	private TextBox amountTxt;
 	private TextBox remarkTxt;
+	private TextBox recipientTxt;
+	private TextBox bankNameTxt;
 
 	private List <String > hints= new ArrayList<String>();
 
@@ -710,10 +712,14 @@ public class SCB implements EntryPoint {
 		Label receiverBankNrLbl=new Label("Receiver Bank number");
 		Label amountLbl=new Label("Amount");
 		Label remarkLbl=new Label("Remark");
+		Label recipientName=new Label("Recipient");
+		Label bankName=new Label("Bank name");
 		receiverAccountNrTxt = new TextBox();
 		receiverBankNrTxt = new TextBox();
 		amountTxt = new TextBox();
 		remarkTxt=new TextBox();
+		recipientTxt=new TextBox();
+		bankNameTxt=new TextBox();
 		Button sendMoneyBtn=new Button("Send Money");
 		sendMoneyBtn.addClickHandler(new ClickHandler() {
 			
@@ -735,8 +741,12 @@ public class SCB implements EntryPoint {
 		});
 		transferForm.setWidget(0,0,receiverAccountNrLbl);
 		transferForm.setWidget(0,1,receiverAccountNrTxt);
+		transferForm.setWidget(0,2,recipientName);
+		transferForm.setWidget(0,3,recipientTxt);
 		transferForm.setWidget(1,0,receiverBankNrLbl);
 		transferForm.setWidget(1,1,receiverBankNrTxt);
+		transferForm.setWidget(1,2,bankName);
+		transferForm.setWidget(1,3,bankNameTxt);
 		transferForm.setWidget(2,0,amountLbl);
 		transferForm.setWidget(2,1,amountTxt);
 		transferForm.setWidget(3,0,remarkLbl);
@@ -754,7 +764,7 @@ public class SCB implements EntryPoint {
 		
 		Double amount=Double.parseDouble( amountTxt.getText());
 		String remark=remarkTxt.getText();
-		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,new AsyncCallback<Void>() {
+		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<Void>() {
 
 			public void onFailure(Throwable caught) {
 				Log.error("Sending money failed",caught);

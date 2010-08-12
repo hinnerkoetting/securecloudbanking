@@ -45,9 +45,26 @@ public class MoneyTransfer implements Serializable{
 
 	@Persistent
 	private String senderAccountNr;
+	
+	@Persistent
+	private String receiverName;
 
 
 	
+
+	public String getReceiverName() {
+		return receiverName;
+	}
+
+
+	public void setReceiverName(String receiverName) {
+		this.receiverName = receiverName;
+	}
+
+
+
+
+
 
 	@Persistent
 	private String senderBLZ;
@@ -84,20 +101,20 @@ public class MoneyTransfer implements Serializable{
 	}
 
 
-	public MoneyTransferDTO getDTO(){
+	public MoneyTransferDTO getDTO(PersistenceManager pm){
 		
-		PersistenceManager pm= PMF.get().getPersistenceManager();
+		
 		
 		Account s=(Account)Account.getOwnByAccountNr(pm,senderAccountNr);
 		
 
 		Bank b=Bank.getByBLZ(pm,receiverBLZ);
-		ExternalAccount r=(ExternalAccount)ExternalAccount.getAccountByBLZAndAccountNr(b,receiverAccountNr);
+		ExternalAccount r=(ExternalAccount)ExternalAccount.getAccountByBLZAndAccountNr(pm,b,receiverAccountNr);
 		if (r!=null){
 		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank().getBlz(),s.getAccountNr(),r.getBank().getBlz(),r.getAccountNr(),getAmount());
 		dto.setTimestamp(getTimestamp());
 		dto.setRemark(getRemark());
-		
+		dto.setReceiverName(getReceiverName());	
 			return dto;
 		}
 		else{
@@ -109,6 +126,7 @@ public class MoneyTransfer implements Serializable{
 			dto.setReceiverBankNr("Unbekannt");
 			dto.setRemark(getRemark());
 			dto.setTimestamp(getTimestamp());
+			dto.setReceiverName(getReceiverName());
 			return dto;
 			
 		}

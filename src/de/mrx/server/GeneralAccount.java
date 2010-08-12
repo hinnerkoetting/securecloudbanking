@@ -88,14 +88,15 @@ public abstract class GeneralAccount {
 	}
 	public AccountDTO getDTO() {
 		AccountDTO dto = new AccountDTO(getOwner(), getAccountNr());
+		
 		return dto;
 	}
 	
 	
-	public AccountDetailDTO getDetailedDTO() {
+	public AccountDetailDTO getDetailedDTO(PersistenceManager pm) {
 		AccountDetailDTO dto = new AccountDetailDTO(getOwner(), getAccountNr());
 		for (MoneyTransfer m:getTransfers()){
-			dto.addTranfer(m.getDTO());
+			dto.addTranfer(m.getDTO(pm));
 		}
 		
 		return dto;
