@@ -10,6 +10,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -521,16 +522,9 @@ public class SCB implements EntryPoint {
 			bankingService = GWT.create(BankingService.class);
 		}
 		accountsDetailsPanel.clear();
-		Button transferMoneyButton=new Button("Send money");
+		
 		currentAccount=accNr;
-		transferMoneyButton.addClickHandler(new ClickHandler() {
-			
-			public void onClick(ClickEvent event) {
-				sendMoney(currentAccount);
-				
-			}
-		});
-		accountsDetailsPanel.add(transferMoneyButton);
+		
 		bankingService.getAccountDetails(accNr,new AsyncCallback<AccountDetailDTO>() {
 
 			public void onFailure(Throwable caught) {
@@ -543,13 +537,21 @@ public class SCB implements EntryPoint {
 			
 			public void onSuccess(AccountDetailDTO result) {
 				Log.info("Balance: "+result);
-				accountsDetailsPanel.add(new Label("Your balance: "+result.getBalance()+" Dollar"));
+				Label accBalanceLbl=new Label("Current balance: "+NumberFormat.getCurrencyFormat().format( result.getBalance()));
+				if (result.getBalance()>=0){
+					accBalanceLbl.setStyleName("positiveMoney");
+				}
+				else{
+					accBalanceLbl.setStyleName("negativeMoney");
+				}
+				
+				
 				
 				if (accountDetailTable!=null){
 					accountsDetailsPanel.remove(accountDetailTable);
 				}
 				List<MoneyTransferDTO> transfers=result.getTransfers();
-				accountDetailTable = new Grid(transfers.size()+1,4);
+				accountDetailTable = new Grid(transfers.size()+2,4);
 				Label dateLbl=new Label("Date");
 				Label commentLbl=new Label("Comment");
 				Label accountLbl=new Label("Account");
@@ -564,24 +566,31 @@ public class SCB implements EntryPoint {
 				accountDetailTable.setWidget(0,2,accountLbl);
 				accountDetailTable.setWidget(0,3,amountLbl);
 				int pos=1;
-				Log.info("Eintraege: "+transfers.size());
+				Log.debug("Money transfer entries: "+transfers.size());
 				for (MoneyTransferDTO transfer: transfers){
 					Log.info("Transfer: "+transfer);
 					Label entryDateLbl=new Label(DateTimeFormat.getMediumDateFormat().format(transfer.getTimestamp()));
 					Label entryRemarkLbl=new Label(transfer.getRemark());
 					Label entryReceiverDetailsLbl=new Label(transfer.getReceiverBankNr()+": "+ transfer.getReceiverAccountNr());
-					Label entryAmountLbl=new Label(""+transfer.getAmount());
+					
+					Label entryAmountLbl=new Label(NumberFormat.getCurrencyFormat().format( transfer.getAmount()));
 					if (pos%2==0){
 						entryDateLbl.setStyleName("TransfersOdd");
 						entryRemarkLbl.setStyleName("TransfersOdd");
 						entryReceiverDetailsLbl.setStyleName("TransfersOdd");
-						entryAmountLbl.setStyleName("TransfersOdd");					
+										
 					}
 					else{
 						entryDateLbl.setStyleName("TransfersEven");
 						entryRemarkLbl.setStyleName("TransfersEven");
 						entryReceiverDetailsLbl.setStyleName("TransfersEven");
-						entryAmountLbl.setStyleName("TransfersEven");
+						
+					}
+					if (transfer.getAmount()>=0){
+						entryAmountLbl.setStyleName("positiveMoney");
+					}
+					else{
+						entryAmountLbl.setStyleName("negativeMoney");
 					}
 					accountDetailTable.setWidget(pos,0,entryDateLbl);
 					accountDetailTable.setWidget(pos,1,entryRemarkLbl);
@@ -589,62 +598,25 @@ public class SCB implements EntryPoint {
 					accountDetailTable.setWidget(pos,3,entryAmountLbl);
 					pos++;					
 				}
-				accountsDetailsPanel.insert(accountDetailTable,0);
+				Button transferMoneyButton=new Button("Send money");
+				transferMoneyButton.addClickHandler(new ClickHandler() {
+					
+					public void onClick(ClickEvent event) {
+						sendMoney(currentAccount);
+						
+					}
+				});
+				accountDetailTable.setWidget(accountDetailTable.getRowCount()-1, 3, transferMoneyButton);
+				
+				accountsDetailsPanel.insert(accBalanceLbl,0);				
+				accountsDetailsPanel.insert(accountDetailTable,1);
+				
 
 			
 				
 			}
 		});
-		
-//		bankingService.getBalance(accNr,new AsyncCallback<Double>() {
-//
-//			public void onFailure(Throwable caught) {
-//				Log.error("Error loading balance", caught);
-//				
-//			}
-//
-//			public void onSuccess(Double result) {
-//				Log.info("Balance: "+result);
-//				accountsDetailsPanel.add(new Label("Your balance: "+result+" Dollar"));
-//				
-//			}
-//			
-//		});
-//		bankingService.getTransaction(currentAccount, new AsyncCallback<List<MoneyTransferDTO>>() {
-//
-//			private HTMLTable accountDetailTable;
-//
-//			public void onFailure(Throwable caught) {
-//				Log.error("Error loading transactions", caught);				
-//			}
-//
-//			public void onSuccess(List<MoneyTransferDTO> result) {
-//				if (result==null){
-//					Log.error("No transactions");
-//					accountsDetailsPanel.add(new Label("No transactions"));
-//					return;
-//				}
-//				if (accountDetailTable!=null){
-//					accountsDetailsPanel.remove(accountDetailTable);
-//				}
-//				accountDetailTable = new Grid(result.size(),4);
-//				int pos=0;
-//				Log.info("Einträge: "+result.size());
-//				for (MoneyTransferDTO transfer: result){
-//					Log.info("Transfer: "+transfer);
-//					accountDetailTable.setWidget(pos,0,new Label(transfer.getSenderAccountNr()));
-//					accountDetailTable.setWidget(pos,1,new Label(transfer.getReceiverAccountNr()));
-//					accountDetailTable.setWidget(pos,2,new Label(""+transfer.getAmount()));
-//					pos++;
-//					
-//				}
-//				accountsDetailsPanel.add(accountDetailTable);
-//
-//				
-//			}
-//		});
 	}
-
 	
 	private boolean isFieldConfirmToExpresion(TextBox input, String expression, String errorMessage){
 		if (input.getText().trim().toUpperCase().matches(expression)) {
