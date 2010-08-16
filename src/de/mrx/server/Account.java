@@ -23,9 +23,10 @@ public class Account extends GeneralAccount implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	    
-    public static Account getOwnByAccountNr(PersistenceManager pm, String accountNr){
+	
+	
+	
+	public static Account getOwnByAccountNr(PersistenceManager pm, String accountNr){
 		
 		Extent e=pm.getExtent(Account.class);
 		Query query=pm.newQuery(e,"accountNr == accountNrParam");
@@ -36,37 +37,64 @@ public class Account extends GeneralAccount implements Serializable{
 		
 		return result;
 	}
-    
-    @Persistent
+	@Persistent
+	private String accountDescription;
+
+
+	@Persistent
+	private int accountType;
+
+
+	@Persistent
 	private double balance;//current money
-    
-    public Account(){
+
+
+	public Account(){
     	
     }
-    
-    
-    	public Account( String owner, String accountNr, double balance, Bank bank) {
-			super(owner,accountNr, bank);
-			this.balance = balance;		
-		}
 
-	
-    	public AccountDTO getDTO() {
-    		AccountDTO dto = super.getDTO();
-    		dto.setBalance(getBalance());    		
-    		return dto;
-    	}
-    	
-    	
+	public Account( String owner, String accountNr, double balance, Bank bank) {
+		super(owner,accountNr, bank);
+		this.balance = balance;		
+	}
+
+	    
+    public String getAccounDescriptiont() {
+		return accountDescription;
+	}
+    
+    public int getAccountType() {
+		return accountType;
+	}
+    
+    public double getBalance() {
+	return balance;
+}
+    
+    
     	public AccountDetailDTO getDetailedDTO(PersistenceManager pm) {
     		AccountDetailDTO dto=super.getDetailedDTO(pm);
     		dto.setBalance(getBalance());    		
     		return dto;
     	}
+
+	
+    	public AccountDTO getDTO() {
+    		AccountDTO dto = super.getDTO();
+    		dto.setBalance(getBalance());
+    		dto.setAccountDescription(getAccounDescriptiont());
+    		dto.setAccountNr(getAccountNr());
+    		return dto;
+    	}
     	
-	public double getBalance() {
-	return balance;
-}
+    	
+    	public void setAccountDescription(String accountDesc) {
+			this.accountDescription = accountDesc;
+		}
+    	
+	public void setAccountType(int accountType) {
+		this.accountType = accountType;
+	}
 	
 	public void setBalance(double balance) {
 		this.balance = balance;

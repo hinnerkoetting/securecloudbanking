@@ -5,6 +5,8 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
+import de.mrx.shared.SCBException;
+
 @RemoteServiceRelativePath("banking")
 public interface BankingService extends RemoteService {
 	
@@ -16,7 +18,7 @@ public interface BankingService extends RemoteService {
 	
 	public List<MoneyTransferDTO> getTransaction(String accountNr);
 	
-	public AccountDetailDTO getAccountDetails(String accountNr);
+	public AccountDetailDTO getAccountDetails(String accountNr) throws SCBException;
 	
 	public void openNewAccount();
 	

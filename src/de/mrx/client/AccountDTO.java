@@ -13,6 +13,36 @@ public class AccountDTO implements Serializable{
 	private double balance;//current money
 	private String owner;
 	
+	
+	public final static int SAVING_ACCOUNT=1;
+	public final static int CREDITCARD_ACCOUNT=2;
+	
+	public final static String SAVING_ACCOUNT_DES="Savings";
+	public final static String CREDITCARD_ACCOUNT_DES="Credit Card";
+	
+	
+	private String accountDescription;
+
+
+	public String getAccountDescription() {
+		return accountDescription;
+	}
+
+	public void setAccountDescription(String accountBeschreibung) {
+		this.accountDescription = accountBeschreibung;
+	}
+
+	public int getAccountType() {
+		return accountType;
+	}
+
+	public void setAccountType(int accountType) {
+		this.accountType = accountType;
+	}
+	private int accountType;
+
+	
+	
 	public AccountDTO(){
 		
 	}

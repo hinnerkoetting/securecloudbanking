@@ -20,6 +20,7 @@ import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.BankingService;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
+import de.mrx.shared.SCBException;
 
 @SuppressWarnings("serial")
 @PersistenceAware
@@ -187,6 +188,8 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 				ownBank);
 		acc.setBank(ownBank);
 		acc.setId(  KeyFactory.createKey(ownBank.getId(),Account.class.getSimpleName(),kontoNr));
+		acc.setAccountType(AccountDTO.SAVING_ACCOUNT);
+		acc.setAccountDescription(AccountDTO.SAVING_ACCOUNT_DES);
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.currentTransaction().begin();
@@ -286,9 +289,12 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public AccountDetailDTO getAccountDetails( String accountNr) {
+	public AccountDetailDTO getAccountDetails( String accountNr) throws SCBException {
 		PersistenceManager pm=PMF.get().getPersistenceManager();
 		Account acc=Account.getOwnByAccountNr(pm,accountNr);
+		if (acc==null){
+			throw new SCBException("Account data for Account '"+accountNr+"' can not be loaded at the moment!");
+		}
 		return acc.getDetailedDTO(pm);
 	}
 

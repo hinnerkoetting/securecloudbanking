@@ -326,26 +326,27 @@ public class SCB implements EntryPoint {
 		Log.info("Show Account Overview");
 		accountOverviewPanel.add(accountsListPanel);
 		accountOverviewPanel.add(accountsDetailsPanel);
-		Log.info("Uebersicht zeigen");
+		
 		if (bankingService == null) {
 			bankingService = GWT.create(BankingService.class);
 		}
 		bankingService.getAccounts(new AsyncCallback<List<AccountDTO>>() {
 
 			public void onFailure(Throwable caught) {
-				Log.error("Laden der Accountdaten gescheitert", caught);
+				Log.error("Loading Account data failed", caught);
 				return;
 
 			}
 
 			public void onSuccess(List<AccountDTO> result) {
-				Log.info("Account geladen ");
+				Log.info("Account loaded ");
 				if (result == null) {
-					Log.error("Keine Accountdaten");
+					Log.warn("No accounts");
 
 				} else {
-					Log.info("Anzahl Accounts: " + result.size());
-					Button overviewBtn=new Button("Overview");
+					Log.info("Number of Accounts: " + result.size());
+					Button overviewBtn=new Button("Financial state");
+					overviewBtn.setStyleName("OverViewButton");
 					overviewBtn.addClickHandler(new ClickHandler() {
 						
 						public void onClick(ClickEvent event) {
@@ -354,37 +355,37 @@ public class SCB implements EntryPoint {
 					});
 					accountsListPanel.add(overviewBtn);
 					showAccountOverviewInDetailPanel( result);
-					accountsListPanel.add(new Label("Your accounts "));
+//					accountsListPanel.add(new Label("Your accounts "));
 					for (AccountDTO acc : result) {
 						Log.info(acc.toString());
 						
-						Button btn=new Button(acc.getAccountNr());
+						Button btn=new Button(acc.getAccountDescription()+" ("+acc.getAccountNr()+")");
 						
-						btn.addClickHandler(new ClickHandler() {
-							
-							public void onClick(ClickEvent event) {
-								String accountNr=((Button)event.getSource()).getText();
-								showAccountDetails(accountNr);
-								
-							}
-						});
+						btn.setStyleName("OverViewButton");
+						
+						btn.addClickHandler(new AccountClickHandler(acc.getAccountNr()));
 						accountsListPanel.add(btn);
 					}
-				}Log.info(".....Vor einbinden in oberpanel");
-				
-				
-				Button neuerAccountBtn = new Button("Neuer Account");
-				neuerAccountBtn.addClickHandler(new ClickHandler() {
+					
+					if (result.size()==0){
+						Button neuerAccountBtn = new Button("Open saving Account");
+						neuerAccountBtn.setStyleName("OverViewButton");
+						neuerAccountBtn.addClickHandler(new ClickHandler() {
 
-					public void onClick(ClickEvent event) {
-						createAccount();
+							public void onClick(ClickEvent event) {
+								createAccount();
+							}
+
+						});
+						Log.debug("Include 'open saving account button");
+						accountsListPanel.add(neuerAccountBtn);
+			
 					}
-
-				});
-				Log.info("Vor einbinden in oberpanel");
-				accountsListPanel.add(neuerAccountBtn);
-				RootPanel.get(PAGEID_CONTENT).add(accountOverviewPanel);
-				Log.info("Account Uebersicht fertig geladen");
+				}
+				
+				
+							RootPanel.get(PAGEID_CONTENT).add(accountOverviewPanel);
+				Log.debug("Overview Page loaded");
 
 			}
 		});
@@ -760,5 +761,17 @@ public class SCB implements EntryPoint {
 			hintLabel.setStyleName(STYLE_VALUE_NOT_OKAY);
 			validateErrorTable.setWidget(i,1,hintLabel);
 		}
-	}	
+	}
+	
+	class AccountClickHandler implements ClickHandler{
+		String accNr;
+		public AccountClickHandler(String accountNr){
+			accNr=accountNr;
+		}
+
+		public void onClick(ClickEvent event) {			
+			showAccountDetails(accNr);
+		}
+		
+	}
 }
