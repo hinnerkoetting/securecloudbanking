@@ -49,6 +49,8 @@ public class SCB implements EntryPoint {
 	private final static String STYLE_VALUE_OKAY="ValueOkay";
 
 	
+	 private SCBConstants constants = GWT.create(SCBConstants.class);
+	  private SCBMessages messages = GWT.create(SCBMessages.class);
 	RegisterServiceAsync registerSvc;
 	private BankingServiceAsync bankingService;
 	/**
@@ -85,7 +87,7 @@ public class SCB implements EntryPoint {
 	private PasswordTextBox password;
 	private Label passwordLbl;
 
-	private Button registerButton = new Button("Register");
+	private Button registerButton = new Button(constants.menuRegister());
 
 	private VerticalPanel registrationPanel;
 
@@ -95,8 +97,8 @@ public class SCB implements EntryPoint {
 	private SCBIdentityDTO identityInfo = null;
 	private VerticalPanel loginPanel = new VerticalPanel();
 
-	private Anchor signInLink = new Anchor("Sign In");
-	private Anchor signOutLink = new Anchor("Sign Out");
+	private Anchor signInLink = new Anchor(constants.signIn());
+	private Anchor signOutLink = new Anchor(constants.signOut());
 	private MenuBar informationMenu;
 
 	private MenuBar menu;
@@ -119,7 +121,7 @@ public class SCB implements EntryPoint {
 
 	private void doShowNoService() {
 
-		Window.alert("Our business will soon offer service. Please try again the other day!");
+		Window.alert(constants.outOfServiceNotice());
 
 	}
 
@@ -135,8 +137,8 @@ public class SCB implements EntryPoint {
 
 		registrationPanel = new VerticalPanel();
 		registrationTable = new Grid(6, 4);
-		nameLbl = new Label("Your name: ");
-		streetLbl = new Label("Your street: ");
+		nameLbl = new Label(constants.registrationName());
+		streetLbl = new Label(constants.registrationStreet());
 		plzLbl = new Label("Postal Code: ");
 		cityLbl = new Label("City: ");
 		emailLbl = new Label("Email (currently only Googlemail accepted): ");
@@ -217,7 +219,7 @@ public class SCB implements EntryPoint {
 				
 				if (caught instanceof SCBException ){
 					SCBException scbE=(SCBException) caught;
-					Window.alert(caught.getMessage()+": "+((SCBException) caught).getDetailMessage());
+					Window.alert(messages.invalidSymbol(caught.getMessage()));
 				}
 				else{				
 					Window.alert("Registration fails! Reason: "+caught.getMessage());		
@@ -227,7 +229,7 @@ public class SCB implements EntryPoint {
 			}
 
 			public void onSuccess(Void result) {
-				Window.alert("Gratulation. You have registered! We will progress your request as soon as we are able to!");
+				Window.alert(constants.registrationSuccessMessage()); 
 				getRegistrationPanel().removeFromParent();
 				checkGoogleStatus();
 			}
