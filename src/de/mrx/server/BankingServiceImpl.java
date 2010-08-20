@@ -412,5 +412,88 @@ return mimeAttachment;
 		
 
 	}
+
+	public MoneyTransferDTO sendMoneyAskForConfirmationData(String senderAccountNr, String blz,
+	String receiveraccountNr, double amount, String remark, String receiverName, String bankName) throws SCBException  {
+		
+		try{
+			
+			pm=PMF.get().getPersistenceManager();
+			bankWrapper=AllBanks.getBankWrapper(pm);
+			ownBank=bankWrapper.getOwnBanks();
+		Account senderAccount = Account.getOwnByAccountNr(pm,senderAccountNr);
+		if (senderAccount==null){
+			throw new SCBException("Sender Account "+senderAccountNr+" existiert nicht!");
+		}
+
+		 
+		
+
+		Bank receiverBank = Bank.getByBLZ(pm,blz);
+		if (receiverBank == null) {
+			if (bankName==null || bankName.trim().equals("")){
+				bankName="Neue Bank";
+			}
+			receiverBank = new Bank(blz.trim(), bankName);
+			receiverBank.setId(KeyFactory.createKey(bankWrapper.getId(),Bank.class.getSimpleName(),blz));
+			
+			bankWrapper.getOtherBanks().add(receiverBank);
+			log.info("Create external bank");
+			pm.currentTransaction().begin();
+			pm.makePersistent(bankWrapper);
+			pm.currentTransaction().commit();
+			
+		}
+
+		GeneralAccount recAccount;
+		if (receiverBank.equals(ownBank)) {
+			recAccount = Account.getOwnByAccountNr(pm,receiveraccountNr);
+			if (recAccount==null){
+				throw new RuntimeException("Dieser Account existiert nicht bei der Bank "+receiveraccountNr);
+			}
+
+		} else {
+			recAccount=ExternalAccount.getAccountByBLZAndAccountNr(pm,receiverBank, receiveraccountNr);
+			
+			if (recAccount == null) {
+				log.info("Account"+ receiveraccountNr+" is not yet known at "+receiverBank.getName()+"("+receiverBank.getBlz()+"). Create it.");
+				log.info("Create external account");
+				pm.currentTransaction().begin();
+				recAccount = new ExternalAccount(receiverName,
+						receiveraccountNr, receiverBank);
+				recAccount.setId(KeyFactory.createKey(receiverBank.getId(),ExternalAccount.class.getSimpleName(),receiverBank.getBlz()+"_"+receiveraccountNr));
+				receiverBank.addAccount(recAccount);
+				pm.makePersistent(recAccount);
+				
+				pm.currentTransaction().commit();
+			}
+		}
+//		pm.currentTransaction().commit();
+		MoneyTransfer transfer = new MoneyTransfer(senderAccount, recAccount,
+				amount);
+		transfer.setRemark(remark);
+		transfer.setReceiverName(receiverName);
+		transfer.setPending(true);
+		Random r=new Random();
+		int transNr=r.nextInt(100);
+		transfer.setRequiredTan(transNr);
+//		transfer.setId(KeyFactory.createKey(senderAccount.getId(), MoneyTransfer.class.getSimpleName(), 19));
+		log.info("Save Moneytransfer");
+		pm.currentTransaction().begin();
+		
+//		pm.makePersistent(transfer);
+		senderAccount.addMoneyTransfer(transfer);
+		
+		pm.makePersistent(senderAccount);
+		 pm.currentTransaction().commit();
+		 return transfer.getDTO(pm);
+
+	}
+		catch (Exception e){
+			log.severe(e.getMessage());
+			e.printStackTrace();
+			throw new SCBException("Überweisung kann derzeit nicht ausgeführt werden",e);			
+		}
+	}
 	
 }

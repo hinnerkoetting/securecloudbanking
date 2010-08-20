@@ -40,10 +40,12 @@ public class Account extends GeneralAccount implements Serializable{
 
 	@Persistent
 	private int accountType;
+	
+	
+	
+	
+	
 
-	
-	
-	
 	@Persistent
 	TANList tans;
 

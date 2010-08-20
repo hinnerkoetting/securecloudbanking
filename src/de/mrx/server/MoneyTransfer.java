@@ -31,6 +31,36 @@ public class MoneyTransfer implements Serializable{
 	 @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
  
+	@Persistent
+	private boolean pending;
+	
+	@Persistent
+	private int requiredTan;
+	
+
+	public int getRequiredTan() {
+		return requiredTan;
+	}
+
+
+	public void setRequiredTan(int requiredTan) {
+		this.requiredTan = requiredTan;
+	}
+
+
+	public boolean isPending() {
+		return pending;
+	}
+
+
+	public void setPending(boolean pending) {
+		this.pending = pending;
+	}
+
+
+
+
+
 
 	@Persistent
 	private String receiverAccountNr;
@@ -114,7 +144,8 @@ public class MoneyTransfer implements Serializable{
 		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank().getBlz(),s.getAccountNr(),r.getBank().getBlz(),r.getAccountNr(),getAmount());
 		dto.setTimestamp(getTimestamp());
 		dto.setRemark(getRemark());
-		dto.setReceiverName(getReceiverName());	
+		dto.setReceiverName(getReceiverName());
+		dto.setRequiredTan(getRequiredTan());
 			return dto;
 		}
 		else{
@@ -127,6 +158,7 @@ public class MoneyTransfer implements Serializable{
 			dto.setRemark(getRemark());
 			dto.setTimestamp(getTimestamp());
 			dto.setReceiverName(getReceiverName());
+			dto.setRequiredTan(getRequiredTan());
 			return dto;
 			
 		}

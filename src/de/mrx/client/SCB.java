@@ -739,6 +739,37 @@ public class SCB implements EntryPoint {
 		
 		Double amount=Double.parseDouble( amountTxt.getText());
 		String remark=remarkTxt.getText();
+		
+		
+		bankingService.sendMoneyAskForConfirmationData(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<MoneyTransferDTO>() {
+//		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<Void>() {
+
+			public void onFailure(Throwable caught) {
+				Log.error("Sending money failed",caught);
+				
+			}
+
+			
+			public void onSuccess(MoneyTransferDTO result) {
+				Window.alert("Money sent sucessfully");
+				Window.Location.reload();
+				
+			}
+		});
+		
+	}
+	
+	
+	protected void doSendMoneyCommit() {
+		if (bankingService == null) {
+			bankingService = GWT.create(BankingService.class);
+		}
+		
+		Double amount=Double.parseDouble( amountTxt.getText());
+		String remark=remarkTxt.getText();
+		
+		
+		
 		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<Void>() {
 
 			public void onFailure(Throwable caught) {

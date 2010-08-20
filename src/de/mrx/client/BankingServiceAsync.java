@@ -25,4 +25,9 @@ public interface BankingServiceAsync {
 	void getAccountDetails(String accountNr,
 			AsyncCallback<AccountDetailDTO> callback);
 
+	void sendMoneyAskForConfirmationData(String senderAccountNr, String blz,
+			String accountNr, double amount, String remark,
+			String receiverName, String bankName,
+			AsyncCallback<MoneyTransferDTO> callback);
+
 }
