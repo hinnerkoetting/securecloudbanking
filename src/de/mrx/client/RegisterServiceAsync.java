@@ -4,6 +4,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface RegisterServiceAsync {
 
-	void register(SCBIdentityDTO identity, AsyncCallback<Void> callback);
+	public void register(SCBIdentityDTO identity, AsyncCallback<Void> callback);
+
+	void activate(String accountNr, String invitationCode,
+			AsyncCallback<Void> callback);
 
 }

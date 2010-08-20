@@ -1,13 +1,10 @@
 package de.mrx.server;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.annotations.Inheritance;
-import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
@@ -44,7 +41,20 @@ public class Account extends GeneralAccount implements Serializable{
 	@Persistent
 	private int accountType;
 
+	
+	
+	
+	@Persistent
+	TANList tans;
 
+	public TANList getTans() {
+		return tans;
+	}
+	
+	public String getTan(int pos){
+		return tans.getTan().get(pos);
+	}
+	
 	@Persistent
 	private double balance;//current money
 
@@ -56,6 +66,8 @@ public class Account extends GeneralAccount implements Serializable{
 	public Account( String owner, String accountNr, double balance, Bank bank) {
 		super(owner,accountNr, bank);
 		this.balance = balance;		
+		tans=new TANList();
+		tans.generatedTANs();
 	}
 
 	    

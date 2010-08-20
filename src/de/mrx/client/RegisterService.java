@@ -9,5 +9,6 @@ import de.mrx.shared.SCBException;
 @RemoteServiceRelativePath("register")
 public interface RegisterService extends RemoteService{
 	public void register(SCBIdentityDTO identity) throws SCBException;
+	public void activate(String accountNr, String invitationCode) throws SCBException;
 
 }

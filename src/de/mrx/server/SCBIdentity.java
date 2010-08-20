@@ -35,6 +35,19 @@ public class SCBIdentity implements Serializable{
 		return serialVersionUID;
 	}
 
+	
+	@Persistent
+	private String invitationCode;;
+
+	public String getInvitationCode() {
+		return invitationCode;
+	}
+
+
+	public void setInvitationCode(String invitationCode) {
+		this.invitationCode = invitationCode;
+	}
+
 
 	@Persistent
 	private boolean activated=false;
@@ -62,13 +75,13 @@ public class SCBIdentity implements Serializable{
 		this.nickName = nickName;
 	}
 	
-	public static SCBIdentity getIdentity(User user) {
+	public static SCBIdentity getIdentity(PersistenceManager pm, User user) {
 		
 //		String query = "select from " + Identity.class.getName()
 //				+ " WHERE email=='" + user.getEmail() + "'";
 //		
 		
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+
 		Extent<SCBIdentity> identityExtent=pm.getExtent(SCBIdentity.class);
 		javax.jdo.Query query=pm.newQuery(identityExtent);
 		List<SCBIdentity> ids = (List<SCBIdentity>) pm.newQuery(query).execute();

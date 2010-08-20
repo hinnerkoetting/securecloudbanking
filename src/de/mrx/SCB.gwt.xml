@@ -4,6 +4,7 @@
   <inherits name='com.google.gwt.user.User'/>
 <inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" />
 
+
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
   <!-- any one of the following lines.                            -->
@@ -22,5 +23,7 @@
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
   <source path='shared'/>
+  
+  <servlet path='/register' class='de.mrx.server.RegisterServiceImpl'/>
 
 </module>
