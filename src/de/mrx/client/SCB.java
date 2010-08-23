@@ -109,7 +109,9 @@ public class SCB implements EntryPoint {
 	private String currentAccount;
 
 	private TextBox receiverAccountNrTxt;
-
+	private TextBox tanConfirmationTxt;
+	private Button tanConfirmationBtn;
+	
 	private TextBox receiverBankNrTxt;
 
 	private TextBox amountTxt;
@@ -118,6 +120,10 @@ public class SCB implements EntryPoint {
 	private TextBox bankNameTxt;
 
 	private List <String > hints= new ArrayList<String>();
+
+	private Button sendMoneyBtn;
+
+	private HTMLTable transferForm;
 
 	private void doShowNoService() {
 
@@ -682,7 +688,7 @@ public class SCB implements EntryPoint {
 	
 	protected void sendMoney(String accNr) {
 		accountsDetailsPanel.clear();
-		HTMLTable transferForm = new Grid(6, 4);
+		transferForm = new Grid(6, 4);
 		Label receiverAccountNrLbl=new Label("Receiver Account Nr:");
 		Label receiverBankNrLbl=new Label("Receiver Bank number");
 		Label amountLbl=new Label("Amount");
@@ -695,7 +701,7 @@ public class SCB implements EntryPoint {
 		remarkTxt=new TextBox();
 		recipientTxt=new TextBox();
 		bankNameTxt=new TextBox();
-		Button sendMoneyBtn=new Button("Send Money");
+		sendMoneyBtn = new Button("Send Money");
 		sendMoneyBtn.addClickHandler(new ClickHandler() {
 			
 			public void onClick(ClickEvent event) {
@@ -751,14 +757,81 @@ public class SCB implements EntryPoint {
 
 			
 			public void onSuccess(MoneyTransferDTO result) {
-				Window.alert("Money sent sucessfully");
-				Window.Location.reload();
+				Log.debug("Show confirmation page");
+				showConfirmationPage(result);
 				
 			}
 		});
 		
 	}
 	
+	
+	protected void doConfirmSendMoney() {
+		if (bankingService == null) {
+			bankingService = GWT.create(BankingService.class);
+		}
+		
+		Double amount=Double.parseDouble( amountTxt.getText());
+		String remark=remarkTxt.getText();
+		
+		
+//		bankingService.sendMoneyAskForConfirmationData(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<MoneyTransferDTO>() {
+		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<Void>() {
+
+			public void onFailure(Throwable caught) {
+				Log.error("Sending money failed",caught);
+				Window.alert("Money sent failed :"+caught.getMessage());
+				
+			}
+
+			
+			public void onSuccess(Void result) {
+				Window.alert("Money sent sucessfully");
+				
+				
+				
+			}
+		});
+		
+	}
+	
+	private void showConfirmationPage( MoneyTransferDTO dto){
+//		accountsDetailsPanel.clear();
+		
+		receiverAccountNrTxt.setText(dto.getReceiverAccountNr());
+		
+		receiverBankNrTxt.setText(dto.getReceiverBankNr());
+		amountTxt.setText(""+dto.getAmount());
+		remarkTxt.setText(dto.getRemark());
+		recipientTxt.setText(dto.getReceiverName());
+		receiverAccountNrTxt.setEnabled(false);
+		receiverBankNrTxt.setEnabled(false);
+		amountTxt.setEnabled(false);
+		remarkTxt.setEnabled(false);
+		recipientTxt.setEnabled(false);
+		receiverAccountNrTxt.setEnabled(false);
+		tanConfirmationTxt=new TextBox();
+		tanConfirmationTxt.setText(""+dto.getRequiredTan());
+		tanConfirmationBtn=new Button("Confim Tranaction");
+		transferForm.setWidget(3,2,tanConfirmationTxt);
+		transferForm.setWidget(4,1,tanConfirmationBtn);
+		
+		tanConfirmationBtn.addClickHandler(new ClickHandler() {
+
+			public void onClick(ClickEvent event) {
+				validateErrorTable.clear();
+				
+				if (isSendMoneyFormValid()){
+					doConfirmSendMoney();
+				}
+				else{
+					
+					createHintTable();
+					accountsDetailsPanel.add(validateErrorTable);
+				}
+			}				
+		});
+	}
 	
 	protected void doSendMoneyCommit() {
 		if (bankingService == null) {

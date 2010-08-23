@@ -469,11 +469,14 @@ return mimeAttachment;
 			}
 		}
 //		pm.currentTransaction().commit();
-		MoneyTransfer transfer = new MoneyTransfer(senderAccount, recAccount,
-				amount);
+		MoneyTransferPending transfer = new MoneyTransferPending();
 		transfer.setRemark(remark);
 		transfer.setReceiverName(receiverName);
-		transfer.setPending(true);
+		transfer.setSenderAccountNr(senderAccountNr);
+		transfer.setReceiverBLZ(blz);
+		transfer.setReceiverAccountNr(receiveraccountNr);
+		transfer.setAmount(amount);
+		
 		Random r=new Random();
 		int transNr=r.nextInt(100);
 		transfer.setRequiredTan(transNr);
@@ -482,11 +485,11 @@ return mimeAttachment;
 		pm.currentTransaction().begin();
 		
 //		pm.makePersistent(transfer);
-		senderAccount.addMoneyTransfer(transfer);
+		senderAccount.setPendingTransaction(transfer);
 		
 		pm.makePersistent(senderAccount);
 		 pm.currentTransaction().commit();
-		 return transfer.getDTO(pm);
+		 return transfer.getDTO();
 
 	}
 		catch (Exception e){

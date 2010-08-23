@@ -42,29 +42,28 @@ public class Account extends GeneralAccount implements Serializable{
 	private int accountType;
 	
 	
-	
-	
-	
-
 	@Persistent
-	TANList tans;
+	private MoneyTransferPending pendingTransaction;
+	
+	
 
-	public TANList getTans() {
-		return tans;
+	public MoneyTransferPending getPendingTransaction() {
+		return pendingTransaction;
 	}
-	
-	public String getTan(int pos){
-		return tans.getTan().get(pos);
+
+	public void setPendingTransaction(MoneyTransferPending pendingTransaction) {
+		this.pendingTransaction = pendingTransaction;
 	}
-	
 	@Persistent
 	private double balance;//current money
 
-
+	@Persistent
+	TANList tans;
+	
 	public Account(){
     	
     }
-
+	
 	public Account( String owner, String accountNr, double balance, Bank bank) {
 		super(owner,accountNr, bank);
 		this.balance = balance;		
@@ -72,34 +71,43 @@ public class Account extends GeneralAccount implements Serializable{
 		tans.generatedTANs();
 	}
 
-	    
-    public String getAccounDescriptiont() {
+
+	public String getAccounDescriptiont() {
 		return accountDescription;
 	}
-    
-    public int getAccountType() {
+
+	public int getAccountType() {
 		return accountType;
 	}
-    
+
+	    
     public double getBalance() {
 	return balance;
 }
     
+    public AccountDetailDTO getDetailedDTO(PersistenceManager pm) {
+		AccountDetailDTO dto=super.getDetailedDTO(pm);
+		dto.setBalance(getBalance());    		
+		return dto;
+	}
     
-    	public AccountDetailDTO getDetailedDTO(PersistenceManager pm) {
-    		AccountDetailDTO dto=super.getDetailedDTO(pm);
-    		dto.setBalance(getBalance());    		
-    		return dto;
-    	}
+    public AccountDTO getDTO() {
+		AccountDTO dto = super.getDTO();
+		dto.setBalance(getBalance());
+		dto.setAccountDescription(getAccounDescriptiont());
+		dto.setAccountNr(getAccountNr());
+		return dto;
+	}
+    
+    
+    	public String getTan(int pos){
+			return tans.getTan().get(pos);
+		}
 
 	
-    	public AccountDTO getDTO() {
-    		AccountDTO dto = super.getDTO();
-    		dto.setBalance(getBalance());
-    		dto.setAccountDescription(getAccounDescriptiont());
-    		dto.setAccountNr(getAccountNr());
-    		return dto;
-    	}
+    	public TANList getTans() {
+			return tans;
+		}
     	
     	
     	public void setAccountDescription(String accountDesc) {
