@@ -25,6 +25,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.omg.CORBA.WrongTransaction;
+
 import net.sourceforge.htmlunit.corejs.javascript.ast.ThrowStatement;
 
 import com.google.appengine.api.datastore.KeyFactory;
@@ -45,6 +47,7 @@ import de.mrx.client.BankingService;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.SCBException;
+import de.mrx.shared.WrongTANException;
 
 @SuppressWarnings("serial")
 @PersistenceAware
@@ -244,7 +247,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	}
 
 	public void sendMoney(String senderAccountNr, String blz,
-			String receiveraccountNr, double amount, String remark, String receiverName, String bankName) {
+			String receiveraccountNr, double amount, String remark, String receiverName, String bankName, String tan) throws SCBException{
 		try{
 			
 			pm=PMF.get().getPersistenceManager();
@@ -298,6 +301,23 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			}
 		}
 //		pm.currentTransaction().commit();
+		MoneyTransferPending pendingTrans=senderAccount.getPendingTransaction();
+		if (pendingTrans==null){
+			log.severe("Hacking attempt!. No pending transaction before commit");
+			throw new SCBException("Invalid transaction");
+		}
+		int tanPos=pendingTrans.getRequiredTan();
+		String referenzTan=senderAccount.getTan(tanPos);
+		if (!tan.equals(referenzTan)){
+			log.severe("Wrong TAN. Request TAN Pos : "+tanPos+" \t Send TAN: "+tan);
+			senderAccount.increaseWrongTANCounter();
+			throw new WrongTANException(senderAccount.getWrongTANCounter());
+		}
+		else{
+			senderAccount.resetWrongTANCounter();
+		}
+//		if (pendingT)
+		
 		MoneyTransfer transfer = new MoneyTransfer(senderAccount, recAccount,
 				amount);
 		transfer.setRemark(remark);

@@ -773,10 +773,10 @@ public class SCB implements EntryPoint {
 		
 		Double amount=Double.parseDouble( amountTxt.getText());
 		String remark=remarkTxt.getText();
+		String tan=tanConfirmationTxt.getText();
 		
 		
-//		bankingService.sendMoneyAskForConfirmationData(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<MoneyTransferDTO>() {
-		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<Void>() {
+		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), tan, new AsyncCallback<Void>() {
 
 			public void onFailure(Throwable caught) {
 				Log.error("Sending money failed",caught);
@@ -810,10 +810,10 @@ public class SCB implements EntryPoint {
 		remarkTxt.setEnabled(false);
 		recipientTxt.setEnabled(false);
 		receiverAccountNrTxt.setEnabled(false);
-		tanConfirmationTxt=new TextBox();
-		tanConfirmationTxt.setText(""+dto.getRequiredTan());
+		tanConfirmationTxt=new TextBox();		
 		tanConfirmationBtn=new Button("Confim Tranaction");
-		transferForm.setWidget(3,2,tanConfirmationTxt);
+		transferForm.setWidget(3,2,new Label("TAN: +"+dto.getRequiredTan()));
+		transferForm.setWidget(3,3,tanConfirmationTxt);
 		transferForm.setWidget(4,1,tanConfirmationBtn);
 		
 		tanConfirmationBtn.addClickHandler(new ClickHandler() {
@@ -833,32 +833,7 @@ public class SCB implements EntryPoint {
 		});
 	}
 	
-	protected void doSendMoneyCommit() {
-		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
-		}
-		
-		Double amount=Double.parseDouble( amountTxt.getText());
-		String remark=remarkTxt.getText();
-		
-		
-		
-		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<Void>() {
-
-			public void onFailure(Throwable caught) {
-				Log.error("Sending money failed",caught);
-				
-			}
-
-			
-			public void onSuccess(Void result) {
-				Window.alert("Money sent sucessfully");
-				Window.Location.reload();
-				
-			}
-		});
-		
-	}
+	
 	
 	private void createHintTable() {
 		for (int i=0;i<hints.size();i++){

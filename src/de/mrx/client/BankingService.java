@@ -22,7 +22,7 @@ public interface BankingService extends RemoteService {
 	
 	public void openNewAccount() throws SCBException;
 	
-	public void sendMoney(String senderAccountNr, String blz, String accountNr, double amount, String remark, String receiverName, String bankName);
+	public void sendMoney(String senderAccountNr, String blz, String accountNr, double amount, String remark, String receiverName, String bankName, String tan) throws SCBException;
 	
 	public MoneyTransferDTO sendMoneyAskForConfirmationData(String senderAccountNr, String blz, String accountNr, double amount, String remark, String receiverName, String bankName) throws SCBException;
 		

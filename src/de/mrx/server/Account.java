@@ -37,7 +37,12 @@ public class Account extends GeneralAccount implements Serializable{
 	@Persistent
 	private String accountDescription;
 
+	@Persistent
+	private int wrongTANCounter=0;
 
+	public int getWrongTANCounter() {
+		return wrongTANCounter;
+	}
 	@Persistent
 	private int accountType;
 	
@@ -121,4 +126,13 @@ public class Account extends GeneralAccount implements Serializable{
 	public void setBalance(double balance) {
 		this.balance = balance;
 	}
+	
+	public void increaseWrongTANCounter(){
+		wrongTANCounter++;
+	}
+	
+	public void resetWrongTANCounter(){
+		wrongTANCounter=0;
+	}
+
 }
