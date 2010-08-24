@@ -31,6 +31,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.shared.SCBException;
+import de.mrx.shared.WrongTANException;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -44,13 +45,12 @@ public class SCB implements EntryPoint {
 	private static final String PAGEID_CONTENT = "content";
 	private static final String PAGEID_FEHLER = "fehler";
 	private static final String PAGEID_SIGN = "signInOut";
-	
-	private final static String STYLE_VALUE_NOT_OKAY="ValueNotOkay";
-	private final static String STYLE_VALUE_OKAY="ValueOkay";
 
-	
-	 private SCBConstants constants = GWT.create(SCBConstants.class);
-	  private SCBMessages messages = GWT.create(SCBMessages.class);
+	private final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
+	private final static String STYLE_VALUE_OKAY = "ValueOkay";
+
+	private SCBConstants constants = GWT.create(SCBConstants.class);
+	private SCBMessages messages = GWT.create(SCBMessages.class);
 	RegisterServiceAsync registerSvc;
 	private BankingServiceAsync bankingService;
 	/**
@@ -63,14 +63,14 @@ public class SCB implements EntryPoint {
 
 	private CheckBox agbBox;;
 	MenuBar generalMenu = new MenuBar(true);
-	
-	private VerticalPanel mainPanel=new VerticalPanel();
+
+	private VerticalPanel mainPanel = new VerticalPanel();
 
 	private HorizontalPanel accountOverviewPanel = new HorizontalPanel();
 	private VerticalPanel accountsListPanel = new VerticalPanel();
 	private VerticalPanel accountsDetailsPanel = new VerticalPanel();
-	
-	FlexTable validateErrorTable=new FlexTable();
+
+	FlexTable validateErrorTable = new FlexTable();
 
 	private TextBox nameTxt;
 	private TextBox streetTxt;
@@ -91,7 +91,6 @@ public class SCB implements EntryPoint {
 
 	private VerticalPanel registrationPanel;
 
-	
 	private HTMLTable registrationTable;
 
 	private SCBIdentityDTO identityInfo = null;
@@ -111,7 +110,7 @@ public class SCB implements EntryPoint {
 	private TextBox receiverAccountNrTxt;
 	private TextBox tanConfirmationTxt;
 	private Button tanConfirmationBtn;
-	
+
 	private TextBox receiverBankNrTxt;
 
 	private TextBox amountTxt;
@@ -119,7 +118,7 @@ public class SCB implements EntryPoint {
 	private TextBox recipientTxt;
 	private TextBox bankNameTxt;
 
-	private List <String > hints= new ArrayList<String>();
+	private List<String> hints = new ArrayList<String>();
 
 	private Button sendMoneyBtn;
 
@@ -154,12 +153,11 @@ public class SCB implements EntryPoint {
 		streetTxt = new TextBox();
 		plzTxt = new TextBox();
 		cityTxt = new TextBox();
-		emailTxt = new TextBox();		
-		if (identityInfo!=null && (identityInfo.getEmail()!=null)){
+		emailTxt = new TextBox();
+		if (identityInfo != null && (identityInfo.getEmail() != null)) {
 			emailTxt.setText(identityInfo.getEmail());
 			emailTxt.setReadOnly(true);
-		}
-		else{
+		} else {
 			Log.info("Email ist editierbar");
 		}
 		password = new PasswordTextBox();
@@ -174,30 +172,27 @@ public class SCB implements EntryPoint {
 		registrationTable.setWidget(2, 1, plzTxt);
 		registrationTable.setWidget(2, 2, cityLbl);
 		registrationTable.setWidget(2, 3, cityTxt);
-//		registrationTable.setWidget(3, 0, passwordLbl);
-//		registrationTable.setWidget(3, 1, password);
-//		registrationTable.setWidget(4, 0, agbBox);
+		// registrationTable.setWidget(3, 0, passwordLbl);
+		// registrationTable.setWidget(3, 1, password);
+		// registrationTable.setWidget(4, 0, agbBox);
 		registrationTable.setWidget(4, 1, registerButton);
 
 		registerButton.addClickHandler(new ClickHandler() {
 
 			public void onClick(ClickEvent event) {
 				validateErrorTable.clear();
-				
-				if (isRegisterFormValid()){
+
+				if (isRegisterFormValid()) {
 					register();
-				}
-				else{
-					
+				} else {
+
 					createHintTable();
 					registrationPanel.add(validateErrorTable);
 				}
-				
 
 			}
 		});
 		registrationPanel.add(registrationTable);
-
 
 		return registrationPanel;
 	}
@@ -222,28 +217,27 @@ public class SCB implements EntryPoint {
 		AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
 			public void onFailure(Throwable caught) {
-				
-				if (caught instanceof SCBException ){
-					SCBException scbE=(SCBException) caught;
+
+				if (caught instanceof SCBException) {
+					SCBException scbE = (SCBException) caught;
 					Window.alert(messages.invalidSymbol(caught.getMessage()));
-				}
-				else{				
-					Window.alert("Registration fails! Reason: "+caught.getMessage());		
+				} else {
+					Window.alert("Registration fails! Reason: "
+							+ caught.getMessage());
 					caught.printStackTrace();
 				}
 
 			}
 
 			public void onSuccess(Void result) {
-				Window.alert(constants.registrationSuccessMessage()); 
+				Window.alert(constants.registrationSuccessMessage());
 				getRegistrationPanel().removeFromParent();
 				checkGoogleStatus();
 			}
 		};
-		
-		registerSvc.register(id, callback);
-//		Window.Location.reload();
 
+		registerSvc.register(id, callback);
+		// Window.Location.reload();
 
 	}
 
@@ -259,16 +253,15 @@ public class SCB implements EntryPoint {
 				GWT.log("Root not found: '" + PAGEID_HEADER + "'");
 				return;
 			}
-			
+
 			RootPanel.get(PAGEID_FEHLER).add(divLogger);
 			Log.setUncaughtExceptionHandler();
-
 
 			Command cmdShowImpressum = new Command() {
 				public void execute() {
 					GWT.log("Impressum follows");
-					Window.alert("This is a academic technology study in Cloud Computing. At the moment you see an internal development state." );
-					
+					Window
+							.alert("This is a academic technology study in Cloud Computing. At the moment you see an internal development state.");
 
 				}
 			};
@@ -276,8 +269,8 @@ public class SCB implements EntryPoint {
 			Command cmdShowInfoSCB = new Command() {
 				public void execute() {
 					GWT.log("SCB Info");
-					Window.alert("Demonstration of cloud and security technology ." );
-					
+					Window
+							.alert("Demonstration of cloud and security technology .");
 
 				}
 			};
@@ -297,8 +290,6 @@ public class SCB implements EntryPoint {
 
 				}
 			};
-
-
 
 			MenuBar bankingMenu = new MenuBar(true);
 
@@ -334,7 +325,7 @@ public class SCB implements EntryPoint {
 		Log.info("Show Account Overview");
 		accountOverviewPanel.add(accountsListPanel);
 		accountOverviewPanel.add(accountsDetailsPanel);
-		
+
 		if (bankingService == null) {
 			bankingService = GWT.create(BankingService.class);
 		}
@@ -353,30 +344,33 @@ public class SCB implements EntryPoint {
 
 				} else {
 					Log.info("Number of Accounts: " + result.size());
-					Button overviewBtn=new Button("Financial state");
+					Button overviewBtn = new Button("Financial state");
 					overviewBtn.setStyleName("OverViewButton");
 					overviewBtn.addClickHandler(new ClickHandler() {
-						
+
 						public void onClick(ClickEvent event) {
 							showAccountOverview();
 						}
 					});
 					accountsListPanel.add(overviewBtn);
-					showAccountOverviewInDetailPanel( result);
-//					accountsListPanel.add(new Label("Your accounts "));
+					showAccountOverviewInDetailPanel(result);
+					// accountsListPanel.add(new Label("Your accounts "));
 					for (AccountDTO acc : result) {
 						Log.info(acc.toString());
-						
-						Button btn=new Button(acc.getAccountDescription()+" ("+acc.getAccountNr()+")");
-						
+
+						Button btn = new Button(acc.getAccountDescription()
+								+ " (" + acc.getAccountNr() + ")");
+
 						btn.setStyleName("OverViewButton");
-						
-						btn.addClickHandler(new AccountClickHandler(acc.getAccountNr()));
+
+						btn.addClickHandler(new AccountClickHandler(acc
+								.getAccountNr()));
 						accountsListPanel.add(btn);
 					}
-					
-					if (result.size()==0){
-						Button neuerAccountBtn = new Button("Open saving Account");
+
+					if (result.size() == 0) {
+						Button neuerAccountBtn = new Button(
+								"Open saving Account");
 						neuerAccountBtn.setStyleName("OverViewButton");
 						neuerAccountBtn.addClickHandler(new ClickHandler() {
 
@@ -387,12 +381,11 @@ public class SCB implements EntryPoint {
 						});
 						Log.debug("Include 'open saving account button");
 						accountsListPanel.add(neuerAccountBtn);
-			
+
 					}
 				}
-				
-				
-							RootPanel.get(PAGEID_CONTENT).add(accountOverviewPanel);
+
+				RootPanel.get(PAGEID_CONTENT).add(accountOverviewPanel);
 				Log.debug("Overview Page loaded");
 
 			}
@@ -402,33 +395,32 @@ public class SCB implements EntryPoint {
 
 	protected void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
 		accountsDetailsPanel.clear();
-		Label accHeaderLbl=new Label("Account Overview");
+		Label accHeaderLbl = new Label("Account Overview");
 		accountsDetailsPanel.add(accHeaderLbl);
-		Grid grid=new Grid(result.size()+1,2);
+		Grid grid = new Grid(result.size() + 1, 2);
 		accountsDetailsPanel.add(grid);
-		Label accHeader=new Label("Account");
-		Label amountHeader=new Label("Balance");
+		Label accHeader = new Label("Account");
+		Label amountHeader = new Label("Balance");
 		accHeader.setStyleName("TransfersHeader");
 		amountHeader.setStyleName("TransfersHeader");
-		grid.setWidget(0,0, accHeader);
-		grid.setWidget(0,1, amountHeader);
+		grid.setWidget(0, 0, accHeader);
+		grid.setWidget(0, 1, amountHeader);
 		grid.setBorderWidth(1);
-		
-		
-		
-		int row=1;
-		for (AccountDTO dto:result){
-			Label accountElement=new Label(dto.getAccountNr());
-			Label balanceElement=new Label(com.google.gwt.i18n.client.NumberFormat.getCurrencyFormat().format( dto.getBalance()));
-			if (dto.getBalance()>=0){
+
+		int row = 1;
+		for (AccountDTO dto : result) {
+			Label accountElement = new Label(dto.getAccountNr());
+			Label balanceElement = new Label(
+					com.google.gwt.i18n.client.NumberFormat.getCurrencyFormat()
+							.format(dto.getBalance()));
+			if (dto.getBalance() >= 0) {
 				balanceElement.setStyleName("positiveMoney");
-			}
-			else{
+			} else {
 				balanceElement.setStyleName("negativeMoney");
 			}
-			grid.setWidget(row, 0,accountElement);
-			grid.setWidget(row, 1,balanceElement);
-			
+			grid.setWidget(row, 0, accountElement);
+			grid.setWidget(row, 1, balanceElement);
+
 			row++;
 		}
 	}
@@ -446,8 +438,10 @@ public class SCB implements EntryPoint {
 				new AsyncCallback<SCBIdentityDTO>() {
 					public void onFailure(Throwable error) {
 						error.printStackTrace();
-						Log.error("Login state can not be retrieved! ",error);
-						Window.alert("Login state can not be retrieved! Detail: "+error.getMessage());
+						Log.error("Login state can not be retrieved! ", error);
+						Window
+								.alert("Login state can not be retrieved! Detail: "
+										+ error.getMessage());
 					}
 
 					public void onSuccess(SCBIdentityDTO result) {
@@ -525,283 +519,307 @@ public class SCB implements EntryPoint {
 		});
 
 	}
-	
-	private void showAccountDetails(String accNr){
+
+	private void showAccountDetails(String accNr) {
 		if (bankingService == null) {
 			bankingService = GWT.create(BankingService.class);
 		}
 		accountsDetailsPanel.clear();
-		
-		currentAccount=accNr;
-		
-		bankingService.getAccountDetails(accNr,new AsyncCallback<AccountDetailDTO>() {
 
-			public void onFailure(Throwable caught) {
-				Log.error("Error loading balance", caught);
-				
-			}
+		currentAccount = accNr;
 
-			
-			private HTMLTable accountDetailTable;
-			
-			public void onSuccess(AccountDetailDTO result) {
-				Log.info("Balance: "+result);
-				Label accBalanceLbl=new Label("Current balance: "+NumberFormat.getCurrencyFormat().format( result.getBalance()));
-				if (result.getBalance()>=0){
-					accBalanceLbl.setStyleName("positiveMoney");
-				}
-				else{
-					accBalanceLbl.setStyleName("negativeMoney");
-				}
-				
-				
-				
-				if (accountDetailTable!=null){
-					accountsDetailsPanel.remove(accountDetailTable);
-				}
-				List<MoneyTransferDTO> transfers=result.getTransfers();
-				accountDetailTable = new Grid(transfers.size()+2,4);
-				Label dateLbl=new Label("Date");
-				Label commentLbl=new Label("Comment");
-				Label accountLbl=new Label("Account");
-				Label amountLbl=new Label("Amount");
-				commentLbl.setStyleName("TransfersHeader");
-				dateLbl.setStyleName("TransfersHeader");
-				accountLbl.setStyleName("TransfersHeader");
-				amountLbl.setStyleName("TransfersHeader");
-				
-				accountDetailTable.setWidget(0,0,dateLbl);
-				accountDetailTable.setWidget(0,1,commentLbl);
-				accountDetailTable.setWidget(0,2,accountLbl);
-				accountDetailTable.setWidget(0,3,amountLbl);
-				int pos=1;
-				Log.debug("Money transfer entries: "+transfers.size());
-				for (MoneyTransferDTO transfer: transfers){
-					Log.info("Transfer: "+transfer);
-					Label entryDateLbl=new Label(DateTimeFormat.getMediumDateFormat().format(transfer.getTimestamp()));
-					Label entryRemarkLbl=new Label(transfer.getRemark());
-					Label entryReceiverDetailsLbl=new Label(transfer.getReceiverBankNr()+": "+ transfer.getReceiverAccountNr());
-					
-					Label entryAmountLbl=new Label(NumberFormat.getCurrencyFormat().format( transfer.getAmount()));
-					if (pos%2==0){
-						entryDateLbl.setStyleName("TransfersOdd");
-						entryRemarkLbl.setStyleName("TransfersOdd");
-						entryReceiverDetailsLbl.setStyleName("TransfersOdd");
-										
+		bankingService.getAccountDetails(accNr,
+				new AsyncCallback<AccountDetailDTO>() {
+
+					public void onFailure(Throwable caught) {
+						Log.error("Error loading balance", caught);
+
 					}
-					else{
-						entryDateLbl.setStyleName("TransfersEven");
-						entryRemarkLbl.setStyleName("TransfersEven");
-						entryReceiverDetailsLbl.setStyleName("TransfersEven");
-						
-					}
-					if (transfer.getAmount()>=0){
-						entryAmountLbl.setStyleName("positiveMoney");
-					}
-					else{
-						entryAmountLbl.setStyleName("negativeMoney");
-					}
-					accountDetailTable.setWidget(pos,0,entryDateLbl);
-					accountDetailTable.setWidget(pos,1,entryRemarkLbl);
-					accountDetailTable.setWidget(pos,2,entryReceiverDetailsLbl);
-					accountDetailTable.setWidget(pos,3,entryAmountLbl);
-					pos++;					
-				}
-				Button transferMoneyButton=new Button("Send money");
-				transferMoneyButton.addClickHandler(new ClickHandler() {
-					
-					public void onClick(ClickEvent event) {
-						sendMoney(currentAccount);
-						
+
+					private HTMLTable accountDetailTable;
+
+					public void onSuccess(AccountDetailDTO result) {
+						Log.info("Balance: " + result);
+						Label accBalanceLbl = new Label("Current balance: "
+								+ NumberFormat.getCurrencyFormat().format(
+										result.getBalance()));
+						if (result.getBalance() >= 0) {
+							accBalanceLbl.setStyleName("positiveMoney");
+						} else {
+							accBalanceLbl.setStyleName("negativeMoney");
+						}
+
+						if (accountDetailTable != null) {
+							accountsDetailsPanel.remove(accountDetailTable);
+						}
+						List<MoneyTransferDTO> transfers = result
+								.getTransfers();
+						accountDetailTable = new Grid(transfers.size() + 2, 4);
+						Label dateLbl = new Label("Date");
+						Label commentLbl = new Label("Comment");
+						Label accountLbl = new Label("Account");
+						Label amountLbl = new Label("Amount");
+						commentLbl.setStyleName("TransfersHeader");
+						dateLbl.setStyleName("TransfersHeader");
+						accountLbl.setStyleName("TransfersHeader");
+						amountLbl.setStyleName("TransfersHeader");
+
+						accountDetailTable.setWidget(0, 0, dateLbl);
+						accountDetailTable.setWidget(0, 1, commentLbl);
+						accountDetailTable.setWidget(0, 2, accountLbl);
+						accountDetailTable.setWidget(0, 3, amountLbl);
+						int pos = 1;
+						Log
+								.debug("Money transfer entries: "
+										+ transfers.size());
+						for (MoneyTransferDTO transfer : transfers) {
+							Log.info("Transfer: " + transfer);
+							Label entryDateLbl = new Label(DateTimeFormat
+									.getMediumDateFormat().format(
+											transfer.getTimestamp()));
+							Label entryRemarkLbl = new Label(transfer
+									.getRemark());
+							Label entryReceiverDetailsLbl = new Label(transfer
+									.getReceiverBankNr()
+									+ ": " + transfer.getReceiverAccountNr());
+
+							Label entryAmountLbl = new Label(NumberFormat
+									.getCurrencyFormat().format(
+											transfer.getAmount()));
+							if (pos % 2 == 0) {
+								entryDateLbl.setStyleName("TransfersOdd");
+								entryRemarkLbl.setStyleName("TransfersOdd");
+								entryReceiverDetailsLbl
+										.setStyleName("TransfersOdd");
+
+							} else {
+								entryDateLbl.setStyleName("TransfersEven");
+								entryRemarkLbl.setStyleName("TransfersEven");
+								entryReceiverDetailsLbl
+										.setStyleName("TransfersEven");
+
+							}
+							if (transfer.getAmount() >= 0) {
+								entryAmountLbl.setStyleName("positiveMoney");
+							} else {
+								entryAmountLbl.setStyleName("negativeMoney");
+							}
+							accountDetailTable.setWidget(pos, 0, entryDateLbl);
+							accountDetailTable
+									.setWidget(pos, 1, entryRemarkLbl);
+							accountDetailTable.setWidget(pos, 2,
+									entryReceiverDetailsLbl);
+							accountDetailTable
+									.setWidget(pos, 3, entryAmountLbl);
+							pos++;
+						}
+						Button transferMoneyButton = new Button("Send money");
+						transferMoneyButton.addClickHandler(new ClickHandler() {
+
+							public void onClick(ClickEvent event) {
+								sendMoney(currentAccount);
+
+							}
+						});
+						accountDetailTable.setWidget(accountDetailTable
+								.getRowCount() - 1, 3, transferMoneyButton);
+
+						accountsDetailsPanel.insert(accBalanceLbl, 0);
+						accountsDetailsPanel.insert(accountDetailTable, 1);
+
 					}
 				});
-				accountDetailTable.setWidget(accountDetailTable.getRowCount()-1, 3, transferMoneyButton);
-				
-				accountsDetailsPanel.insert(accBalanceLbl,0);				
-				accountsDetailsPanel.insert(accountDetailTable,1);
-				
-
-			
-				
-			}
-		});
 	}
-	
-	private boolean isFieldConfirmToExpresion(TextBox input, String expression, String errorMessage){
+
+	private boolean isFieldConfirmToExpresion(TextBox input, String expression,
+			String errorMessage) {
 		if (input.getText().trim().toUpperCase().matches(expression)) {
 			input.setStyleName(STYLE_VALUE_OKAY);
 			return true;
-		}
-		else{
+		} else {
 			input.setStyleName(STYLE_VALUE_NOT_OKAY);
-			Log.info("Text: '"+input.getText()+"'\tExpression: "+expression);
+			Log.info("Text: '" + input.getText() + "'\tExpression: "
+					+ expression);
 			hints.add(errorMessage);
 			return false;
 		}
-		
-		
+
 	}
-	
-	private boolean isSendMoneyFormValid(){
-		boolean result=true;
-		Log.info("Text: "+receiverAccountNrTxt.getText());
-		hints.clear() ;
-		if (!isFieldConfirmToExpresion(receiverAccountNrTxt,"^[0-9]{1,10}$","Account may only contain numbers")){
-			result=false;
+
+	private boolean isSendMoneyFormValid() {
+		boolean result = true;
+		Log.info("Text: " + receiverAccountNrTxt.getText());
+		hints.clear();
+		if (!isFieldConfirmToExpresion(receiverAccountNrTxt, "^[0-9]{1,10}$",
+				"Account may only contain numbers")) {
+			result = false;
 		}
-		if (!isFieldConfirmToExpresion(receiverBankNrTxt,"^[0-9]{1,10}$","BLZ may only contain numbers")){
-			result=false;
+		if (!isFieldConfirmToExpresion(receiverBankNrTxt, "^[0-9]{1,10}$",
+				"BLZ may only contain numbers")) {
+			result = false;
 		}
-		if (!isFieldConfirmToExpresion(amountTxt,"^[0-9]{1,5}[\\.]?[0-9]{0,2}$","Amount may only contain a value between 0.00 and 9999.99.")){
-			result=false;
+		if (!isFieldConfirmToExpresion(amountTxt,
+				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
+				"Amount may only contain a value between 0.00 and 9999.99.")) {
+			result = false;
 		}
 		return result;
 	}
-	
-	
-	private boolean isRegisterFormValid(){
-		boolean result=true;
-		
-		hints.clear() ;
-		
-		if (!isFieldConfirmToExpresion(nameTxt,"[\\w]+","Please enter a valid name!")){
-			result=false;
+
+	private boolean isRegisterFormValid() {
+		boolean result = true;
+
+		hints.clear();
+
+		if (!isFieldConfirmToExpresion(nameTxt, "[\\w]+",
+				"Please enter a valid name!")) {
+			result = false;
 		}
-		if (!isFieldConfirmToExpresion(emailTxt,"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b","Please enter a valid email address!")){
-			result=false;
+		if (!isFieldConfirmToExpresion(emailTxt,
+				"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
+				"Please enter a valid email address!")) {
+			result = false;
 		}
-		if (!isFieldConfirmToExpresion(streetTxt,"[\\w \\däÄöÖüÜ]+","Please enter a valid street name!")){
-			result=false;
-		}		
-		if (!isFieldConfirmToExpresion(plzTxt,"[\\d]+","Please enter a valid postal code!")){
-			result=false;
+		if (!isFieldConfirmToExpresion(streetTxt, "[\\w \\däÄöÖüÜ]+",
+				"Please enter a valid street name!")) {
+			result = false;
+		}
+		if (!isFieldConfirmToExpresion(plzTxt, "[\\d]+",
+				"Please enter a valid postal code!")) {
+			result = false;
 		}
 
-		if (!isFieldConfirmToExpresion(cityTxt,"[\\w]+","Please enter a city! ")){
-			result=false;
+		if (!isFieldConfirmToExpresion(cityTxt, "[\\w]+",
+				"Please enter a city! ")) {
+			result = false;
 		}
 
-		
 		return result;
 	}
-	
-	
+
 	protected void sendMoney(String accNr) {
 		accountsDetailsPanel.clear();
 		transferForm = new Grid(6, 4);
-		Label receiverAccountNrLbl=new Label("Receiver Account Nr:");
-		Label receiverBankNrLbl=new Label("Receiver Bank number");
-		Label amountLbl=new Label("Amount");
-		Label remarkLbl=new Label("Remark");
-		Label recipientName=new Label("Recipient");
-		Label bankName=new Label("Bank name");
+		Label receiverAccountNrLbl = new Label("Receiver Account Nr:");
+		Label receiverBankNrLbl = new Label("Receiver Bank number");
+		Label amountLbl = new Label("Amount");
+		Label remarkLbl = new Label("Remark");
+		Label recipientName = new Label("Recipient");
+		Label bankName = new Label("Bank name");
 		receiverAccountNrTxt = new TextBox();
 		receiverBankNrTxt = new TextBox();
 		amountTxt = new TextBox();
-		remarkTxt=new TextBox();
-		recipientTxt=new TextBox();
-		bankNameTxt=new TextBox();
+		remarkTxt = new TextBox();
+		recipientTxt = new TextBox();
+		bankNameTxt = new TextBox();
 		sendMoneyBtn = new Button("Send Money");
 		sendMoneyBtn.addClickHandler(new ClickHandler() {
-			
+
 			public void onClick(ClickEvent event) {
 				validateErrorTable.clear();
-				
-				if (isSendMoneyFormValid()){
+
+				if (isSendMoneyFormValid()) {
 					doSendMoney();
-				}
-				else{
-					
+				} else {
+
 					createHintTable();
 					accountsDetailsPanel.add(validateErrorTable);
 				}
-				
+
 			}
 
-			
 		});
-		transferForm.setWidget(0,0,receiverAccountNrLbl);
-		transferForm.setWidget(0,1,receiverAccountNrTxt);
-		transferForm.setWidget(0,2,recipientName);
-		transferForm.setWidget(0,3,recipientTxt);
-		transferForm.setWidget(1,0,receiverBankNrLbl);
-		transferForm.setWidget(1,1,receiverBankNrTxt);
-		transferForm.setWidget(1,2,bankName);
-		transferForm.setWidget(1,3,bankNameTxt);
-		transferForm.setWidget(2,0,amountLbl);
-		transferForm.setWidget(2,1,amountTxt);
-		transferForm.setWidget(3,0,remarkLbl);
-		transferForm.setWidget(3,1,remarkTxt);
-		transferForm.setWidget(4,1,sendMoneyBtn);
-		
+		transferForm.setWidget(0, 0, receiverAccountNrLbl);
+		transferForm.setWidget(0, 1, receiverAccountNrTxt);
+		transferForm.setWidget(0, 2, recipientName);
+		transferForm.setWidget(0, 3, recipientTxt);
+		transferForm.setWidget(1, 0, receiverBankNrLbl);
+		transferForm.setWidget(1, 1, receiverBankNrTxt);
+		transferForm.setWidget(1, 2, bankName);
+		transferForm.setWidget(1, 3, bankNameTxt);
+		transferForm.setWidget(2, 0, amountLbl);
+		transferForm.setWidget(2, 1, amountTxt);
+		transferForm.setWidget(3, 0, remarkLbl);
+		transferForm.setWidget(3, 1, remarkTxt);
+		transferForm.setWidget(4, 1, sendMoneyBtn);
+
 		accountsDetailsPanel.add(transferForm);
-		
+
 	}
 
 	protected void doSendMoney() {
 		if (bankingService == null) {
 			bankingService = GWT.create(BankingService.class);
 		}
-		
-		Double amount=Double.parseDouble( amountTxt.getText());
-		String remark=remarkTxt.getText();
-		
-		
-		bankingService.sendMoneyAskForConfirmationData(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<MoneyTransferDTO>() {
-//		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), new AsyncCallback<Void>() {
 
-			public void onFailure(Throwable caught) {
-				Log.error("Sending money failed",caught);
-				
-			}
+		Double amount = Double.parseDouble(amountTxt.getText());
+		String remark = remarkTxt.getText();
 
-			
-			public void onSuccess(MoneyTransferDTO result) {
-				Log.debug("Show confirmation page");
-				showConfirmationPage(result);
-				
-			}
-		});
-		
+		bankingService.sendMoneyAskForConfirmationData(currentAccount,
+				receiverBankNrTxt.getText(), receiverAccountNrTxt.getText(),
+				amount, remark, recipientTxt.getText(), bankNameTxt.getText(),
+				new AsyncCallback<MoneyTransferDTO>() {
+					// bankingService.sendMoney(currentAccount,
+					// receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(),
+					// bankNameTxt.getText(), new AsyncCallback<Void>() {
+
+					public void onFailure(Throwable caught) {
+						Log.error("Sending money failed", caught);
+
+					}
+
+					public void onSuccess(MoneyTransferDTO result) {
+						Log.debug("Show confirmation page");
+						showConfirmationPage(result);
+
+					}
+				});
+
 	}
-	
-	
+
 	protected void doConfirmSendMoney() {
 		if (bankingService == null) {
 			bankingService = GWT.create(BankingService.class);
 		}
-		
-		Double amount=Double.parseDouble( amountTxt.getText());
-		String remark=remarkTxt.getText();
-		String tan=tanConfirmationTxt.getText();
-		
-		
-		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(), bankNameTxt.getText(), tan, new AsyncCallback<Void>() {
 
-			public void onFailure(Throwable caught) {
-				Log.error("Sending money failed",caught);
-				Window.alert("Money sent failed :"+caught.getMessage());
-				
-			}
+		Double amount = Double.parseDouble(amountTxt.getText());
+		String remark = remarkTxt.getText();
+		String tan = tanConfirmationTxt.getText();
 
-			
-			public void onSuccess(Void result) {
-				Window.alert("Money sent sucessfully");
-				
-				
-				
-			}
-		});
-		
+		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),
+				receiverAccountNrTxt.getText(), amount, remark, recipientTxt
+						.getText(), bankNameTxt.getText(), tan,
+				new AsyncCallback<Void>() {
+
+					public void onFailure(Throwable caught) {
+						if (caught instanceof WrongTANException) {
+							WrongTANException wte = (WrongTANException) caught;
+							Window.alert("Falsche TAN eingegeben: "
+									+ wte.getTrials() + " x");
+						} else {
+
+							Log.error("Sending money failed", caught);
+							Window.alert("Money sent failed :"
+									+ caught.getMessage());
+						}
+
+					}
+
+					public void onSuccess(Void result) {
+						Window.alert("Money sent sucessfully");
+
+					}
+				});
+
 	}
-	
-	private void showConfirmationPage( MoneyTransferDTO dto){
-//		accountsDetailsPanel.clear();
-		
+
+	private void showConfirmationPage(MoneyTransferDTO dto) {
+		// accountsDetailsPanel.clear();
+
 		receiverAccountNrTxt.setText(dto.getReceiverAccountNr());
-		
+
 		receiverBankNrTxt.setText(dto.getReceiverBankNr());
-		amountTxt.setText(""+dto.getAmount());
+		amountTxt.setText("" + dto.getAmount());
 		remarkTxt.setText(dto.getRemark());
 		recipientTxt.setText(dto.getReceiverName());
 		receiverAccountNrTxt.setEnabled(false);
@@ -810,49 +828,48 @@ public class SCB implements EntryPoint {
 		remarkTxt.setEnabled(false);
 		recipientTxt.setEnabled(false);
 		receiverAccountNrTxt.setEnabled(false);
-		tanConfirmationTxt=new TextBox();		
-		tanConfirmationBtn=new Button("Confim Tranaction");
-		transferForm.setWidget(3,2,new Label("TAN: +"+dto.getRequiredTan()));
-		transferForm.setWidget(3,3,tanConfirmationTxt);
-		transferForm.setWidget(4,1,tanConfirmationBtn);
-		
+		tanConfirmationTxt = new TextBox();
+		tanConfirmationBtn = new Button("Confim Tranaction");
+		transferForm
+				.setWidget(3, 2, new Label("TAN Nr: " + dto.getRequiredTan()));
+		transferForm.setWidget(3, 3, tanConfirmationTxt);
+		transferForm.setWidget(4, 1, tanConfirmationBtn);
+
 		tanConfirmationBtn.addClickHandler(new ClickHandler() {
 
 			public void onClick(ClickEvent event) {
 				validateErrorTable.clear();
-				
-				if (isSendMoneyFormValid()){
+
+				if (isSendMoneyFormValid()) {
 					doConfirmSendMoney();
-				}
-				else{
-					
+				} else {
+
 					createHintTable();
 					accountsDetailsPanel.add(validateErrorTable);
 				}
-			}				
+			}
 		});
 	}
-	
-	
-	
+
 	private void createHintTable() {
-		for (int i=0;i<hints.size();i++){
-			String currentMessage=hints.get(i);			
-			Label hintLabel=new Label(currentMessage);
+		for (int i = 0; i < hints.size(); i++) {
+			String currentMessage = hints.get(i);
+			Label hintLabel = new Label(currentMessage);
 			hintLabel.setStyleName(STYLE_VALUE_NOT_OKAY);
-			validateErrorTable.setWidget(i,1,hintLabel);
+			validateErrorTable.setWidget(i, 1, hintLabel);
 		}
 	}
-	
-	class AccountClickHandler implements ClickHandler{
+
+	class AccountClickHandler implements ClickHandler {
 		String accNr;
-		public AccountClickHandler(String accountNr){
-			accNr=accountNr;
+
+		public AccountClickHandler(String accountNr) {
+			accNr = accountNr;
 		}
 
-		public void onClick(ClickEvent event) {			
+		public void onClick(ClickEvent event) {
 			showAccountDetails(accNr);
 		}
-		
+
 	}
 }

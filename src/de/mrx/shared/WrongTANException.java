@@ -11,6 +11,10 @@ public class WrongTANException extends SCBException{
 		this.trials = trials;
 	}
 
+	public WrongTANException(){
+		
+	}
+	
 	public WrongTANException(int trial){
 		super("Wrong TAN");
 		setTrials(trial);
