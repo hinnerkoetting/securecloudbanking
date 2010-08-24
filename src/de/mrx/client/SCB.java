@@ -19,8 +19,10 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -90,6 +92,7 @@ public class SCB implements EntryPoint {
 	private Button registerButton = new Button(constants.menuRegister());
 
 	private VerticalPanel registrationPanel;
+	private VerticalPanel informationPanel;
 
 	private HTMLTable registrationTable;
 
@@ -129,9 +132,24 @@ public class SCB implements EntryPoint {
 		Window.alert(constants.outOfServiceNotice());
 
 	}
+	
+	
+	private void doShowAbout(){
+		RootPanel.get(PAGEID_CONTENT).clear();
+		informationPanel=new VerticalPanel();
+		HTML text=new HTML("Secure Cloud Banking is a technology demonstration platform to evaluate aspects of cloud computing. <br>Feel free to register with a google account and use the SCB banking services. <br>Enjoy!<br><br>");
+		text.setStyleName("centerAligned");
+		Image bild=new Image("images/banking.jpg");
+		bild.setStyleName("centerAligned");
+		
+		informationPanel.add(text);
+		informationPanel.add(bild);
+		
+		RootPanel.get(PAGEID_CONTENT).add(informationPanel);
+	}
 
 	private void doOpenRegisterMenu() {
-		RootPanel.get(PAGEID_CONTENT).remove(getRegistrationPanel());
+		RootPanel.get(PAGEID_CONTENT).clear();
 		RootPanel.get(PAGEID_CONTENT).add(getRegistrationPanel());
 	}
 
@@ -261,7 +279,7 @@ public class SCB implements EntryPoint {
 				public void execute() {
 					GWT.log("Impressum follows");
 					Window
-							.alert("This is a academic technology study in Cloud Computing. At the moment you see an internal development state.");
+							.alert("This is a academic technology study in Cloud Computing. At the moment you see an internal development state.\n This site is provided by J. Oetting");
 
 				}
 			};
@@ -270,7 +288,7 @@ public class SCB implements EntryPoint {
 				public void execute() {
 					GWT.log("SCB Info");
 					Window
-							.alert("Demonstration of cloud and security technology .");
+							.alert("This site demonstrates cloud security technology.");
 
 				}
 			};
@@ -300,8 +318,7 @@ public class SCB implements EntryPoint {
 
 			menu = new MenuBar();
 			registerMItem = new MenuItem("Register", cmdRegister);
-			menu.addItem(registerMItem);
-			menu.addItem("Banking", bankingMenu);
+			menu.addItem(registerMItem);			
 			menu.addItem("Information", informationMenu);
 			userInformationMenuItem = new MenuItem("UserInfo", cmdShowNoService);
 			menu.addItem(userInformationMenuItem);
@@ -309,8 +326,10 @@ public class SCB implements EntryPoint {
 			mainPanel.add(menu);
 
 			r.add(mainPanel);
+			
 			checkGoogleStatus();
-			GWT.log("Module laden durchgefuehrt");
+			doShowAbout();
+			GWT.log("Module loaded");
 
 		} catch (Exception e) {
 			GWT.log(e.getMessage());
@@ -447,7 +466,7 @@ public class SCB implements EntryPoint {
 					public void onSuccess(SCBIdentityDTO result) {
 						identityInfo = result;
 						if (identityInfo.isLoggedIn()) {
-							Log.info("Eingeloggt");
+							Log.info("User is logged in with email-adress "+result.getEmail());
 							if (identityInfo.isActivated()) {
 								Log.info("Valid Account " + identityInfo);
 								String userInfo = identityInfo.getEmail();
@@ -461,14 +480,14 @@ public class SCB implements EntryPoint {
 								showAccountOverview();
 
 							} else {
-								Log.info("Account nicht aktiviert: "
+								Log.info("Account not yet activated in SCB: "
 										+ identityInfo);
 								userInformationMenuItem.setText(identityInfo
 										.getEmail());
 							}
 							loadLoggedInSetup();
 						} else {
-							Log.info("Nicht eingeloggt");
+							Log.info("User is not yet logged in with his Google account");
 							loadLogin();
 						}
 					}
@@ -479,6 +498,7 @@ public class SCB implements EntryPoint {
 	private void loadLogin() {
 		// Assemble login panel.
 		signInLink.setHref(identityInfo.getLoginUrl());
+		signInLink.setStyleName("rightAligned");
 
 		// loginPanel.add(onlyGoogleAllowedLabel);
 		// loginPanel.add(signInLink);

@@ -82,3 +82,20 @@ color: red;
 	margin:5px;
 		
 }
+
+
+.rightAligned{
+  text-align:right
+}
+
+.centerAligned{
+  text-align:center    
+   display:block;  
+  color:blue;
+  font-size:130%;
+  margin-left: 3cm;
+    margin-right: auto;
+    
+  
+  
+}
