@@ -634,7 +634,7 @@ public class SCB implements EntryPoint {
 	private boolean isFieldConfirmToExpresion(TextBox input, String expression,
 			String errorMessage) {
 		if (input.getText().trim().toUpperCase().matches(expression)) {
-			input.setStyleName(STYLE_VALUE_OKAY);
+			input.setStyleName("");
 			return true;
 		} else {
 			input.setStyleName(STYLE_VALUE_NOT_OKAY);
@@ -824,16 +824,18 @@ public class SCB implements EntryPoint {
 		recipientTxt.setText(dto.getReceiverName());
 		receiverAccountNrTxt.setEnabled(false);
 		receiverBankNrTxt.setEnabled(false);
+		bankNameTxt.setEnabled(false);
 		amountTxt.setEnabled(false);
 		remarkTxt.setEnabled(false);
 		recipientTxt.setEnabled(false);
 		receiverAccountNrTxt.setEnabled(false);
 		tanConfirmationTxt = new TextBox();
-		tanConfirmationBtn = new Button("Confim Tranaction");
+		tanConfirmationBtn = new Button("Confirm Transaction");
 		transferForm
 				.setWidget(3, 2, new Label("TAN Nr: " + dto.getRequiredTan()));
 		transferForm.setWidget(3, 3, tanConfirmationTxt);
-		transferForm.setWidget(4, 1, tanConfirmationBtn);
+		transferForm.remove( sendMoneyBtn);
+		transferForm.setWidget(4, 3, tanConfirmationBtn);
 
 		tanConfirmationBtn.addClickHandler(new ClickHandler() {
 
@@ -842,6 +844,7 @@ public class SCB implements EntryPoint {
 
 				if (isSendMoneyFormValid()) {
 					doConfirmSendMoney();
+					showAccountDetails(currentAccount);
 				} else {
 
 					createHintTable();
