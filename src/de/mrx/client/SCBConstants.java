@@ -16,7 +16,7 @@ public interface SCBConstants extends Constants{
 	 @DefaultStringValue("Our business will soon offer service. Please try again the other day!")
 	 String outOfServiceNotice();
 
-	@DefaultStringValue("Your name:")
+	@DefaultStringValue("Last name:")
 	String registrationName();
 	
 	@DefaultStringValue("Street:")

@@ -40,6 +40,12 @@ h1 {
   
 }
 
+.hint {  
+  color: red;
+  font-size:120%;
+    
+}
+
 
 .ValueOkay{
   background:white;

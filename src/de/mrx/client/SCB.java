@@ -75,13 +75,17 @@ public class SCB implements EntryPoint {
 	FlexTable validateErrorTable = new FlexTable();
 
 	private TextBox nameTxt;
+	private TextBox firstNameTxt;
 	private TextBox streetTxt;
+	private TextBox houseTxt;
 	private TextBox plzTxt;
 	private TextBox cityTxt;
 	private TextBox emailTxt;
 
 	private Label nameLbl;
+	private Label firstNameLbl;
 	private Label streetLbl;
+	private Label houseLbl;
 	private Label plzLbl;
 	private Label cityLbl;
 	private Label emailLbl;
@@ -127,6 +131,8 @@ public class SCB implements EntryPoint {
 
 	private HTMLTable transferForm;
 
+	private Image scbLogo;
+
 	private void doShowNoService() {
 
 		Window.alert(constants.outOfServiceNotice());
@@ -134,66 +140,85 @@ public class SCB implements EntryPoint {
 	}
 	
 	
-	private void doShowAbout(){
+	private void doShowAbout(boolean picture){
 		RootPanel.get(PAGEID_CONTENT).clear();
 		informationPanel=new VerticalPanel();
 		HTML text=new HTML("Secure Cloud Banking is a technology demonstration platform to evaluate aspects of cloud computing. <br>Feel free to register with a google account and use the SCB banking services. <br>Enjoy!<br><br>");
 		text.setStyleName("centerAligned");
-		Image bild=new Image("images/banking.jpg");
-		bild.setStyleName("centerAligned");
+		scbLogo = new Image("images/banking.jpg");
+		scbLogo.setStyleName("centerAligned");
 		
 		informationPanel.add(text);
-		informationPanel.add(bild);
+		if (picture){
+			informationPanel.add(scbLogo);
+		}
 		
 		RootPanel.get(PAGEID_CONTENT).add(informationPanel);
 	}
 
 	private void doOpenRegisterMenu() {
 		RootPanel.get(PAGEID_CONTENT).clear();
+		doShowAbout(false);
+		
 		RootPanel.get(PAGEID_CONTENT).add(getRegistrationPanel());
 	}
 
-	public VerticalPanel getRegistrationPanel() {
-		if (registrationPanel != null) {
-			return registrationPanel;
-		}
+	public VerticalPanel getRegistrationPanel() {		
 
 		registrationPanel = new VerticalPanel();
-		registrationTable = new Grid(6, 4);
+		
+		if (identityInfo==null || !identityInfo.isLoggedIn()  ){
+			Label hint=new Label("We recommend you to log in first with your google account before proceeding");
+			hint.setStyleName("hint");
+			registrationPanel.add(hint);
+			registrationPanel.add(signInLink);
+		}
+		registrationTable = new Grid(6, 6);
 		nameLbl = new Label(constants.registrationName());
+		firstNameLbl=new Label("First name:");
 		streetLbl = new Label(constants.registrationStreet());
+		houseLbl=new Label("House No:");
 		plzLbl = new Label("Postal Code: ");
 		cityLbl = new Label("City: ");
-		emailLbl = new Label("Email (currently only Googlemail accepted): ");
+		emailLbl = new Label("Email (gmail only): ");
 
 		passwordLbl = new Label("Your desired password: ");
 		nameTxt = new TextBox();
+		firstNameTxt=new TextBox();
 		streetTxt = new TextBox();
 		plzTxt = new TextBox();
 		cityTxt = new TextBox();
 		emailTxt = new TextBox();
+		houseTxt=new TextBox();
 		if (identityInfo != null && (identityInfo.getEmail() != null)) {
 			emailTxt.setText(identityInfo.getEmail());
 			emailTxt.setReadOnly(true);
 		} else {
-			Log.info("Email ist editierbar");
+			Log.info("User logged in yet. He should enter a gmail-adress to be able to use this service");
 		}
 		password = new PasswordTextBox();
 		agbBox = new CheckBox("I accept the Terms Of Services");
-		registrationTable.setWidget(0, 0, nameLbl);
-		registrationTable.setWidget(0, 1, nameTxt);
-		registrationTable.setWidget(0, 2, emailLbl);
-		registrationTable.setWidget(0, 3, emailTxt);
+		Anchor toSLink=new Anchor("ToS", "doc/ToS.pdf");
+		toSLink.setTarget("_blank");
+		registrationTable.setWidget(0, 0, firstNameLbl);
+		registrationTable.setWidget(0, 1, firstNameTxt);
+		registrationTable.setWidget(0, 2, nameLbl);
+		registrationTable.setWidget(0, 3, nameTxt);
+		registrationTable.setWidget(0, 4, emailLbl);
+		registrationTable.setWidget(0, 5, emailTxt);
 		registrationTable.setWidget(1, 0, streetLbl);
 		registrationTable.setWidget(1, 1, streetTxt);
+		registrationTable.setWidget(1, 2, houseLbl);
+		registrationTable.setWidget(1, 3, houseTxt);
 		registrationTable.setWidget(2, 0, plzLbl);
 		registrationTable.setWidget(2, 1, plzTxt);
 		registrationTable.setWidget(2, 2, cityLbl);
 		registrationTable.setWidget(2, 3, cityTxt);
 		// registrationTable.setWidget(3, 0, passwordLbl);
 		// registrationTable.setWidget(3, 1, password);
-		// registrationTable.setWidget(4, 0, agbBox);
-		registrationTable.setWidget(4, 1, registerButton);
+		 registrationTable.setWidget(4, 0, agbBox);
+		 registrationTable.setWidget(4, 1, toSLink);
+		registrationTable.setWidget(4, 3, registerButton);
 
 		registerButton.addClickHandler(new ClickHandler() {
 
@@ -222,12 +247,17 @@ public class SCB implements EntryPoint {
 		String city = cityTxt.getText();
 		String plz = plzTxt.getText();
 		String email = emailTxt.getText();
+		String houseNr=houseTxt.getText();
+		String firstName=firstNameTxt.getText();
 
 		SCBIdentityDTO id = new SCBIdentityDTO(n);
 		id.setStreet(str);
 		id.setCity(city);
 		id.setPlz(plz);
 		id.setEmail(email);
+		id.setHouseNr(houseNr);
+		id.setFirstName(firstName);
+		
 		if (registerSvc == null) {
 			registerSvc = GWT.create(RegisterService.class);
 		}
@@ -249,7 +279,7 @@ public class SCB implements EntryPoint {
 
 			public void onSuccess(Void result) {
 				Window.alert(constants.registrationSuccessMessage());
-				getRegistrationPanel().removeFromParent();
+				RootPanel.get(PAGEID_CONTENT).clear();
 				checkGoogleStatus();
 			}
 		};
@@ -328,7 +358,7 @@ public class SCB implements EntryPoint {
 			r.add(mainPanel);
 			
 			checkGoogleStatus();
-			doShowAbout();
+			doShowAbout(true);
 			GWT.log("Module loaded");
 
 		} catch (Exception e) {
@@ -338,10 +368,11 @@ public class SCB implements EntryPoint {
 	}
 
 	private void showAccountOverview() {
+		RootPanel.get(PAGEID_CONTENT).clear();
 		accountOverviewPanel.clear();
 		accountsDetailsPanel.clear();
 		accountsListPanel.clear();
-		Log.info("Show Account Overview");
+		Log.debug("Show Account Overview");
 		accountOverviewPanel.add(accountsListPanel);
 		accountOverviewPanel.add(accountsDetailsPanel);
 
@@ -356,8 +387,7 @@ public class SCB implements EntryPoint {
 
 			}
 
-			public void onSuccess(List<AccountDTO> result) {
-				Log.info("Account loaded ");
+			public void onSuccess(List<AccountDTO> result) {				
 				if (result == null) {
 					Log.warn("No accounts");
 
@@ -414,6 +444,11 @@ public class SCB implements EntryPoint {
 
 	protected void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
 		accountsDetailsPanel.clear();
+		if (result.size()==0){
+			Label noAccountHint=new Label("At the moment you have no account at SCB.");
+			accountsDetailsPanel.add(noAccountHint);
+			return;
+		}		
 		Label accHeaderLbl = new Label("Account Overview");
 		accountsDetailsPanel.add(accHeaderLbl);
 		Grid grid = new Grid(result.size() + 1, 2);
@@ -574,7 +609,14 @@ public class SCB implements EntryPoint {
 						}
 						List<MoneyTransferDTO> transfers = result
 								.getTransfers();
+						
 						accountDetailTable = new Grid(transfers.size() + 2, 4);
+						if (transfers.size()==0){
+							Label noTransferHint=new Label("At the moment there are no outgoing neither incoming transactions");
+							accountDetailTable.setWidget(0,0,noTransferHint);
+						}
+						else{
+						
 						Label dateLbl = new Label("Date");
 						Label commentLbl = new Label("Comment");
 						Label accountLbl = new Label("Account");
@@ -624,6 +666,7 @@ public class SCB implements EntryPoint {
 							} else {
 								entryAmountLbl.setStyleName("negativeMoney");
 							}
+							
 							accountDetailTable.setWidget(pos, 0, entryDateLbl);
 							accountDetailTable
 									.setWidget(pos, 1, entryRemarkLbl);
@@ -632,6 +675,7 @@ public class SCB implements EntryPoint {
 							accountDetailTable
 									.setWidget(pos, 3, entryAmountLbl);
 							pos++;
+						}
 						}
 						Button transferMoneyButton = new Button("Send money");
 						transferMoneyButton.addClickHandler(new ClickHandler() {
@@ -695,6 +739,12 @@ public class SCB implements EntryPoint {
 				"Please enter a valid name!")) {
 			result = false;
 		}
+		
+		if (!isFieldConfirmToExpresion(firstNameTxt, "[\\w]+",
+		"Please enter a valid first name!")) {
+			result = false;
+		}
+		
 		if (!isFieldConfirmToExpresion(emailTxt,
 				"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
 				"Please enter a valid email address!")) {
@@ -708,10 +758,20 @@ public class SCB implements EntryPoint {
 				"Please enter a valid postal code!")) {
 			result = false;
 		}
+		
+		if (!isFieldConfirmToExpresion(houseTxt, "[\\d]+",
+		"Please enter a valid house number!")) {
+	result = false;
+}
 
 		if (!isFieldConfirmToExpresion(cityTxt, "[\\w]+",
 				"Please enter a city! ")) {
 			result = false;
+		}
+		
+		if (agbBox.getValue()==false){
+			hints.add("Please read the Term of Services and agree to them!");
+			result = false;			
 		}
 
 		return result;

@@ -48,6 +48,20 @@ public class SCBIdentity implements Serializable{
 		this.invitationCode = invitationCode;
 	}
 
+	
+	
+	@Persistent
+	private String firstName;
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
 
 	@Persistent
 	private boolean activated=false;
@@ -133,6 +147,8 @@ public class SCBIdentity implements Serializable{
 		setEmail(dto.getEmail());
 		setActivated(dto.isActivated());
 		setNickName(dto.getNickName());
+		setFirstName(dto.getFirstName());
+		setHouseNr(getHouseNr());
 	}
 
 
@@ -159,6 +175,8 @@ public class SCBIdentity implements Serializable{
 		dto.setEmail(getEmail());
 		dto.setActivated(isActivated());
 		dto.setNickName(getNickName());
+		dto.setHouseNr(getHouseNr());
+		dto.setFirstName(getFirstName());
 		return dto;
 	}
 	  public String getEmail() {

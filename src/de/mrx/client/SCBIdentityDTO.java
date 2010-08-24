@@ -33,7 +33,16 @@ public class SCBIdentityDTO implements Serializable {
 	}
 
 	private String name;
+	private String firstName;
 	
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
 	private String phone;
 	  private String plz;
 	  private String street;
@@ -139,13 +148,16 @@ public class SCBIdentityDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "IdentityDTO [activated=" + activated + ", "
+		return "SCBIdentityDTO [activated=" + activated + ", "
 				+ (city != null ? "city=" + city + ", " : "")
 				+ (email != null ? "email=" + email + ", " : "")
+				+ (firstName != null ? "firstName=" + firstName + ", " : "")
 				+ (houseNr != null ? "houseNr=" + houseNr + ", " : "")
 				+ "loggedIn=" + loggedIn + ", "
-				+ (nickName != null ? "nickName=" + nickName + ", " : "")
+				+ (loginUrl != null ? "loginUrl=" + loginUrl + ", " : "")
+				+ (logoutUrl != null ? "logoutUrl=" + logoutUrl + ", " : "")
 				+ (name != null ? "name=" + name + ", " : "")
+				+ (nickName != null ? "nickName=" + nickName + ", " : "")
 				+ (phone != null ? "phone=" + phone + ", " : "")
 				+ (plz != null ? "plz=" + plz + ", " : "")
 				+ (street != null ? "street=" + street : "") + "]";
