@@ -8,6 +8,8 @@ import javax.jdo.Query;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import com.google.appengine.api.datastore.Key;
+
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
 
@@ -23,6 +25,19 @@ public class Account extends GeneralAccount implements Serializable{
 	
 	
 	
+	@Persistent
+	private String ownerEmail;
+	
+	public String getOwnerEmail() {
+		return ownerEmail;
+	}
+
+	public void setOwnerEmail(String ownerEmail) {
+		this.ownerEmail = ownerEmail;
+	}
+
+	
+
 	public static Account getOwnByAccountNr(PersistenceManager pm, String accountNr){
 		
 		Extent e=pm.getExtent(Account.class);
@@ -34,6 +49,19 @@ public class Account extends GeneralAccount implements Serializable{
 		
 		return result;
 	}
+	
+	
+public static Account getOwnByEmail(PersistenceManager pm, String email){
+		
+		Extent<Account> e=pm.getExtent(Account.class);
+		Query query=pm.newQuery(e,"ownerEmail == emailParam");		
+		query.declareParameters("java.lang.String emailParam");
+		query.setUnique(true);
+		Account result= (Account) query.execute(email);
+		
+		return result;
+	}
+	
 	@Persistent
 	private String accountDescription;
 

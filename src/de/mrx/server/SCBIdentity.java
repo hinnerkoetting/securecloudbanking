@@ -5,15 +5,14 @@ import java.util.List;
 
 import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.Query;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.User;
-import com.google.gwt.core.client.GWT;
 
 import de.mrx.client.SCBIdentityDTO;
 
@@ -91,14 +90,11 @@ public class SCBIdentity implements Serializable{
 	
 	public static SCBIdentity getIdentity(PersistenceManager pm, User user) {
 		
-//		String query = "select from " + Identity.class.getName()
-//				+ " WHERE email=='" + user.getEmail() + "'";
-//		
+	
 		
 
 		Extent<SCBIdentity> identityExtent=pm.getExtent(SCBIdentity.class);
 		javax.jdo.Query query=pm.newQuery(identityExtent);
-		List<SCBIdentity> ids = (List<SCBIdentity>) pm.newQuery(query).execute();
 		query.setFilter("email== emailParam");
 		query.declareParameters("String emailParam");
 		query.setUnique(true);
@@ -303,5 +299,14 @@ public class SCBIdentity implements Serializable{
 				+ (street != null ? "street=" + street : "") + "]";
 	}
 	
-
+	
+	public static SCBIdentity getByEmail(PersistenceManager pm,  String email){
+	Extent<SCBIdentity> e=pm.getExtent(SCBIdentity.class);
+	Query query=pm.newQuery(e,"email == emailParam");
+	query.declareParameters("java.lang.String emailParam");
+	query.setUnique(true);
+	SCBIdentity result= (SCBIdentity) query.execute(email);
+	
+	return result;
+	}
 }

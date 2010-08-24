@@ -51,6 +51,18 @@ public class MoneyTransferPending {
 	private Date timestamp;
 
 	
+	@Persistent
+	private String receiverBankName;
+
+	
+	public String getReceiverBankName() {
+		return receiverBankName;
+	}
+
+	public void setReceiverBankName(String receiverBankName) {
+		this.receiverBankName = receiverBankName;
+	}
+
 	public MoneyTransferDTO getDTO(){
 		MoneyTransferDTO dto=new MoneyTransferDTO();
 		dto.setAmount(getAmount());
@@ -62,6 +74,7 @@ public class MoneyTransferPending {
 		dto.setSenderAccountNr(getSenderAccountNr());
 		dto.setSenderBankNr(getSenderBLZ());
 		dto.setTimestamp(getTimestamp());
+		dto.setReceiverBankName(getReceiverBankName());
 		
 		return dto;
 	}

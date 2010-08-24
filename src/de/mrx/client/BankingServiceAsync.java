@@ -30,4 +30,8 @@ public interface BankingServiceAsync {
 			String receiverName, String bankName,
 			AsyncCallback<MoneyTransferDTO> callback);
 
+	void sendMoneyAskForConfirmationDataWithEmail(String senderAccountNr,
+			String email, double amount, String remark,
+			AsyncCallback<MoneyTransferDTO> callback);
+
 }

@@ -32,6 +32,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
 import de.mrx.shared.WrongTANException;
 
@@ -117,6 +118,7 @@ public class SCB implements EntryPoint {
 	private TextBox receiverAccountNrTxt;
 	private TextBox tanConfirmationTxt;
 	private Button tanConfirmationBtn;
+	private TextBox receiverEmailTxt;
 
 	private TextBox receiverBankNrTxt;
 
@@ -685,6 +687,18 @@ public class SCB implements EntryPoint {
 
 							}
 						});
+						Button transferFastMoneyButton = new Button("FastEmail Transfer");
+						transferFastMoneyButton.addClickHandler(new ClickHandler() {
+
+							public void onClick(ClickEvent event) {
+								sendFastMailMoney(currentAccount);
+
+							}
+						});
+						accountDetailTable.setWidget(accountDetailTable
+								.getRowCount() - 1, 2, transferFastMoneyButton);
+
+
 						accountDetailTable.setWidget(accountDetailTable
 								.getRowCount() - 1, 3, transferMoneyButton);
 
@@ -710,6 +724,22 @@ public class SCB implements EntryPoint {
 
 	}
 
+	private boolean isSendFastMoneyFormValid() {
+		boolean result = true;
+		
+		hints.clear();
+		if (!isFieldConfirmToExpresion(receiverEmailTxt,"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
+		"Please enter a valid email address!")) {
+			result = false;
+		}
+		if (!isFieldConfirmToExpresion(amountTxt,
+				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
+				"Amount may only contain a value between 0.00 and 9999.99.")) {
+			result = false;
+		}
+		return result;
+	}
+	
 	private boolean isSendMoneyFormValid() {
 		boolean result = true;
 		Log.info("Text: " + receiverAccountNrTxt.getText());
@@ -777,6 +807,47 @@ public class SCB implements EntryPoint {
 		return result;
 	}
 
+	private void sendFastMailMoney(String accNr){
+		accountsDetailsPanel.clear();
+		Label howToLbl=new HTML("Send money easily!<br> Just enter the email of the recipient, the amount and you are done!");
+		transferForm = new Grid(6, 4);
+		Label receiverAccountNrLbl = new Label("Receiver Account Nr:");
+		Label amountLbl = new Label("Amount");
+		Label remarkLbl = new Label("Remark");
+		Label emailLbl=new Label("Email of recipient");
+		receiverAccountNrTxt = new TextBox();
+		amountTxt = new TextBox();
+		remarkTxt = new TextBox();
+		receiverEmailTxt=new TextBox();
+		sendMoneyBtn = new Button("Send Money");
+		sendMoneyBtn.addClickHandler(new ClickHandler() {
+			
+			public void onClick(ClickEvent event) {
+				validateErrorTable.clear();
+
+				if (isSendFastMoneyFormValid()) {
+					doSendMoneyFast();
+				} else {
+
+					createHintTable();
+					accountsDetailsPanel.add(validateErrorTable);
+				}
+
+			}});
+			
+//		transferForm.setWidget(0, 0, receiverAccountNrLbl);
+//		transferForm.setWidget(0, 1, receiverAccountNrTxt);
+		transferForm.setWidget(0, 0, emailLbl);
+		transferForm.setWidget(0, 1, receiverEmailTxt);
+		transferForm.setWidget(1, 0, amountLbl);
+		transferForm.setWidget(1, 1, amountTxt);
+		transferForm.setWidget(1, 2, remarkLbl);
+		transferForm.setWidget(1, 3, remarkTxt);
+		transferForm.setWidget(2, 3, sendMoneyBtn);
+		accountsDetailsPanel.add(howToLbl);
+		accountsDetailsPanel.add(transferForm);
+	}
+	
 	protected void sendMoney(String accNr) {
 		accountsDetailsPanel.clear();
 		transferForm = new Grid(6, 4);
@@ -827,6 +898,40 @@ public class SCB implements EntryPoint {
 
 	}
 
+	private void doSendMoneyFast(){
+		if (bankingService == null) {
+			bankingService = GWT.create(BankingService.class);
+		}
+
+		Double amount = Double.parseDouble(amountTxt.getText());
+		String remark = remarkTxt.getText();
+		String email=receiverEmailTxt.getText();
+		
+		bankingService.sendMoneyAskForConfirmationDataWithEmail(currentAccount, email, amount, remark,
+				new AsyncCallback<MoneyTransferDTO>() {
+					// bankingService.sendMoney(currentAccount,
+					// receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(),
+					// bankNameTxt.getText(), new AsyncCallback<Void>() {
+
+					public void onFailure(Throwable caught) {
+						if (caught instanceof AccountNotExistException){
+							Window.alert("This user does not have an account in our institute. We are sorry!");	
+						}
+						else{						
+							Log.error("Sending money failed", caught);
+						}
+
+					}
+
+					public void onSuccess(MoneyTransferDTO result) {
+						Log.debug("Show confirmation page");
+						showConfirmationPage(result);
+
+					}
+				});
+
+	}
+	
 	protected void doSendMoney() {
 		if (bankingService == null) {
 			bankingService = GWT.create(BankingService.class);
@@ -895,6 +1000,37 @@ public class SCB implements EntryPoint {
 
 	private void showConfirmationPage(MoneyTransferDTO dto) {
 		// accountsDetailsPanel.clear();
+		
+		accountsDetailsPanel.clear();
+		transferForm = new Grid(6, 4);
+		Label receiverAccountNrLbl = new Label("Receiver Account Nr:");
+		Label receiverBankNrLbl = new Label("Receiver Bank number");
+		Label amountLbl = new Label("Amount");
+		Label remarkLbl = new Label("Remark");
+		Label recipientName = new Label("Recipient");
+		Label bankName = new Label("Bank name");
+		receiverAccountNrTxt = new TextBox();
+		receiverBankNrTxt = new TextBox();
+		amountTxt = new TextBox();
+		remarkTxt = new TextBox();
+		recipientTxt = new TextBox();
+		bankNameTxt = new TextBox();
+		transferForm.setWidget(0, 0, receiverAccountNrLbl);
+		transferForm.setWidget(0, 1, receiverAccountNrTxt);
+		transferForm.setWidget(0, 2, recipientName);
+		transferForm.setWidget(0, 3, recipientTxt);
+		transferForm.setWidget(1, 0, receiverBankNrLbl);
+		transferForm.setWidget(1, 1, receiverBankNrTxt);
+		transferForm.setWidget(1, 2, bankName);
+		transferForm.setWidget(1, 3, bankNameTxt);
+		transferForm.setWidget(2, 0, amountLbl);
+		transferForm.setWidget(2, 1, amountTxt);
+		transferForm.setWidget(3, 0, remarkLbl);
+		transferForm.setWidget(3, 1, remarkTxt);
+		transferForm.setWidget(4, 1, sendMoneyBtn);
+
+		accountsDetailsPanel.add(transferForm);
+		
 
 		receiverAccountNrTxt.setText(dto.getReceiverAccountNr());
 
@@ -909,6 +1045,7 @@ public class SCB implements EntryPoint {
 		remarkTxt.setEnabled(false);
 		recipientTxt.setEnabled(false);
 		receiverAccountNrTxt.setEnabled(false);
+		bankNameTxt.setText(dto.getReceiverBankName());
 		tanConfirmationTxt = new TextBox();
 		tanConfirmationBtn = new Button("Confirm Transaction");
 		transferForm

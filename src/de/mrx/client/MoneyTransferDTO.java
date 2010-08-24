@@ -13,6 +13,20 @@ public class MoneyTransferDTO implements Serializable{
 	private Date timestamp;
 	private String receiverName;
 	private int requiredTan;
+	private String receiverBankName;
+	
+
+
+	
+
+	public String getReceiverBankName() {
+		return receiverBankName;
+	}
+
+
+	public void setReceiverBankName(String receiverBankName) {
+		this.receiverBankName = receiverBankName;
+	}
 
 
 	public int getRequiredTan() {
