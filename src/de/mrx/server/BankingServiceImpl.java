@@ -284,7 +284,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			if (receiverBank.equals(ownBank)) {
 				recAccount = Account.getOwnByAccountNr(pm, receiveraccountNr);
 				if (recAccount == null) {
-					throw new RuntimeException(
+					throw new AccountNotExistException(
 							"Dieser Account existiert nicht bei der Bank "
 									+ receiveraccountNr);
 				}

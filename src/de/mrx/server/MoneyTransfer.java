@@ -16,7 +16,7 @@ import de.mrx.client.MoneyTransferDTO;
 
 
 @PersistenceCapable
-public class MoneyTransfer implements Serializable{
+public class MoneyTransfer {
 
 	private final static Logger logger=Logger.getLogger(MoneyTransfer.class.getName());
 	/**

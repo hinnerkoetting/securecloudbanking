@@ -22,7 +22,7 @@ import de.mrx.client.SCBIdentityDTO;
  *
  */
 @PersistenceCapable
-public class SCBIdentity implements Serializable{
+public class SCBIdentity {
 	
 	/**
 	 * 

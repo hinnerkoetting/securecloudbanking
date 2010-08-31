@@ -1,20 +1,16 @@
 package de.mrx.server;
 
-import java.io.Serializable;
-
 import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
-import com.google.appengine.api.datastore.Key;
-
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
 
 @PersistenceCapable
-public class Account extends GeneralAccount implements Serializable{
+public class Account extends GeneralAccount {
 	
    
 
@@ -40,7 +36,7 @@ public class Account extends GeneralAccount implements Serializable{
 
 	public static Account getOwnByAccountNr(PersistenceManager pm, String accountNr){
 		
-		Extent e=pm.getExtent(Account.class);
+		Extent<Account> e=pm.getExtent(Account.class);
 		Query query=pm.newQuery(e,"accountNr == accountNrParam");
 		query.setFilter("accountNr == accountNrParam");
 		query.declareParameters("java.lang.String accountNrParam");

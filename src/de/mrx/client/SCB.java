@@ -26,7 +26,6 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -50,7 +49,7 @@ public class SCB implements EntryPoint {
 	private static final String PAGEID_SIGN = "signInOut";
 
 	private final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
-	private final static String STYLE_VALUE_OKAY = "ValueOkay";
+	
 
 	private SCBConstants constants = GWT.create(SCBConstants.class);
 	private SCBMessages messages = GWT.create(SCBMessages.class);
@@ -91,9 +90,7 @@ public class SCB implements EntryPoint {
 	private Label cityLbl;
 	private Label emailLbl;
 
-	private PasswordTextBox password;
-	private Label passwordLbl;
-
+	
 	private Button registerButton = new Button(constants.menuRegister());
 
 	private VerticalPanel registrationPanel;
@@ -170,21 +167,21 @@ public class SCB implements EntryPoint {
 		registrationPanel = new VerticalPanel();
 		
 		if (identityInfo==null || !identityInfo.isLoggedIn()  ){
-			Label hint=new Label("We recommend you to log in first with your google account before proceeding");
+			Label hint=new Label(constants.hintRegistration());
 			hint.setStyleName("hint");
 			registrationPanel.add(hint);
 			registrationPanel.add(signInLink);
 		}
 		registrationTable = new Grid(6, 6);
 		nameLbl = new Label(constants.registrationName());
-		firstNameLbl=new Label("First name:");
+		firstNameLbl=new Label(constants.registrationFirstName());
 		streetLbl = new Label(constants.registrationStreet());
-		houseLbl=new Label("House No:");
-		plzLbl = new Label("Postal Code: ");
-		cityLbl = new Label("City: ");
-		emailLbl = new Label("Email (gmail only): ");
+		houseLbl=new Label(constants.registrationHouseNr());
+		plzLbl = new Label(constants.registrationPostalCode());
+		cityLbl = new Label(constants.registrationCity());
+		emailLbl = new Label(constants.registrationEmail());
 
-		passwordLbl = new Label("Your desired password: ");
+		
 		nameTxt = new TextBox();
 		firstNameTxt=new TextBox();
 		streetTxt = new TextBox();
@@ -198,9 +195,9 @@ public class SCB implements EntryPoint {
 		} else {
 			Log.info("User logged in yet. He should enter a gmail-adress to be able to use this service");
 		}
-		password = new PasswordTextBox();
-		agbBox = new CheckBox("I accept the Terms Of Services");
-		Anchor toSLink=new Anchor("ToS", "doc/ToS.pdf");
+		
+		agbBox = new CheckBox(constants.registrationtoSAGBHint());
+		Anchor toSLink=new Anchor(constants.registrationtoAGBLink(), "doc/ToS.pdf");
 		toSLink.setTarget("_blank");
 		registrationTable.setWidget(0, 0, firstNameLbl);
 		registrationTable.setWidget(0, 1, firstNameTxt);
@@ -216,8 +213,6 @@ public class SCB implements EntryPoint {
 		registrationTable.setWidget(2, 1, plzTxt);
 		registrationTable.setWidget(2, 2, cityLbl);
 		registrationTable.setWidget(2, 3, cityTxt);
-		// registrationTable.setWidget(3, 0, passwordLbl);
-		// registrationTable.setWidget(3, 1, password);
 		 registrationTable.setWidget(4, 0, agbBox);
 		 registrationTable.setWidget(4, 1, toSLink);
 		registrationTable.setWidget(4, 3, registerButton);
@@ -268,8 +263,7 @@ public class SCB implements EntryPoint {
 
 			public void onFailure(Throwable caught) {
 
-				if (caught instanceof SCBException) {
-					SCBException scbE = (SCBException) caught;
+				if (caught instanceof SCBException) {					
 					Window.alert(messages.invalidSymbol(caught.getMessage()));
 				} else {
 					Window.alert("Registration fails! Reason: "
@@ -311,7 +305,7 @@ public class SCB implements EntryPoint {
 				public void execute() {
 					GWT.log("Impressum follows");
 					Window
-							.alert("This is a academic technology study in Cloud Computing. At the moment you see an internal development state.\n This site is provided by J. Oetting");
+							.alert(constants.impressumText());
 
 				}
 			};
@@ -320,7 +314,7 @@ public class SCB implements EntryPoint {
 				public void execute() {
 					GWT.log("SCB Info");
 					Window
-							.alert("This site demonstrates cloud security technology.");
+							.alert(constants.aboutText());
 
 				}
 			};
@@ -341,7 +335,6 @@ public class SCB implements EntryPoint {
 				}
 			};
 
-			MenuBar bankingMenu = new MenuBar(true);
 
 			informationMenu = new MenuBar(true);
 			informationMenu.addItem("Impressum", cmdShowImpressum);
@@ -811,7 +804,7 @@ public class SCB implements EntryPoint {
 		accountsDetailsPanel.clear();
 		Label howToLbl=new HTML("Send money easily!<br> Just enter the email of the recipient, the amount and you are done!");
 		transferForm = new Grid(6, 4);
-		Label receiverAccountNrLbl = new Label("Receiver Account Nr:");
+		
 		Label amountLbl = new Label("Amount");
 		Label remarkLbl = new Label("Remark");
 		Label emailLbl=new Label("Email of recipient");
