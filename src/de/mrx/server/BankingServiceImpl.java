@@ -69,6 +69,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	public List<AccountDTO> getAccounts() {
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
+		
 
 		// Extent<Account> e=pm.getExtent(Account.class,true);
 		// for ( Account acc: e){

@@ -161,5 +161,48 @@ public interface SCBConstants extends Constants{
 	@DefaultStringValue("Please read the Term of Services and agree to them!")
 	String registerValidateToS();
 
+	@DefaultStringValue("Send money easily!<br> Just enter the email of the recipient, the amount and you are done!")
+	String sendMoneyHint();
+	
+	@DefaultStringValue("Amount")
+	String sendMoneyFormAmount();
+	
+	
+	@DefaultStringValue("Remark")
+	String sendMoneyFormRemark();
+	
+	
+	@DefaultStringValue("Email of recipient")
+	String sendMoneyFormEmailRecipient();
+	
+	@DefaultStringValue("Send Money")
+	String sendMoneyFormEmailBtn();
+	
+	@DefaultStringValue("Receiver Account Nr:")
+	String sendMoneyFormReceiverAccountNr();
+	
+	@DefaultStringValue("Receiver Bank number")
+	String sendMoneyFormReceiverBankNr();
+	
+	@DefaultStringValue("Recipient")
+	String sendMoneyFormReceiverName();
+	
+	@DefaultStringValue("Bank name")
+	String sendMoneyFormReceiverBankName();
+	
+	
+	@DefaultStringValue("This user does not have an account in our institute. We are sorry!")
+	String sendMoneyErrorNoAccountInOurInstitute();
+	
+	
+	@DefaultStringValue("Money sent sucessfully")
+	String sendMoneyHintSuccessful();
+	
+	
+	@DefaultStringValue("Confirm Transaction")
+	String confirmTan();
+	
+	@DefaultStringValue("TAN Nr: ")
+	String confirmTanNr();
 	
 }

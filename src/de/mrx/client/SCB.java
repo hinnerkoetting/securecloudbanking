@@ -798,17 +798,17 @@ public class SCB implements EntryPoint {
 
 	private void sendFastMailMoney(String accNr){
 		accountsDetailsPanel.clear();
-		Label howToLbl=new HTML("Send money easily!<br> Just enter the email of the recipient, the amount and you are done!");
+		Label howToLbl=new HTML(constants.sendMoneyHint());
 		transferForm = new Grid(6, 4);
 		
-		Label amountLbl = new Label("Amount");
-		Label remarkLbl = new Label("Remark");
-		Label emailLbl=new Label("Email of recipient");
+		Label amountLbl = new Label(constants.sendMoneyFormAmount());
+		Label remarkLbl = new Label(constants.sendMoneyFormRemark());
+		Label emailLbl=new Label(constants.sendMoneyFormEmailRecipient());
 		receiverAccountNrTxt = new TextBox();
 		amountTxt = new TextBox();
 		remarkTxt = new TextBox();
 		receiverEmailTxt=new TextBox();
-		sendMoneyBtn = new Button("Send Money");
+		sendMoneyBtn = new Button(constants.sendMoneyFormEmailBtn());
 		sendMoneyBtn.addClickHandler(new ClickHandler() {
 			
 			public void onClick(ClickEvent event) {
@@ -840,19 +840,19 @@ public class SCB implements EntryPoint {
 	protected void sendMoney(String accNr) {
 		accountsDetailsPanel.clear();
 		transferForm = new Grid(6, 4);
-		Label receiverAccountNrLbl = new Label("Receiver Account Nr:");
-		Label receiverBankNrLbl = new Label("Receiver Bank number");
-		Label amountLbl = new Label("Amount");
-		Label remarkLbl = new Label("Remark");
-		Label recipientName = new Label("Recipient");
-		Label bankName = new Label("Bank name");
+		Label receiverAccountNrLbl = new Label(constants.sendMoneyFormReceiverAccountNr());
+		Label receiverBankNrLbl = new Label(constants.sendMoneyFormReceiverBankNr());
+		Label amountLbl = new Label(constants.sendMoneyFormAmount());
+		Label remarkLbl = new Label(constants.sendMoneyFormRemark());
+		Label recipientName = new Label(constants.sendMoneyFormReceiverName());
+		Label bankName = new Label(constants.sendMoneyFormReceiverBankName());
 		receiverAccountNrTxt = new TextBox();
 		receiverBankNrTxt = new TextBox();
 		amountTxt = new TextBox();
 		remarkTxt = new TextBox();
 		recipientTxt = new TextBox();
 		bankNameTxt = new TextBox();
-		sendMoneyBtn = new Button("Send Money");
+		sendMoneyBtn = new Button(constants.sendMoneyFormEmailBtn());
 		sendMoneyBtn.addClickHandler(new ClickHandler() {
 
 			public void onClick(ClickEvent event) {
@@ -904,7 +904,7 @@ public class SCB implements EntryPoint {
 
 					public void onFailure(Throwable caught) {
 						if (caught instanceof AccountNotExistException){
-							Window.alert("This user does not have an account in our institute. We are sorry!");	
+							Window.alert(constants.sendMoneyErrorNoAccountInOurInstitute());	
 						}
 						else{						
 							Log.error("Sending money failed", caught);
@@ -980,7 +980,7 @@ public class SCB implements EntryPoint {
 					}
 
 					public void onSuccess(Void result) {
-						Window.alert("Money sent sucessfully");
+						Window.alert(constants.sendMoneyHintSuccessful());
 
 					}
 				});
@@ -992,12 +992,12 @@ public class SCB implements EntryPoint {
 		
 		accountsDetailsPanel.clear();
 		transferForm = new Grid(6, 4);
-		Label receiverAccountNrLbl = new Label("Receiver Account Nr:");
-		Label receiverBankNrLbl = new Label("Receiver Bank number");
-		Label amountLbl = new Label("Amount");
-		Label remarkLbl = new Label("Remark");
-		Label recipientName = new Label("Recipient");
-		Label bankName = new Label("Bank name");
+		Label receiverAccountNrLbl = new Label(constants.sendMoneyFormReceiverAccountNr());
+		Label receiverBankNrLbl = new Label(constants.sendMoneyFormReceiverBankNr());
+		Label amountLbl = new Label(constants.sendMoneyFormAmount());
+		Label remarkLbl = new Label(constants.sendMoneyFormRemark());
+		Label recipientName = new Label(constants.sendMoneyFormReceiverName());
+		Label bankName = new Label(constants.sendMoneyFormReceiverBankName());
 		receiverAccountNrTxt = new TextBox();
 		receiverBankNrTxt = new TextBox();
 		amountTxt = new TextBox();
@@ -1036,9 +1036,9 @@ public class SCB implements EntryPoint {
 		receiverAccountNrTxt.setEnabled(false);
 		bankNameTxt.setText(dto.getReceiverBankName());
 		tanConfirmationTxt = new TextBox();
-		tanConfirmationBtn = new Button("Confirm Transaction");
+		tanConfirmationBtn = new Button(constants.confirmTan());
 		transferForm
-				.setWidget(3, 2, new Label("TAN Nr: " + dto.getRequiredTan()));
+				.setWidget(3, 2, new Label(constants.confirmTanNr() + dto.getRequiredTan()));
 		transferForm.setWidget(3, 3, tanConfirmationTxt);
 		transferForm.remove( sendMoneyBtn);
 		transferForm.setWidget(4, 3, tanConfirmationBtn);
