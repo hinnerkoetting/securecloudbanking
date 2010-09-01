@@ -41,7 +41,7 @@ import de.mrx.shared.WrongTANException;
 public class SCB implements EntryPoint {
 
 	// private static final Logger log = Logger.getLogger(SCB.class.getName());
-	Widget divLogger = Log.getLogger(DivLogger.class).getWidget();
+//	Widget divLogger = Log.getLogger(DivLogger.class).getWidget();
 
 	private static final String PAGEID_HEADER = "cloudbanking";
 	private static final String PAGEID_CONTENT = "content";
@@ -264,11 +264,10 @@ public class SCB implements EntryPoint {
 			public void onFailure(Throwable caught) {
 
 				if (caught instanceof SCBException) {					
-					Window.alert(messages.invalidSymbol(caught.getMessage()));
+					Window.alert(messages.scbError(caught.getMessage()));
 				} else {
-					Window.alert("Registration fails! Reason: "
-							+ caught.getMessage());
 					caught.printStackTrace();
+					Window.alert(messages.registrationError( caught.getMessage()));					
 				}
 
 			}
@@ -281,7 +280,6 @@ public class SCB implements EntryPoint {
 		};
 
 		registerSvc.register(id, callback);
-		// Window.Location.reload();
 
 	}
 
@@ -298,7 +296,7 @@ public class SCB implements EntryPoint {
 				return;
 			}
 
-			RootPanel.get(PAGEID_FEHLER).add(divLogger);
+//			RootPanel.get(PAGEID_FEHLER).add(divLogger);
 			Log.setUncaughtExceptionHandler();
 
 			Command cmdShowImpressum = new Command() {
@@ -342,10 +340,10 @@ public class SCB implements EntryPoint {
 					cmdShowInfoSCB);
 
 			menu = new MenuBar();
-			registerMItem = new MenuItem("Register", cmdRegister);
+			registerMItem = new MenuItem(constants.menuRegister(), cmdRegister);
 			menu.addItem(registerMItem);			
-			menu.addItem("Information", informationMenu);
-			userInformationMenuItem = new MenuItem("UserInfo", cmdShowNoService);
+			menu.addItem(constants.menuInformation(), informationMenu);
+			userInformationMenuItem = new MenuItem(constants.menuUserInformation(), cmdShowNoService);
 			menu.addItem(userInformationMenuItem);
 
 			mainPanel.add(menu);
@@ -388,7 +386,7 @@ public class SCB implements EntryPoint {
 
 				} else {
 					Log.info("Number of Accounts: " + result.size());
-					Button overviewBtn = new Button("Financial state");
+					Button overviewBtn = new Button(constants.overViewBtnFinancialState());
 					overviewBtn.setStyleName("OverViewButton");
 					overviewBtn.addClickHandler(new ClickHandler() {
 
@@ -413,8 +411,7 @@ public class SCB implements EntryPoint {
 					}
 
 					if (result.size() == 0) {
-						Button neuerAccountBtn = new Button(
-								"Open saving Account");
+						Button neuerAccountBtn = new Button(constants.overViewBtnOpenSavingAccount());
 						neuerAccountBtn.setStyleName("OverViewButton");
 						neuerAccountBtn.addClickHandler(new ClickHandler() {
 
@@ -440,16 +437,16 @@ public class SCB implements EntryPoint {
 	protected void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
 		accountsDetailsPanel.clear();
 		if (result.size()==0){
-			Label noAccountHint=new Label("At the moment you have no account at SCB.");
+			Label noAccountHint=new Label(constants.accountOverviewHintNoAccount());
 			accountsDetailsPanel.add(noAccountHint);
 			return;
 		}		
-		Label accHeaderLbl = new Label("Account Overview");
+		Label accHeaderLbl = new Label(constants.accountOverviewLblTitel());
 		accountsDetailsPanel.add(accHeaderLbl);
 		Grid grid = new Grid(result.size() + 1, 2);
 		accountsDetailsPanel.add(grid);
-		Label accHeader = new Label("Account");
-		Label amountHeader = new Label("Balance");
+		Label accHeader = new Label(constants.accountOverviewLblHeaderAccount());
+		Label amountHeader = new Label(constants.accountOverviewLblHeaderBalance());
 		accHeader.setStyleName("TransfersHeader");
 		amountHeader.setStyleName("TransfersHeader");
 		grid.setWidget(0, 0, accHeader);
@@ -489,8 +486,7 @@ public class SCB implements EntryPoint {
 						error.printStackTrace();
 						Log.error("Login state can not be retrieved! ", error);
 						Window
-								.alert("Login state can not be retrieved! Detail: "
-										+ error.getMessage());
+								.alert(constants.loginFailedText());
 					}
 
 					public void onSuccess(SCBIdentityDTO result) {
@@ -562,7 +558,7 @@ public class SCB implements EntryPoint {
 
 			public void onSuccess(Void result) {
 				Log.info("Account created");
-				Window.alert("Your saving account is ready for service");
+				Window.alert(constants.accountOpened());
 				Window.Location.reload();
 
 			}
@@ -590,7 +586,7 @@ public class SCB implements EntryPoint {
 
 					public void onSuccess(AccountDetailDTO result) {
 						Log.info("Balance: " + result);
-						Label accBalanceLbl = new Label("Current balance: "
+						Label accBalanceLbl = new Label(constants.accountDetailCurrentBalance()
 								+ NumberFormat.getCurrencyFormat().format(
 										result.getBalance()));
 						if (result.getBalance() >= 0) {
@@ -607,15 +603,15 @@ public class SCB implements EntryPoint {
 						
 						accountDetailTable = new Grid(transfers.size() + 2, 4);
 						if (transfers.size()==0){
-							Label noTransferHint=new Label("At the moment there are no outgoing neither incoming transactions");
+							Label noTransferHint=new Label(constants.accountDetailHintNoTransaction());
 							accountDetailTable.setWidget(0,0,noTransferHint);
 						}
 						else{
 						
-						Label dateLbl = new Label("Date");
-						Label commentLbl = new Label("Comment");
-						Label accountLbl = new Label("Account");
-						Label amountLbl = new Label("Amount");
+						Label dateLbl = new Label(constants.accountDetailHeaderDate());
+						Label commentLbl = new Label(constants.accountDetailHeaderComment());
+						Label accountLbl = new Label(constants.accountDetailHeaderAccount());
+						Label amountLbl = new Label(constants.accountDetailHeaderAmount());
 						commentLbl.setStyleName("TransfersHeader");
 						dateLbl.setStyleName("TransfersHeader");
 						accountLbl.setStyleName("TransfersHeader");
@@ -672,7 +668,7 @@ public class SCB implements EntryPoint {
 							pos++;
 						}
 						}
-						Button transferMoneyButton = new Button("Send money");
+						Button transferMoneyButton = new Button(constants.accountDetailSendMoneyBtn());
 						transferMoneyButton.addClickHandler(new ClickHandler() {
 
 							public void onClick(ClickEvent event) {
@@ -680,7 +676,7 @@ public class SCB implements EntryPoint {
 
 							}
 						});
-						Button transferFastMoneyButton = new Button("FastEmail Transfer");
+						Button transferFastMoneyButton = new Button(constants.accountDetailSendMoneyFastBtn());
 						transferFastMoneyButton.addClickHandler(new ClickHandler() {
 
 							public void onClick(ClickEvent event) {
@@ -722,12 +718,12 @@ public class SCB implements EntryPoint {
 		
 		hints.clear();
 		if (!isFieldConfirmToExpresion(receiverEmailTxt,"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
-		"Please enter a valid email address!")) {
+				constants.fastMoneyValidateEmail())) {
 			result = false;
 		}
 		if (!isFieldConfirmToExpresion(amountTxt,
 				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
-				"Amount may only contain a value between 0.00 and 9999.99.")) {
+				constants.fastMoneyValidateAmount())) {				
 			result = false;
 		}
 		return result;
@@ -738,16 +734,16 @@ public class SCB implements EntryPoint {
 		Log.info("Text: " + receiverAccountNrTxt.getText());
 		hints.clear();
 		if (!isFieldConfirmToExpresion(receiverAccountNrTxt, "^[0-9]{1,10}$",
-				"Account may only contain numbers")) {
+				constants.sendMoneyValidateaccount())) {
 			result = false;
 		}
 		if (!isFieldConfirmToExpresion(receiverBankNrTxt, "^[0-9]{1,10}$",
-				"BLZ may only contain numbers")) {
+				constants.sendMoneyValidateBLZ())) {
 			result = false;
 		}
 		if (!isFieldConfirmToExpresion(amountTxt,
 				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
-				"Amount may only contain a value between 0.00 and 9999.99.")) {
+				constants.fastMoneyValidateAmount())) {
 			result = false;
 		}
 		return result;
@@ -759,41 +755,41 @@ public class SCB implements EntryPoint {
 		hints.clear();
 
 		if (!isFieldConfirmToExpresion(nameTxt, "[\\w]+",
-				"Please enter a valid name!")) {
+				constants.registerValidateName())) {
 			result = false;
 		}
 		
 		if (!isFieldConfirmToExpresion(firstNameTxt, "[\\w]+",
-		"Please enter a valid first name!")) {
+		constants.registerValidateFirstName())) {
 			result = false;
 		}
 		
 		if (!isFieldConfirmToExpresion(emailTxt,
 				"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
-				"Please enter a valid email address!")) {
+				constants.registerValidateEmail())) {
 			result = false;
 		}
 		if (!isFieldConfirmToExpresion(streetTxt, "[\\w \\däÄöÖüÜ]+",
-				"Please enter a valid street name!")) {
+				constants.registerValidateStreet())) {
 			result = false;
 		}
 		if (!isFieldConfirmToExpresion(plzTxt, "[\\d]+",
-				"Please enter a valid postal code!")) {
+				constants.registerValidatePLZ())) {
 			result = false;
 		}
 		
 		if (!isFieldConfirmToExpresion(houseTxt, "[\\d]+",
-		"Please enter a valid house number!")) {
+				constants.registerValidateHouseNr())) {
 	result = false;
 }
 
 		if (!isFieldConfirmToExpresion(cityTxt, "[\\w]+",
-				"Please enter a city! ")) {
+				constants.registerValidateCity())) {
 			result = false;
 		}
 		
 		if (agbBox.getValue()==false){
-			hints.add("Please read the Term of Services and agree to them!");
+			hints.add(constants.registerValidateToS());
 			result = false;			
 		}
 

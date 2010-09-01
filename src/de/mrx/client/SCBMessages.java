@@ -10,5 +10,12 @@ public interface SCBMessages extends Messages {
 
 	  @DefaultMessage("Last update: {0,date,medium} {0,time,medium}")
 	  String lastUpdate(Date timestamp);
+	  
+	  
+	  @DefaultMessage("There was a problem: {0}")
+	  String scbError(String detail);
+	  
+	  @DefaultMessage("Registration could not proceed: {0}")
+	  String registrationError(String detail);
 
 }
