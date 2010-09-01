@@ -19,6 +19,16 @@ public class SCBIdentityDTO implements Serializable {
 
 	private String houseNr;
 	
+	private String language;
+	
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
 	private boolean loggedIn = false;
 	private String loginUrl;
 	private String logoutUrl;

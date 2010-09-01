@@ -1,7 +1,6 @@
 package de.mrx.client;
 
 import com.google.gwt.i18n.client.Constants;
-import com.google.gwt.user.client.ui.Label;
 
 public interface SCBConstants extends Constants{
 	 @DefaultStringValue("Register")
@@ -48,6 +47,9 @@ public interface SCBConstants extends Constants{
 	@DefaultStringValue("Email (gmail only): ")
 	String registrationEmail();
 	
+	@DefaultStringValue("Sprache: ")
+	String registrationLanguage();
+	
 	@DefaultStringValue("I accept the Terms Of Services")
 	String registrationtoSAGBHint();
 	
@@ -65,6 +67,9 @@ public interface SCBConstants extends Constants{
 	
 	@DefaultStringValue("UserInfo")
 	String menuUserInformation();
+	
+	@DefaultStringValue("Language")
+	String menuLanguage();
 	
 	
 	@DefaultStringValue("Financial state")
@@ -137,6 +142,10 @@ public interface SCBConstants extends Constants{
 	@DefaultStringValue("BLZ may only contain numbers")
 	String sendMoneyValidateBLZ();
 	
+	
+	@DefaultStringValue("Secure Cloud Banking is a technology demonstration platform to evaluate aspects of cloud computing. <br>Feel free to register with a google account and use the SCB banking services. <br>Enjoy!<br><br>")
+	String registrationIntroductionText();
+	
 	@DefaultStringValue("Please enter a valid name!")
 	String registerValidateName();
 	
@@ -205,4 +214,12 @@ public interface SCBConstants extends Constants{
 	@DefaultStringValue("TAN Nr: ")
 	String confirmTanNr();
 	
+	@DefaultStringValue("English")
+	String languageEnglish();
+	
+	@DefaultStringValue("German")
+	String languageGerman();
+	
+	@DefaultStringValue("Language")
+	String languageMenu();
 }

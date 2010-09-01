@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -49,6 +50,7 @@ public class SCB implements EntryPoint {
 	private static final String PAGEID_SIGN = "signInOut";
 
 	private final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
+	String currentLanguage="en";
 	
 
 	private SCBConstants constants = GWT.create(SCBConstants.class);
@@ -82,6 +84,10 @@ public class SCB implements EntryPoint {
 	private TextBox cityTxt;
 	private TextBox emailTxt;
 
+	
+	RadioButton languageGerman;
+	RadioButton languageEnglish;
+
 	private Label nameLbl;
 	private Label firstNameLbl;
 	private Label streetLbl;
@@ -89,6 +95,7 @@ public class SCB implements EntryPoint {
 	private Label plzLbl;
 	private Label cityLbl;
 	private Label emailLbl;
+	private Label languageLbl;
 
 	
 	private Button registerButton = new Button(constants.menuRegister());
@@ -108,6 +115,9 @@ public class SCB implements EntryPoint {
 	private MenuBar menu;
 
 	private MenuItem userInformationMenuItem;
+	private MenuBar languageMenubar;
+	private MenuItem languageGermanMenuItem;
+	private MenuItem languageEnglishMenuItem;
 
 	private MenuItem registerMItem;
 	private String currentAccount;
@@ -142,7 +152,7 @@ public class SCB implements EntryPoint {
 	private void doShowAbout(boolean picture){
 		RootPanel.get(PAGEID_CONTENT).clear();
 		informationPanel=new VerticalPanel();
-		HTML text=new HTML("Secure Cloud Banking is a technology demonstration platform to evaluate aspects of cloud computing. <br>Feel free to register with a google account and use the SCB banking services. <br>Enjoy!<br><br>");
+		HTML text=new HTML(constants.registrationIntroductionText());
 		text.setStyleName("centerAligned");
 		scbLogo = new Image("images/banking.jpg");
 		scbLogo.setStyleName("centerAligned");
@@ -159,10 +169,14 @@ public class SCB implements EntryPoint {
 		RootPanel.get(PAGEID_CONTENT).clear();
 		doShowAbout(false);
 		
-		RootPanel.get(PAGEID_CONTENT).add(getRegistrationPanel());
+		RootPanel.get(PAGEID_CONTENT).add(createRegistrationPanel());
 	}
 
-	public VerticalPanel getRegistrationPanel() {		
+	/**
+	 * creates the registration panel
+	 * @return registration panel
+	 */
+	public VerticalPanel createRegistrationPanel() {		
 
 		registrationPanel = new VerticalPanel();
 		
@@ -172,7 +186,7 @@ public class SCB implements EntryPoint {
 			registrationPanel.add(hint);
 			registrationPanel.add(signInLink);
 		}
-		registrationTable = new Grid(6, 6);
+		registrationTable = new Grid(7, 6);
 		nameLbl = new Label(constants.registrationName());
 		firstNameLbl=new Label(constants.registrationFirstName());
 		streetLbl = new Label(constants.registrationStreet());
@@ -180,14 +194,16 @@ public class SCB implements EntryPoint {
 		plzLbl = new Label(constants.registrationPostalCode());
 		cityLbl = new Label(constants.registrationCity());
 		emailLbl = new Label(constants.registrationEmail());
-
-		
+		languageLbl = new Label(constants.registrationLanguage());
 		nameTxt = new TextBox();
 		firstNameTxt=new TextBox();
 		streetTxt = new TextBox();
 		plzTxt = new TextBox();
 		cityTxt = new TextBox();
-		emailTxt = new TextBox();
+		emailTxt = new TextBox();		
+		languageGerman=new RadioButton("language",constants.languageGerman());
+		languageEnglish=new RadioButton("language",constants.languageEnglish());
+		languageGerman.setValue(true);
 		houseTxt=new TextBox();
 		if (identityInfo != null && (identityInfo.getEmail() != null)) {
 			emailTxt.setText(identityInfo.getEmail());
@@ -208,14 +224,18 @@ public class SCB implements EntryPoint {
 		registrationTable.setWidget(1, 0, streetLbl);
 		registrationTable.setWidget(1, 1, streetTxt);
 		registrationTable.setWidget(1, 2, houseLbl);
-		registrationTable.setWidget(1, 3, houseTxt);
+		registrationTable.setWidget(1, 3, houseTxt);		
 		registrationTable.setWidget(2, 0, plzLbl);
 		registrationTable.setWidget(2, 1, plzTxt);
 		registrationTable.setWidget(2, 2, cityLbl);
 		registrationTable.setWidget(2, 3, cityTxt);
-		 registrationTable.setWidget(4, 0, agbBox);
-		 registrationTable.setWidget(4, 1, toSLink);
-		registrationTable.setWidget(4, 3, registerButton);
+		
+		registrationTable.setWidget(3, 0, languageLbl);
+		registrationTable.setWidget(3, 1, languageGerman);
+		registrationTable.setWidget(4, 1, languageEnglish);
+		 registrationTable.setWidget(6, 0, agbBox);
+		 registrationTable.setWidget(6, 1, toSLink);
+		registrationTable.setWidget(6, 3, registerButton);
 
 		registerButton.addClickHandler(new ClickHandler() {
 
@@ -223,7 +243,7 @@ public class SCB implements EntryPoint {
 				validateErrorTable.clear();
 
 				if (isRegisterFormValid()) {
-					register();
+					doRegister();
 				} else {
 
 					createHintTable();
@@ -237,7 +257,11 @@ public class SCB implements EntryPoint {
 		return registrationPanel;
 	}
 
-	protected void register() {
+	/**
+	 * performes the registration
+	 */
+	protected void doRegister() {
+		
 
 		String n = nameTxt.getText();
 		String str = streetTxt.getText();
@@ -254,6 +278,12 @@ public class SCB implements EntryPoint {
 		id.setEmail(email);
 		id.setHouseNr(houseNr);
 		id.setFirstName(firstName);
+		if (languageGerman.getValue().equals(Boolean.TRUE)){
+			id.setLanguage("de");
+		}
+		else{
+			id.setLanguage("en");
+		}
 		
 		if (registerSvc == null) {
 			registerSvc = GWT.create(RegisterService.class);
@@ -345,7 +375,24 @@ public class SCB implements EntryPoint {
 			menu.addItem(constants.menuInformation(), informationMenu);
 			userInformationMenuItem = new MenuItem(constants.menuUserInformation(), cmdShowNoService);
 			menu.addItem(userInformationMenuItem);
+			languageMenubar =new MenuBar(true);
+			Command cmdChangeToEnglish = new Command() {
+				public void execute() {
+					changeToLocalisedVersion("en");
 
+				}
+			};
+			Command cmdChangeToGerman = new Command() {
+				public void execute() {
+					changeToLocalisedVersion("de");
+
+				}
+			};
+			languageEnglishMenuItem=new MenuItem(constants.languageEnglish(), cmdChangeToEnglish);
+			languageGermanMenuItem=new MenuItem(constants.languageGerman(), cmdChangeToGerman);
+			languageMenubar.addItem(languageGermanMenuItem);
+			languageMenubar.addItem(languageEnglishMenuItem);
+			menu.addItem(constants.languageMenu(), languageMenubar);
 			mainPanel.add(menu);
 
 			r.add(mainPanel);
@@ -512,6 +559,11 @@ public class SCB implements EntryPoint {
 										.getEmail());
 							}
 							loadLoggedInSetup();
+							String language=identityInfo.getLanguage();
+							GWT.log("Language: "+language);
+							if (language!=null && !currentLanguage.equals(language)){
+								changeToLocalisedVersion(language);								
+							}
 						} else {
 							Log.info("User is not yet logged in with his Google account");
 							loadLogin();
@@ -544,6 +596,7 @@ public class SCB implements EntryPoint {
 		RootPanel.get(PAGEID_SIGN).remove(signInLink);
 		RootPanel.get(PAGEID_SIGN).remove(signOutLink);
 		RootPanel.get(PAGEID_SIGN).add(signOutLink);
+		
 	}
 
 	private void createAccount() {
@@ -1080,5 +1133,29 @@ public class SCB implements EntryPoint {
 			showAccountDetails(accNr);
 		}
 
+	}
+	
+	/*
+	 * change the language during runtime
+	 * keeps the debug flag
+	 */	
+	private void changeToLocalisedVersion(String language){
+		String queryPart=Window.Location.getQueryString();
+		
+		
+		String reloadURL;
+		String debugFlag=Window.Location.getParameter("gwt.codesvr");
+		
+		if (debugFlag!=null){
+			reloadURL=GWT.getHostPageBaseURL()+queryPart+"&locale="+language;	
+		}
+		else{
+			reloadURL=GWT.getHostPageBaseURL()+"?locale="+language;
+		}
+		
+		GWT.log(reloadURL);
+
+		
+		Window.open(reloadURL,"_self",null);
 	}
 }

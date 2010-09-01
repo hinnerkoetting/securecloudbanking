@@ -27,14 +27,22 @@ public class SCBIdentity {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
 
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+	@Persistent
+	private String language;
+	
+	public String getLanguage() {
+		return language;
 	}
 
-	
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+
+
 	@Persistent
 	private String invitationCode;;
 
@@ -145,6 +153,7 @@ public class SCBIdentity {
 		setNickName(dto.getNickName());
 		setFirstName(dto.getFirstName());
 		setHouseNr(getHouseNr());
+		setLanguage(getLanguage());
 	}
 
 
@@ -173,6 +182,7 @@ public class SCBIdentity {
 		dto.setNickName(getNickName());
 		dto.setHouseNr(getHouseNr());
 		dto.setFirstName(getFirstName());
+		dto.setLanguage(getLanguage());
 		return dto;
 	}
 	  public String getEmail() {
