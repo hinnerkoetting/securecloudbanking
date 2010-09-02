@@ -20,7 +20,11 @@ import javax.jdo.annotations.InheritanceStrategy;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
 
-
+/**
+ * represents an account. Can either be an internal account (SCBAccount) or an external Account.
+ * @author IV#11C9
+ *
+ */
 @PersistenceCapable
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
 public abstract class GeneralAccount {

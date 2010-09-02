@@ -3,7 +3,10 @@ package de.mrx.client;
 import java.io.Serializable;
 
 
-
+/**
+ * Data transfer object for an account
+ * @see de.mrx.server.GeneralAccount
+ */
 public class AccountDTO implements Serializable{
 	/**
 	 * 

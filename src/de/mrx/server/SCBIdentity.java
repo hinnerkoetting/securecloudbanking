@@ -18,7 +18,7 @@ import de.mrx.client.SCBIdentityDTO;
 
 
 /**
- * Identity known to Secure Cloud Banking
+ * Represents an Identity (user) known to Secure Cloud Banking
  *
  */
 @PersistenceCapable

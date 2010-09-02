@@ -13,6 +13,10 @@ import com.google.appengine.api.datastore.Key;
 
 import de.mrx.client.MoneyTransferDTO;
 
+/**
+ * a moneytransfer that is waiting for TAN-Based confirmation
+ *
+ */
 @PersistenceCapable
 public class MoneyTransferPending {
 	

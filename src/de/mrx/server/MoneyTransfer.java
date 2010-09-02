@@ -15,6 +15,12 @@ import com.google.appengine.api.datastore.Key;
 import de.mrx.client.MoneyTransferDTO;
 
 
+/**
+ * represents an moneytransfer between an account of a customer of SCB-Bank and another account (the other account be an InternalSBAccount or an external account
+ *  
+ * @author IV#11C9
+ *
+ */
 @PersistenceCapable
 public class MoneyTransfer {
 
@@ -98,13 +104,8 @@ public class MoneyTransfer {
 	}
 
 
-	public MoneyTransferDTO getDTO(PersistenceManager pm){
-		
-		
-		
+	public MoneyTransferDTO getDTO(PersistenceManager pm){		
 		InternalSCBAccount s=(InternalSCBAccount)InternalSCBAccount.getOwnByAccountNr(pm,senderAccountNr);
-		
-
 		Bank b=Bank.getByBLZ(pm,receiverBLZ);
 		ExternalAccount r=(ExternalAccount)ExternalAccount.getAccountByBLZAndAccountNr(pm,b,receiverAccountNr);
 		if (r!=null){

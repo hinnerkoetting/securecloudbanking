@@ -2,6 +2,10 @@ package de.mrx.client;
 
 import java.io.Serializable;
 
+/**
+ * Data transfer object for a bank institute
+ * @see de.mrx.server.Bank
+ */
 public class BankDTO implements Serializable  {
 	/**
 	 * 

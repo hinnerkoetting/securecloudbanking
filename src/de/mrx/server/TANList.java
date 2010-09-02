@@ -15,6 +15,11 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
 
+/**
+ * belongs to an internalSCBAccount. For every transaction, a TAN must be used. Server side defines the required TAN (iTAN-Procedure)
+ * @author IV#11C9
+ *
+ */
 @PersistenceCapable
 public class TANList implements Serializable{
 	
