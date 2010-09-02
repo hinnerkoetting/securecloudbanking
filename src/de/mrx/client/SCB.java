@@ -47,10 +47,10 @@ public class SCB implements EntryPoint {
 	// private static final Logger log = Logger.getLogger(SCB.class.getName());
 //	Widget divLogger = Log.getLogger(DivLogger.class).getWidget();
 
-	private static final String PAGEID_HEADER = "cloudbanking";
-	private static final String PAGEID_CONTENT = "content";
-	private static final String PAGEID_FEHLER = "fehler";
-	private static final String PAGEID_SIGN = "signInOut";
+	public static final String PAGEID_HEADER = "cloudbanking";
+	public static final String PAGEID_CONTENT = "content";
+	public static final String PAGEID_FEHLER = "fehler";
+	public static final String PAGEID_SIGN = "signInOut";
 
 	private final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
 	String currentLanguage="en";
@@ -153,7 +153,10 @@ public class SCB implements EntryPoint {
 	
 	
 	private void doShowAbout(boolean picture){
-		RootPanel.get(PAGEID_CONTENT).clear();
+		RootPanel r = RootPanel.get(PAGEID_CONTENT);
+		if (r == null)
+			return;
+		r.clear();
 		informationPanel=new VerticalPanel();
 		HTML text=new HTML(constants.registrationIntroductionText());
 		text.setStyleName("centerAligned");
@@ -317,22 +320,10 @@ public class SCB implements EntryPoint {
 	}
 
 	/**
-	 * This is the entry point method.
+	 * REMOVEME: temporal workaround until refactoring
 	 */
-	public void onModuleLoad() {
-
-		try {
-			GWT.log("On Module Load");
-			RootPanel r = RootPanel.get(PAGEID_HEADER);
-			if (r == null) {
-				GWT.log("Root not found: '" + PAGEID_HEADER + "'");
-				return;
-			}
-
-//			RootPanel.get(PAGEID_FEHLER).add(divLogger);
-			Log.setUncaughtExceptionHandler();
-
-			Command cmdShowImpressum = new Command() {
+	public VerticalPanel createMainPanel() {
+		Command cmdShowImpressum = new Command() {
 				public void execute() {
 					GWT.log("Impressum follows");
 					Window
@@ -396,7 +387,31 @@ public class SCB implements EntryPoint {
 			languageMenubar.addItem(languageGermanMenuItem);
 			languageMenubar.addItem(languageEnglishMenuItem);
 			menu.addItem(constants.languageMenu(), languageMenubar);
-			mainPanel.add(menu);
+			VerticalPanel tempMainpanel = new VerticalPanel();
+			tempMainpanel.add(menu);
+		return tempMainpanel;
+	}
+	
+	/**
+	 * This is the entry point method.
+	 */
+	public void onModuleLoad() {
+
+		try {
+			GWT.log("On Module Load");
+			RootPanel r = RootPanel.get(PAGEID_HEADER);
+			if (r == null) {
+				GWT.log("Root not found: '" + PAGEID_HEADER + "'");
+				return;
+			}
+
+//			RootPanel.get(PAGEID_FEHLER).add(divLogger);
+			Log.setUncaughtExceptionHandler();
+
+			
+
+			mainPanel = createMainPanel();
+			
 
 			r.add(mainPanel);
 			
@@ -825,7 +840,7 @@ public class SCB implements EntryPoint {
 				constants.registerValidateEmail())) {
 			result = false;
 		}
-		if (!isFieldConfirmToExpresion(streetTxt, "[\\w \\däÄöÖüÜ]+",
+		if (!isFieldConfirmToExpresion(streetTxt, "[\\w \\dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]+",
 				constants.registerValidateStreet())) {
 			result = false;
 		}
