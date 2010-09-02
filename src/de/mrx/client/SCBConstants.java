@@ -1,7 +1,12 @@
 package de.mrx.client;
 
 import com.google.gwt.i18n.client.Constants;
-
+/**
+ * Internationalisation with GWT static String internationlisation
+ * @see http://code.google.com/intl/de-DE/webtoolkit/doc/1.6/DevGuideI18nAndA11y.html
+ * english is default language
+ *
+ */
 public interface SCBConstants extends Constants{
 	 @DefaultStringValue("Register")
 	  String menuRegister();

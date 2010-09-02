@@ -2,6 +2,11 @@ package de.mrx.client;
 
 import java.io.Serializable;
 
+/**
+ * data transfer object for SCBIdentity. 
+ * @see de.mrx.server.SCBIdentity
+ *
+ */
 public class SCBIdentityDTO implements Serializable {
 	/**
 	 * 

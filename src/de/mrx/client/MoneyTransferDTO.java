@@ -3,10 +3,16 @@ package de.mrx.client;
 import java.io.Serializable;
 import java.util.Date;
 
-
+/**
+ * data transfer object for MoneyTransfer data
+ * @see de.mrx.server.MoneyTransfer
+ *
+ */
 public class MoneyTransferDTO implements Serializable{
 
 	
+	
+	private static final long serialVersionUID = -8599605280764598199L;
 	private boolean selfSended=false;
 	private double amount;
 	private String remark;

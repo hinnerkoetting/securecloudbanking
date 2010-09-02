@@ -4,6 +4,12 @@ import java.util.Date;
 
 import com.google.gwt.i18n.client.Messages;
 
+/**
+ * Internationalisation with GWT static String internationlisation
+ * @see http://code.google.com/intl/de-DE/webtoolkit/doc/1.6/DevGuideI18nAndA11y.html
+ * english is default language
+ *
+ */
 public interface SCBMessages extends Messages {
 	 @DefaultMessage("''{0}'' is not a valid symbol.")
 	  String invalidSymbol(String symbol);

@@ -37,7 +37,10 @@ import de.mrx.shared.SCBException;
 import de.mrx.shared.WrongTANException;
 
 /**
+ * Complete GUI for Secure Cloud Banking. Includes Registration process, general information, and online banking
  * Entry point classes define <code>onModuleLoad()</code>.
+ * TODO: This class is too big! Split!
+ * 
  */
 public class SCB implements EntryPoint {
 
