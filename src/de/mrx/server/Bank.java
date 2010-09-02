@@ -16,6 +16,10 @@ import com.google.appengine.api.datastore.Key;
 
 import de.mrx.client.BankDTO;
 
+/**
+ * represents a bank (SCB as well as external banks). A bank contains accounts.
+ *
+ */
 @PersistenceCapable
 public class Bank {
 

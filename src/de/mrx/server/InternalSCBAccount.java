@@ -9,8 +9,14 @@ import javax.jdo.annotations.Persistent;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
 
+/**
+ * represents an internal account of SCB 
+ * Contains the balance and the owner email. 
+ * @author IV#11C9
+ *
+ */
 @PersistenceCapable
-public class Account extends GeneralAccount {
+public class InternalSCBAccount extends GeneralAccount {
 	
    
 
@@ -34,26 +40,26 @@ public class Account extends GeneralAccount {
 
 	
 
-	public static Account getOwnByAccountNr(PersistenceManager pm, String accountNr){
+	public static InternalSCBAccount getOwnByAccountNr(PersistenceManager pm, String accountNr){
 		
-		Extent<Account> e=pm.getExtent(Account.class);
+		Extent<InternalSCBAccount> e=pm.getExtent(InternalSCBAccount.class);
 		Query query=pm.newQuery(e,"accountNr == accountNrParam");
 		query.setFilter("accountNr == accountNrParam");
 		query.declareParameters("java.lang.String accountNrParam");
 		query.setUnique(true);
-		Account result= (Account) query.execute(accountNr);
+		InternalSCBAccount result= (InternalSCBAccount) query.execute(accountNr);
 		
 		return result;
 	}
 	
 	
-public static Account getOwnByEmail(PersistenceManager pm, String email){
+public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String email){
 		
-		Extent<Account> e=pm.getExtent(Account.class);
+		Extent<InternalSCBAccount> e=pm.getExtent(InternalSCBAccount.class);
 		Query query=pm.newQuery(e,"ownerEmail == emailParam");		
 		query.declareParameters("java.lang.String emailParam");
 		query.setUnique(true);
-		Account result= (Account) query.execute(email);
+		InternalSCBAccount result= (InternalSCBAccount) query.execute(email);
 		
 		return result;
 	}
@@ -89,11 +95,11 @@ public static Account getOwnByEmail(PersistenceManager pm, String email){
 	@Persistent
 	TANList tans;
 	
-	public Account(){
+	public InternalSCBAccount(){
     	
     }
 	
-	public Account( String owner, String accountNr, double balance, Bank bank) {
+	public InternalSCBAccount( String owner, String accountNr, double balance, Bank bank) {
 		super(owner,accountNr, bank);
 		this.balance = balance;		
 		tans=new TANList();

@@ -102,7 +102,7 @@ public class MoneyTransfer {
 		
 		
 		
-		Account s=(Account)Account.getOwnByAccountNr(pm,senderAccountNr);
+		InternalSCBAccount s=(InternalSCBAccount)InternalSCBAccount.getOwnByAccountNr(pm,senderAccountNr);
 		
 
 		Bank b=Bank.getByBLZ(pm,receiverBLZ);

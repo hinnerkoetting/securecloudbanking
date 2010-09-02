@@ -13,6 +13,11 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
 
+/**
+ * Container for all banks (SCB and external.
+ * Works as a root object for the persistence layer
+ *
+ */
 @PersistenceCapable
 public class AllBanks {
 
@@ -55,6 +60,11 @@ public class AllBanks {
 	@Persistent
 	Bank ownBank;
 	
+	/**
+	 * gets the Root-Object of the JDO-Persistence
+	 * @param pm
+	 * @return
+	 */
 	public static AllBanks getBankWrapper(PersistenceManager pm){
 		Extent e=pm.getExtent(AllBanks.class);
 		Query query=pm.newQuery(e);

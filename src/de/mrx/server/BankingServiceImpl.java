@@ -50,6 +50,11 @@ import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
 import de.mrx.shared.WrongTANException;
 
+/**
+ * implementation class for the bankingservice
+ * @see de.mrx.client.BankingService
+ *
+ */
 @SuppressWarnings("serial")
 @PersistenceAware
 public class BankingServiceImpl extends RemoteServiceServlet implements
@@ -59,29 +64,35 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	Logger log = Logger.getLogger(BankingServiceImpl.class.getName());
 	PersistenceManager pm = PMF.get().getPersistenceManager();
 
+	/**
+	 * SCB-Bank 
+	 */
 	Bank ownBank;
+	
+	/**
+	 * reference to the bank container
+	 */
 	AllBanks bankWrapper;
 
 	public BankingServiceImpl() {
 		loadInitialData();
 	}
 
+	/**
+	 * receive all accounts of the currently logged in user 
+	 */
 	public List<AccountDTO> getAccounts() {
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		
 
-		// Extent<Account> e=pm.getExtent(Account.class,true);
-		// for ( Account acc: e){
-		// log.info( acc.toString());
-		// }
 		pm = PMF.get().getPersistenceManager();
-		String query = " SELECT FROM " + Account.class.getName()
+		String query = " SELECT FROM " + InternalSCBAccount.class.getName()
 				+ " WHERE owner =='" + user.getEmail() + "'";
 		log.info("geTAccounts Query: " + query);
-		List<Account> accounts = (List<Account>) pm.newQuery(query).execute();
+		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>) pm.newQuery(query).execute();
 		List<AccountDTO> accountDTOs = new ArrayList<AccountDTO>();
-		for (Account acc : accounts) {
+		for (InternalSCBAccount acc : accounts) {
 			AccountDTO dto = acc.getDTO();
 			accountDTOs.add(dto);
 			log.info(dto.toString());
@@ -89,6 +100,9 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		return accountDTOs;
 	}
 
+	/**
+	 * initialisation. After DB-Resets stores basic data in the JDO-database.
+	 */
 	private void loadInitialData() {
 		try {
 			bankWrapper = AllBanks.getBankWrapper(PMF.get()
@@ -135,7 +149,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String query = " SELECT FROM " + Account.class.getName()
+		String query = " SELECT FROM " + InternalSCBAccount.class.getName()
 				+ " WHERE owner =='" + user.getEmail() + "' && accountNr=='"
 				+ accountNr + "'";
 		// Extent<Account> e=pm.getExtent(Account.class,true);
@@ -143,7 +157,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		// log.info( acc.toString());
 		// }
 		// log.info("geTAccounts Query: "+query);
-		List<Account> accounts = (List<Account>) pm.newQuery(query).execute();
+		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>) pm.newQuery(query).execute();
 		if (accounts.size() != 1) {
 			throw new RuntimeException("Anzahl Accounts mit Nr '" + accountNr
 					+ "' ist " + accounts.size());
@@ -155,7 +169,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		GeneralAccount acc = Account.getOwnByAccountNr(pm, accountNr);
+		GeneralAccount acc = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);
 		// String query = " SELECT FROM " + MoneyTransfer.class.getName()
 		// + " WHERE senderAccountNr =='" + accountNr + "'";
 		// List<MoneyTransfer> moneyTransfers = (List<MoneyTransfer>)
@@ -219,10 +233,10 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			DecimalFormat format = new DecimalFormat("##");
 			format.setMinimumIntegerDigits(6);
 
-			Account acc = new Account(identityInfo.getEmail(), format
+			InternalSCBAccount acc = new InternalSCBAccount(identityInfo.getEmail(), format
 					.format(kontoNr), 5, ownBank);
 			acc.setBank(ownBank);
-			acc.setId(KeyFactory.createKey(ownBank.getId(), Account.class
+			acc.setId(KeyFactory.createKey(ownBank.getId(), InternalSCBAccount.class
 					.getSimpleName(), kontoNr));
 			acc.setAccountType(AccountDTO.SAVING_ACCOUNT);
 			acc.setAccountDescription(AccountDTO.SAVING_ACCOUNT_DES);
@@ -257,7 +271,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			pm = PMF.get().getPersistenceManager();
 			bankWrapper = AllBanks.getBankWrapper(pm);
 			ownBank = bankWrapper.getOwnBanks();
-			Account senderAccount = Account.getOwnByAccountNr(pm,
+			InternalSCBAccount senderAccount = InternalSCBAccount.getOwnByAccountNr(pm,
 					senderAccountNr);
 			if (senderAccount == null) {
 				throw new RuntimeException("Sender Account " + senderAccountNr
@@ -283,7 +297,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 
 			GeneralAccount recAccount;
 			if (receiverBank.equals(ownBank)) {
-				recAccount = Account.getOwnByAccountNr(pm, receiveraccountNr);
+				recAccount = InternalSCBAccount.getOwnByAccountNr(pm, receiveraccountNr);
 				if (recAccount == null) {
 					throw new AccountNotExistException(
 							"Dieser Account existiert nicht bei der Bank "
@@ -351,8 +365,8 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			receivertransfer.setRemark(remark);
 			receivertransfer.setReceiverName(receiverName);
 			recAccount.addMoneyTransfer(receivertransfer);
-			if (recAccount instanceof Account){
-				Account scbAccount=(Account) recAccount;				
+			if (recAccount instanceof InternalSCBAccount){
+				InternalSCBAccount scbAccount=(InternalSCBAccount) recAccount;				
 				scbAccount.setBalance(scbAccount.getBalance() + amount);
 			}
 			
@@ -372,7 +386,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	public AccountDetailDTO getAccountDetails(String accountNr)
 			throws SCBException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Account acc = Account.getOwnByAccountNr(pm, accountNr);
+		InternalSCBAccount acc = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);
 		if (acc == null) {
 			throw new SCBException("Account data for Account '" + accountNr
 					+ "' can not be loaded at the moment!");
@@ -380,7 +394,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		return acc.getDetailedDTO(pm);
 	}
 
-	private MimeBodyPart createPINAttachment(Account account)
+	private MimeBodyPart createPINAttachment(InternalSCBAccount account)
 			throws DocumentException, MessagingException, IOException {
 
 		Document document = new Document();
@@ -418,7 +432,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 
 	}
 
-	private void sendPINList(PersistenceManager pm, Account account)
+	private void sendPINList(PersistenceManager pm, InternalSCBAccount account)
 			throws SCBException {
 		try {
 			UserService userService = UserServiceFactory.getUserService();
@@ -469,7 +483,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			pm = PMF.get().getPersistenceManager();
 			bankWrapper = AllBanks.getBankWrapper(pm);
 			ownBank = bankWrapper.getOwnBanks();
-			Account senderAccount = Account.getOwnByAccountNr(pm,
+			InternalSCBAccount senderAccount = InternalSCBAccount.getOwnByAccountNr(pm,
 					senderAccountNr);
 			if (senderAccount == null) {
 				throw new SCBException("Sender Account " + senderAccountNr
@@ -495,7 +509,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 
 			GeneralAccount recAccount;
 			if (receiverBank.equals(ownBank)) {
-				recAccount = Account.getOwnByAccountNr(pm, receiveraccountNr);
+				recAccount = InternalSCBAccount.getOwnByAccountNr(pm, receiveraccountNr);
 				if (recAccount == null) {
 					throw new RuntimeException(
 							"Dieser Account existiert nicht bei der Bank "
@@ -569,14 +583,14 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			pm = PMF.get().getPersistenceManager();
 			bankWrapper = AllBanks.getBankWrapper(pm);
 			ownBank = bankWrapper.getOwnBanks();
-			Account senderAccount = Account.getOwnByAccountNr(pm,
+			InternalSCBAccount senderAccount = InternalSCBAccount.getOwnByAccountNr(pm,
 					senderAccountNr);
 			if (senderAccount == null) {
 				throw new SCBException("Sender Account " + senderAccountNr
 						+ " existiert nicht!");
 			}
 			
-			Account receiverAcc= Account.getOwnByEmail(pm,email);
+			InternalSCBAccount receiverAcc= InternalSCBAccount.getOwnByEmail(pm,email);
 			if (receiverAcc==null){
 				throw new AccountNotExistException();
 			}
