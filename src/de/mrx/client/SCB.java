@@ -217,7 +217,7 @@ public class SCB implements EntryPoint {
 		}
 		
 		agbBox = new CheckBox(constants.registrationtoSAGBHint());
-		Anchor toSLink=new Anchor(constants.registrationtoAGBLink(), "doc/ToS.pdf");
+		Anchor toSLink=new Anchor(constants.registrationtoAGBLink(), GeneralConstants.AGB_LINK);
 		toSLink.setTarget("_blank");
 		registrationTable.setWidget(0, 0, firstNameLbl);
 		registrationTable.setWidget(0, 1, firstNameTxt);
