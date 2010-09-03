@@ -3,7 +3,6 @@ package de.mrx.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.allen_sauer.gwt.log.client.DivLogger;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -30,7 +29,6 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
@@ -59,7 +57,7 @@ public class SCB implements EntryPoint {
 	private SCBConstants constants = GWT.create(SCBConstants.class);
 	private SCBMessages messages = GWT.create(SCBMessages.class);
 	RegisterServiceAsync registerSvc;
-	private BankingServiceAsync bankingService;
+	private CustomerServiceAsync bankingService;
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -219,7 +217,7 @@ public class SCB implements EntryPoint {
 		}
 		
 		agbBox = new CheckBox(constants.registrationtoSAGBHint());
-		Anchor toSLink=new Anchor(constants.registrationtoAGBLink(), "doc/ToS.pdf");
+		Anchor toSLink=new Anchor(constants.registrationtoAGBLink(), GeneralConstants.AGB_LINK);
 		toSLink.setTarget("_blank");
 		registrationTable.setWidget(0, 0, firstNameLbl);
 		registrationTable.setWidget(0, 1, firstNameTxt);
@@ -435,7 +433,7 @@ public class SCB implements EntryPoint {
 		accountOverviewPanel.add(accountsDetailsPanel);
 
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 		bankingService.getAccounts(new AsyncCallback<List<AccountDTO>>() {
 
@@ -542,7 +540,7 @@ public class SCB implements EntryPoint {
 	private void checkGoogleStatus() {
 
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 		GWT.log(GWT.getHostPageBaseURL());
 		bankingService.login(GWT.getHostPageBaseURL(),
@@ -619,7 +617,7 @@ public class SCB implements EntryPoint {
 
 	private void createAccount() {
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 		bankingService.openNewAccount(new AsyncCallback<Void>() {
 
@@ -639,7 +637,7 @@ public class SCB implements EntryPoint {
 
 	private void showAccountDetails(String accNr) {
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 		accountsDetailsPanel.clear();
 
@@ -960,7 +958,7 @@ public class SCB implements EntryPoint {
 
 	private void doSendMoneyFast(){
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 
 		Double amount = Double.parseDouble(amountTxt.getText());
@@ -994,7 +992,7 @@ public class SCB implements EntryPoint {
 	
 	protected void doSendMoney() {
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 
 		Double amount = Double.parseDouble(amountTxt.getText());
@@ -1024,7 +1022,7 @@ public class SCB implements EntryPoint {
 
 	protected void doConfirmSendMoney() {
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 
 		Double amount = Double.parseDouble(amountTxt.getText());
