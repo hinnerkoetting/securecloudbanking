@@ -8,10 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceAware;
 import javax.mail.Message;
@@ -25,15 +23,10 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.omg.CORBA.WrongTransaction;
-
-import net.sourceforge.htmlunit.corejs.javascript.ast.ThrowStatement;
-
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Font;
@@ -43,25 +36,24 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
-import de.mrx.client.BankingService;
+import de.mrx.client.CustomerService;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
-import de.mrx.shared.WrongTANException;
 
 /**
  * implementation class for the bankingservice
- * @see de.mrx.client.BankingService
+ * @see de.mrx.client.CustomerService
  *
  */
 @SuppressWarnings("serial")
 @PersistenceAware
-public class BankingServiceImpl extends RemoteServiceServlet implements
-		BankingService {
+public class CustomerServiceImpl extends BankServiceImpl implements
+		CustomerService {
 
 	private static final String SCB_BLZ = "1502222";
-	Logger log = Logger.getLogger(BankingServiceImpl.class.getName());
+	
 	PersistenceManager pm = PMF.get().getPersistenceManager();
 
 	/**
@@ -74,7 +66,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 	 */
 	AllBanks bankWrapper;
 
-	public BankingServiceImpl() {
+	public CustomerServiceImpl() {
 		loadInitialData();
 	}
 
@@ -171,25 +163,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 		return accounts.get(0).getBalance();
 	}
 
-	/**
-	 * gets all transaction of one account
-	 * may only be called by the owner or an admin?
-	 * @param accountNr
-	 * @return
-	 */
-	public List<MoneyTransferDTO> getTransaction(String accountNr) {
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		GeneralAccount acc = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);		
-		List<MoneyTransferDTO> mtDTOs = new ArrayList<MoneyTransferDTO>();
-		for (MoneyTransfer mtransfer : acc.getTransfers()) {
-			MoneyTransferDTO dto = mtransfer.getDTO(pm);
-			mtDTOs.add(dto);
-			log.info(dto.toString());
-		}
-		return mtDTOs;
-	}
+
 
 	/**
 	 * login to only banking
@@ -376,7 +350,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 
 			// pm.makePersistent(transfer);
 			senderAccount.addMoneyTransfer(transfer);
-			// recAccount.addMoneyTransfer(transfer);Später eine Kopie anlegen
+			// recAccount.addMoneyTransfer(transfer);Spï¿½ter eine Kopie anlegen
 
 			senderAccount.setBalance(senderAccount.getBalance() - amount);
 			MoneyTransfer receivertransfer = new MoneyTransfer(recAccount,
@@ -603,7 +577,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			log.severe(e.getMessage());
 			e.printStackTrace();
 			throw new SCBException(
-					"Überweisung kann derzeit nicht ausgeführt werden", e);
+					"ï¿½berweisung kann derzeit nicht ausgefï¿½hrt werden", e);
 		}
 		finally {
 			if (pm.currentTransaction().isActive()) {
@@ -662,7 +636,7 @@ public class BankingServiceImpl extends RemoteServiceServlet implements
 			log.severe(e.getMessage());
 			e.printStackTrace();
 			throw new SCBException(
-					"Überweisung kann derzeit nicht ausgeführt werden", e);
+					"ï¿½berweisung kann derzeit nicht ausgefï¿½hrt werden", e);
 		}
 		finally {
 			if (pm.currentTransaction().isActive()) {

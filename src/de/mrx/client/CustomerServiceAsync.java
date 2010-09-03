@@ -8,26 +8,13 @@ import de.mrx.shared.SCBException;
 
 /**
  * asynchron interface for Banking service.
- * @see de.mrx.client.BankingService
+ * @see de.mrx.client.CustomerService
  *
  */
-public interface BankingServiceAsync {
+public interface CustomerServiceAsync extends BankServiceAsync {
 
 	
-	/**
-	 * gets all transaction of one account
-	 * may only be called by the owner or an admin?
-	 * @param accountNr
-	 * @return
-	 */
-	void getTransaction(String accountNr,AsyncCallback<List<MoneyTransferDTO>> callback);
-
-	/**
-	 * online banking service
-	 * offers all services directly related to banking * 
-	 */
-	void  login(String requestUri,
-			AsyncCallback<SCBIdentityDTO> callback);
+	
 
 	/**
 	 * fetches information about all account of a user
@@ -41,13 +28,7 @@ public interface BankingServiceAsync {
 	 */
 	void openNewAccount(AsyncCallback<Void> callback);
 
-	/**
-	 * fetches the balance of a given account. 
-	 * Can be only used by the owner of the account or an admin?
-	 * @param accountNr account that should be access
-	 * @return balance of the account
-	 */
-	void getBalance(String accountNr, AsyncCallback<Double> callback);
+	
 
 	/*
 	 * sends money. For this service, the sender must be a customer of SCB
@@ -55,15 +36,7 @@ public interface BankingServiceAsync {
 	void sendMoney(String senderAccountNr, String blz, String accountNr, double amount, String remark,
 			String receiverName,String bankName, String tan, AsyncCallback<Void> callback);
 
-	/**
-	 * get all account details 
-	 * @param accountNr account that should be fetched
-	 * @return detailled information
-	 * @throws SCBException if data can not be fetched
-	 */
-	void getAccountDetails(String accountNr,
-			AsyncCallback<AccountDetailDTO> callback);
-
+	
 	/**
 	 * send all details for a money transaction. The money is not yet transferred, but in a second step must be confirmed with a TAN
 	 * @param senderAccountNr

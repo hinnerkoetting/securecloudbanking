@@ -3,13 +3,11 @@ package de.mrx.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.allen_sauer.gwt.log.client.DivLogger;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
@@ -30,7 +28,6 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
@@ -59,7 +56,7 @@ public class SCB implements EntryPoint {
 	private SCBConstants constants = GWT.create(SCBConstants.class);
 	private SCBMessages messages = GWT.create(SCBMessages.class);
 	RegisterServiceAsync registerSvc;
-	private BankingServiceAsync bankingService;
+	private CustomerServiceAsync bankingService;
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -435,7 +432,7 @@ public class SCB implements EntryPoint {
 		accountOverviewPanel.add(accountsDetailsPanel);
 
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 		bankingService.getAccounts(new AsyncCallback<List<AccountDTO>>() {
 
@@ -542,7 +539,7 @@ public class SCB implements EntryPoint {
 	private void checkGoogleStatus() {
 
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 		GWT.log(GWT.getHostPageBaseURL());
 		bankingService.login(GWT.getHostPageBaseURL(),
@@ -619,7 +616,7 @@ public class SCB implements EntryPoint {
 
 	private void createAccount() {
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 		bankingService.openNewAccount(new AsyncCallback<Void>() {
 
@@ -639,7 +636,7 @@ public class SCB implements EntryPoint {
 
 	private void showAccountDetails(String accNr) {
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 		accountsDetailsPanel.clear();
 
@@ -679,65 +676,7 @@ public class SCB implements EntryPoint {
 						}
 						else{
 						
-						Label dateLbl = new Label(constants.accountDetailHeaderDate());
-						Label commentLbl = new Label(constants.accountDetailHeaderComment());
-						Label accountLbl = new Label(constants.accountDetailHeaderAccount());
-						Label amountLbl = new Label(constants.accountDetailHeaderAmount());
-						commentLbl.setStyleName("TransfersHeader");
-						dateLbl.setStyleName("TransfersHeader");
-						accountLbl.setStyleName("TransfersHeader");
-						amountLbl.setStyleName("TransfersHeader");
-
-						accountDetailTable.setWidget(0, 0, dateLbl);
-						accountDetailTable.setWidget(0, 1, commentLbl);
-						accountDetailTable.setWidget(0, 2, accountLbl);
-						accountDetailTable.setWidget(0, 3, amountLbl);
-						int pos = 1;
-						Log
-								.debug("Money transfer entries: "
-										+ transfers.size());
-						for (MoneyTransferDTO transfer : transfers) {
-							Log.info("Transfer: " + transfer);
-							Label entryDateLbl = new Label(DateTimeFormat
-									.getMediumDateFormat().format(
-											transfer.getTimestamp()));
-							Label entryRemarkLbl = new Label(transfer
-									.getRemark());
-							Label entryReceiverDetailsLbl = new Label(transfer
-									.getReceiverBankNr()
-									+ ": " + transfer.getReceiverAccountNr());
-
-							Label entryAmountLbl = new Label(NumberFormat
-									.getCurrencyFormat().format(
-											transfer.getAmount()));
-							if (pos % 2 == 0) {
-								entryDateLbl.setStyleName("TransfersOdd");
-								entryRemarkLbl.setStyleName("TransfersOdd");
-								entryReceiverDetailsLbl
-										.setStyleName("TransfersOdd");
-
-							} else {
-								entryDateLbl.setStyleName("TransfersEven");
-								entryRemarkLbl.setStyleName("TransfersEven");
-								entryReceiverDetailsLbl
-										.setStyleName("TransfersEven");
-
-							}
-							if (transfer.getAmount() >= 0) {
-								entryAmountLbl.setStyleName("positiveMoney");
-							} else {
-								entryAmountLbl.setStyleName("negativeMoney");
-							}
-							
-							accountDetailTable.setWidget(pos, 0, entryDateLbl);
-							accountDetailTable
-									.setWidget(pos, 1, entryRemarkLbl);
-							accountDetailTable.setWidget(pos, 2,
-									entryReceiverDetailsLbl);
-							accountDetailTable
-									.setWidget(pos, 3, entryAmountLbl);
-							pos++;
-						}
+						
 						}
 						Button transferMoneyButton = new Button(constants.accountDetailSendMoneyBtn());
 						transferMoneyButton.addClickHandler(new ClickHandler() {
@@ -960,7 +899,7 @@ public class SCB implements EntryPoint {
 
 	private void doSendMoneyFast(){
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 
 		Double amount = Double.parseDouble(amountTxt.getText());
@@ -994,7 +933,7 @@ public class SCB implements EntryPoint {
 	
 	protected void doSendMoney() {
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 
 		Double amount = Double.parseDouble(amountTxt.getText());
@@ -1024,7 +963,7 @@ public class SCB implements EntryPoint {
 
 	protected void doConfirmSendMoney() {
 		if (bankingService == null) {
-			bankingService = GWT.create(BankingService.class);
+			bankingService = GWT.create(CustomerService.class);
 		}
 
 		Double amount = Double.parseDouble(amountTxt.getText());
