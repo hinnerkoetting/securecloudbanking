@@ -14,10 +14,9 @@ public class Registration implements EntryPoint {
 
 	@Override
 	public void onModuleLoad() {
-		System.out.println("START Registration");
+		
 		RootPanel r = RootPanel.get(SCB.PAGEID_CONTENT);
-		RegistrationForm regForm=new RegistrationForm();
-		regForm.getFirstName().setText("Test");
+		RegistrationForm regForm=new RegistrationForm();		
 		r.add(regForm);
 
 	}
