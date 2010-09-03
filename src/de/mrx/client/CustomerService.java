@@ -2,7 +2,6 @@ package de.mrx.client;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import de.mrx.shared.SCBException;
@@ -12,22 +11,9 @@ import de.mrx.shared.SCBException;
  * offers all services directly related to banking * 
  */
 @RemoteServiceRelativePath("banking")
-public interface BankingService extends RemoteService {
+public interface CustomerService extends BankService {
 	
-	/**
-	 * login to only banking
-	 * @param requestUri page to be redirected after login and logout
-	 * @return information about the customer
-	 */
-	public SCBIdentityDTO  login(String requestUri);
 	
-	/**
-	 * fetches the balance of a given account. 
-	 * Can be only used by the owner of the account or an admin?
-	 * @param accountNr account that should be access
-	 * @return balance of the account
-	 */
-	public double getBalance(String accountNr);
 	
 	/**
 	 * fetches information about all account of a user
@@ -35,21 +21,7 @@ public interface BankingService extends RemoteService {
 	 */
 	public List<AccountDTO> getAccounts();
 	
-	/**
-	 * gets all transaction of one account
-	 * may only be called by the owner or an admin?
-	 * @param accountNr
-	 * @return
-	 */
-	public List<MoneyTransferDTO> getTransaction(String accountNr);
 	
-	/**
-	 * get all account details 
-	 * @param accountNr account that should be fetched
-	 * @return detailled information
-	 * @throws SCBException if data can not be fetched
-	 */
-	public AccountDetailDTO getAccountDetails(String accountNr) throws SCBException;
 	
 	/**
 	 * open a new account for the logged in customer

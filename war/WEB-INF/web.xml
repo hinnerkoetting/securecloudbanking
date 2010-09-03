@@ -4,9 +4,30 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
+
+
+
+<!--admin -->
+<servlet-mapping>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <url-pattern>/de.mrx.Admin/gwt-log</url-pattern>
+</servlet-mapping>
+
+
+
+<!-- Admin banking Servlet-->
+<servlet-mapping>
+    <servlet-name>adminBankingServlet</servlet-name>
+    <url-pattern>/de.mrx.Admin/admin</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>adminBankingServlet</servlet-name>
+    <servlet-class>de.mrx.server.admin.AdminbankingImpl</servlet-class>
+</servlet>
+
   
-  
-  
+<!--customer client -->  
   <servlet>
     <servlet-name>registerServlet</servlet-name>
     <servlet-class>de.mrx.server.RegisterServiceImpl</servlet-class>
@@ -14,7 +35,7 @@
 
   <servlet>
     <servlet-name>bankingServlet</servlet-name>
-    <servlet-class>de.mrx.server.BankingServiceImpl</servlet-class>
+    <servlet-class>de.mrx.server.CustomerServiceImpl</servlet-class>
   </servlet>
 
 
