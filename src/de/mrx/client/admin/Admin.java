@@ -39,7 +39,7 @@ public class Admin implements EntryPoint {
 	public final String ADMIN_PAGE_ID = "admin";
 	
 	
-	
+	//test
 	private VerticalPanel page;
 	private Grid pageGrid;
 	
