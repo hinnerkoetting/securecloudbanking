@@ -27,7 +27,13 @@
 </servlet>
 
   
-<!--customer client -->  
+  
+  <servlet-mapping>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <url-pattern>/de.mrx.Admin/gwt-log</url-pattern>
+</servlet-mapping>
+
+
   <servlet>
     <servlet-name>registerServlet</servlet-name>
     <servlet-class>de.mrx.server.RegisterServiceImpl</servlet-class>
