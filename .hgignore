@@ -3,5 +3,5 @@ syntax: regexp
 ^war/WEB-INF/classes$
 ^war/WEB-INF/appengine-generated$
 ^war/scb$
-syntax: regexp
+^war/Register$
 ^war/de\.mrx\.Admin$
