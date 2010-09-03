@@ -8,6 +8,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
@@ -676,7 +677,65 @@ public class SCB implements EntryPoint {
 						}
 						else{
 						
-						
+						Label dateLbl = new Label(constants.accountDetailHeaderDate());
+						Label commentLbl = new Label(constants.accountDetailHeaderComment());
+						Label accountLbl = new Label(constants.accountDetailHeaderAccount());
+						Label amountLbl = new Label(constants.accountDetailHeaderAmount());
+						commentLbl.setStyleName("TransfersHeader");
+						dateLbl.setStyleName("TransfersHeader");
+						accountLbl.setStyleName("TransfersHeader");
+						amountLbl.setStyleName("TransfersHeader");
+
+						accountDetailTable.setWidget(0, 0, dateLbl);
+						accountDetailTable.setWidget(0, 1, commentLbl);
+						accountDetailTable.setWidget(0, 2, accountLbl);
+						accountDetailTable.setWidget(0, 3, amountLbl);
+						int pos = 1;
+						Log
+								.debug("Money transfer entries: "
+										+ transfers.size());
+						for (MoneyTransferDTO transfer : transfers) {
+							Log.info("Transfer: " + transfer);
+							Label entryDateLbl = new Label(DateTimeFormat
+									.getMediumDateFormat().format(
+											transfer.getTimestamp()));
+							Label entryRemarkLbl = new Label(transfer
+									.getRemark());
+							Label entryReceiverDetailsLbl = new Label(transfer
+									.getReceiverBankNr()
+									+ ": " + transfer.getReceiverAccountNr());
+
+							Label entryAmountLbl = new Label(NumberFormat
+									.getCurrencyFormat().format(
+											transfer.getAmount()));
+							if (pos % 2 == 0) {
+								entryDateLbl.setStyleName("TransfersOdd");
+								entryRemarkLbl.setStyleName("TransfersOdd");
+								entryReceiverDetailsLbl
+										.setStyleName("TransfersOdd");
+
+							} else {
+								entryDateLbl.setStyleName("TransfersEven");
+								entryRemarkLbl.setStyleName("TransfersEven");
+								entryReceiverDetailsLbl
+										.setStyleName("TransfersEven");
+
+							}
+							if (transfer.getAmount() >= 0) {
+								entryAmountLbl.setStyleName("positiveMoney");
+							} else {
+								entryAmountLbl.setStyleName("negativeMoney");
+							}
+							
+							accountDetailTable.setWidget(pos, 0, entryDateLbl);
+							accountDetailTable
+									.setWidget(pos, 1, entryRemarkLbl);
+							accountDetailTable.setWidget(pos, 2,
+									entryReceiverDetailsLbl);
+							accountDetailTable
+									.setWidget(pos, 3, entryAmountLbl);
+							pos++;
+						}
 						}
 						Button transferMoneyButton = new Button(constants.accountDetailSendMoneyBtn());
 						transferMoneyButton.addClickHandler(new ClickHandler() {
