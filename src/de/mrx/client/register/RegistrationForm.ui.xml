@@ -2,18 +2,17 @@
 ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
+    <ui:style src="../SCB.css" />
    <g:HTMLPanel> 
     
-    <table border="1">
+    <table >
     <tr>
     	<td> <ui:msg description="regLblLastName">Last Name</ui:msg></td>
     	<td> <g:TextBox ui:field='lastName'/></td>
     	<td> <ui:msg description="regLblFirstName">First Name</ui:msg></td>
     	<td> <g:TextBox ui:field='firstName'/></td>
-    	<td> <ui:msg description="regLblEmail">Email (only Googlemail)</ui:msg></td>
-    	<td> <g:TextBox ui:field='email'/></td>
     </tr>
-    <tr>
+    <tr >
     	
     	<td> <ui:msg description="street">Street</ui:msg></td>
     	<td> <g:TextBox ui:field='street'/></td>
@@ -25,14 +24,23 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     	<td> <g:TextBox ui:field='plz'/></td>
     	<td> <ui:msg description="city">City</ui:msg></td>
     	<td> <g:TextBox ui:field='city'/></td>
-    	<td> <g:ListBox ui:field='language' visibleItemCount='1'/></td>
+    
     <tr>
+    <tr>
+        	<td> <ui:msg description="regLblEmail">Email (only Googlemail)</ui:msg></td>
+    		<td> <g:TextBox ui:field='email'/></td>
+        	<td> <ui:msg description="languageLbl">Language</ui:msg></td>
+   			<td> <g:ListBox ui:field='language' visibleItemCount='1'/></td>
+    </tr>
+    <tr/>
     </tr>
 
     <tr>
     	<td><g:CheckBox ui:field='agb'><ui:msg description="agbhint">I accept the Terms Of Services</ui:msg></g:CheckBox></td>
-    	<td><g:Anchor ui:field="agblink"><ui:msg description="agbhint">ToS</ui:msg></g:Anchor></td>
-    	<td> <g:Button></g:Button> </td>
+    	<td><g:Anchor ui:field='agblink'><ui:msg description="agbhint">ToS</ui:msg></g:Anchor></td>
+    	
+    	
+    	<td> <g:Button ui:field='registerBtn'><ui:msg description="registerBtn">Register</ui:msg></g:Button> </td>
     </tr>
     </table> 
     
