@@ -88,6 +88,34 @@ public class MoneyTransferForm extends Composite implements Observable{
 		
 	}
 	
+	/**
+	 * the MoneyTransferForm directly steps into the confirmation page asking for confirmation of a transaction
+	 * @param currentAccountNr current Account
+	 * @param confirmationData transaction to be confirmed
+	 */
+	public MoneyTransferForm(String currentAccountNr, MoneyTransferDTO dto){
+		initWidget(uiBinder.createAndBindUi(this));
+		this.currentAccountNr=currentAccountNr;
+		confirmation=true;
+		requiredTanNr.setText(constants.confirmTanNr() +" "+ dto.getRequiredTan());
+		receiverBLZ.setText(dto.getReceiverBankNr());
+		amount.setText("" + dto.getAmount());
+		remark.setText(dto.getRemark());
+		receiverName.setText(dto.getReceiverName());
+		receiverAccountNr.setText(dto.getReceiverAccountNr());
+		receiverAccountNr.setEnabled(false);
+		receiverBLZ.setEnabled(false);
+		receiverBankName.setEnabled(false);
+		amount.setEnabled(false);
+		remark.setEnabled(false);
+		receiverName.setEnabled(false);
+		receiverAccountNr.setEnabled(false);
+		receiverBankName.setText(dto.getReceiverBankName());
+		
+		updateForm();
+		
+	}
+	
 	@UiHandler("sendMoneyConfirm")
 	public void sendMoneyConfirmation(ClickEvent e){
 		validateErrorTable.clear();
@@ -285,9 +313,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 	public void notifyObservers(Object arg) {
 		for (Observer o: observers){
 			o.update(this,arg);
-		}
-		
-		
+		}		
 	}
 	
 	/**
@@ -300,7 +326,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 			tan.setVisible(true);
 			sendMoneyConfirm.setVisible(true);
 			sendMoney.setVisible(false);
-		}
+		} 
 		else{
 			requiredTanNr.setVisible(false);
 			tan.setVisible(false);
