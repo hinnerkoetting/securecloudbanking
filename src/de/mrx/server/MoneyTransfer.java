@@ -1,8 +1,6 @@
 package de.mrx.server;
 
-import java.io.Serializable;
 import java.util.Date;
-import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -24,11 +22,6 @@ import de.mrx.client.MoneyTransferDTO;
 @PersistenceCapable
 public class MoneyTransfer {
 
-	private final static Logger logger=Logger.getLogger(MoneyTransfer.class.getName());
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	
 	@Persistent	
 	private double amount;

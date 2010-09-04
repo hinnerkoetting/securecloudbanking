@@ -7,8 +7,6 @@ import javax.jdo.annotations.PersistenceCapable;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
-import de.mrx.client.AccountDTO;
-
 /**
  * represents an external account. No extra information compared to GeneralAccount. Only necessary due to limitations in JDO.
  * @author IV#11C9

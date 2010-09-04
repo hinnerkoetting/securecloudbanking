@@ -7,7 +7,12 @@ package de.mrx.shared;
  */
 public class AccountNotExistException extends SCBException {
 	
-	 public AccountNotExistException(){
+	 /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1216342195730542424L;
+
+	public AccountNotExistException(){
 		 
 	 }
 	 

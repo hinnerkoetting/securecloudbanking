@@ -4,6 +4,10 @@ package de.mrx.shared;
  * Exception used when customers uses a wrong TAN
  */
 public class WrongTANException extends SCBException{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5547147090258649102L;
 	int trials;
 	
 	public int getTrials() {

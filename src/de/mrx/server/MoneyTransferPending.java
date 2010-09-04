@@ -1,9 +1,7 @@
 package de.mrx.server;
 
 import java.util.Date;
-import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -21,7 +19,6 @@ import de.mrx.client.MoneyTransferDTO;
 public class MoneyTransferPending {
 	
 	
-	private final static Logger logger=Logger.getLogger(MoneyTransferPending.class.getName());
 	
 	@Persistent	
 	private double amount;

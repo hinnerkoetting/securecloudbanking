@@ -3,20 +3,15 @@ package de.mrx.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.PersistenceAware;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.jdo.annotations.Inheritance;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
-import javax.jdo.annotations.InheritanceStrategy;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
 

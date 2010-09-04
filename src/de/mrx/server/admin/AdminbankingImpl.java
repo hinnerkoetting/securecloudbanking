@@ -7,9 +7,6 @@ import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.SCBIdentityDTO;

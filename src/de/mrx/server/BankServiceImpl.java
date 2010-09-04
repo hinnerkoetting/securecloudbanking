@@ -6,9 +6,6 @@ import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import de.mrx.client.BankService;
@@ -30,9 +27,8 @@ BankService {
 	 * @param accountNr
 	 * @return
 	 */
-	public List<MoneyTransferDTO> getTransaction(String accountNr) {
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
+	public List<MoneyTransferDTO> getTransaction(String accountNr) {		
+		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		GeneralAccount acc = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);		
 		List<MoneyTransferDTO> mtDTOs = new ArrayList<MoneyTransferDTO>();

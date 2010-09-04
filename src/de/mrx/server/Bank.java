@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -73,7 +72,7 @@ public class Bank {
 	private List<Key> accounts = new ArrayList<Key>();
 
 	public static Bank getByBLZ(PersistenceManager pm, String blz) {
-		Extent e = pm.getExtent(Bank.class);
+		Extent<Bank> e = pm.getExtent(Bank.class);
 		Query query = pm.newQuery(e);
 		query.setFilter("blz == blzParam");
 		query.declareParameters("String blzParam");
