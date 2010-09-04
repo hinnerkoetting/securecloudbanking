@@ -1,5 +1,9 @@
 package de.mrx.client.register;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -9,10 +13,14 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.GeneralConstants;
@@ -37,8 +45,11 @@ public class RegistrationForm extends Composite {
 	private SCBConstants constants = GWT.create(SCBConstants.class);
 	private SCBMessages messages = GWT.create(SCBMessages.class);
 	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+	private List<String> hints = new ArrayList<String>();
 	
 	RegisterServiceAsync registerSvc;
+	
+	SCBIdentityDTO identity;
 
 	@UiField
 	TextBox city;
@@ -68,18 +79,37 @@ public class RegistrationForm extends Composite {
 	
 	@UiField
 	Button registerBtn;
+	
+	@UiField
+	Label hintLogIn;
+	
+	@UiField
+	VerticalPanel signInLinkWrapper;
+	
+	@UiField
+	FlexTable validateErrorTable;
+	
+	@UiField
+	CheckBox agb;
 
-	public RegistrationForm() {
+	public RegistrationForm(Anchor signInLink) {
 		// sets listBox
 		initWidget(uiBinder.createAndBindUi(this));		
 		language.addItem(constants.languageGerman());
 		language.addItem(constants.languageEnglish());
 		agblink.setHref(GeneralConstants.AGB_LINK);
+		signInLinkWrapper.add(signInLink);
 		
 	}
 	
 	@UiHandler("registerBtn")
 	void doRegister(ClickEvent e) {
+		validateErrorTable.clear();
+		boolean validForm=isRegisterFormValid();
+		if (!validForm){
+			createHintTable();
+			return;
+		}
 		
 		SCBIdentityDTO id = new SCBIdentityDTO(lastName.getText());
 		id.setStreet(street.getText());
@@ -115,6 +145,23 @@ public class RegistrationForm extends Composite {
 
 			public void onSuccess(Void result) {				
 				RootPanel.get(SCB.PAGEID_CONTENT).clear();
+				String queryPart=Window.Location.getQueryString();
+				
+				
+				String reloadURL;
+				String debugFlag=Window.Location.getParameter("gwt.codesvr");
+				
+				if (debugFlag!=null){
+					reloadURL=GWT.getHostPageBaseURL()+queryPart+"&locale="+language;	
+				}
+				else{
+					reloadURL=GWT.getHostPageBaseURL()+"?locale="+language;
+				}
+				
+				GWT.log(reloadURL);
+
+				
+				Window.open(reloadURL,"_self",null);
 				
 			}
 		};
@@ -182,6 +229,103 @@ public class RegistrationForm extends Composite {
 
 	public void setStreet(TextBox street) {
 		this.street = street;
+	}
+	
+	public void setUser(SCBIdentityDTO identity){
+		this.identity=identity;
+		updateForm();
+		
+	}
+	
+	
+	/**
+	 * update the form. Should be called if state of registration form is changed
+	 */
+	public void updateForm(){
+		if (identity==null || !identity.isLoggedIn()  ){
+			hintLogIn.setVisible(true);
+			signInLinkWrapper.setVisible(true);
+			email.setReadOnly(false);
+			Log.info("User logged in yet. This would ease the registration!");
+		}
+		else{
+			hintLogIn.setVisible(false);
+			signInLinkWrapper.setVisible(false);
+			email.setReadOnly(true);
+		}
+			
+	}
+	
+	
+	private boolean isRegisterFormValid() {
+		boolean result = true;
+
+		hints.clear();
+
+		if (!isFieldConfirmToExpresion(lastName, "[\\w]+",
+				constants.registerValidateName())) {
+			result = false;
+		}
+		
+		if (!isFieldConfirmToExpresion(firstName, "[\\w]+",
+		constants.registerValidateFirstName())) {
+			result = false;
+		}
+		
+		if (!isFieldConfirmToExpresion(email,
+				"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
+				constants.registerValidateEmail())) {
+			result = false;
+		}
+		if (!isFieldConfirmToExpresion(street, "[\\w \\d������]+",
+				constants.registerValidateStreet())) {
+			result = false;
+		}
+		if (!isFieldConfirmToExpresion(plz, "[\\d]+",
+				constants.registerValidatePLZ())) {
+			result = false;
+		}
+		
+		if (!isFieldConfirmToExpresion(houseNr, "[\\d]+",
+				constants.registerValidateHouseNr())) {
+	result = false;
+}
+
+		if (!isFieldConfirmToExpresion(city, "[\\w]+",
+				constants.registerValidateCity())) {
+			result = false;
+		}
+		
+		if (agb.getValue()==false){
+			hints.add(constants.registerValidateToS());
+			result = false;			
+		}
+
+		return result;
+	}
+	
+	private boolean isFieldConfirmToExpresion(TextBox input, String expression,
+			String errorMessage) {
+		if (input.getText().trim().toUpperCase().matches(expression)) {
+			input.setStyleName("");
+			return true;
+		} else {
+			input.setStyleName(SCB.STYLE_VALUE_NOT_OKAY);
+			Log.info("Text: '" + input.getText() + "'\tExpression: "
+					+ expression);
+			hints.add(errorMessage);
+			return false;
+		}
+
+	}
+	
+	private void createHintTable() {
+		for (int i = 0; i < hints.size(); i++) {
+			String currentMessage = hints.get(i);
+			Label hintLabel = new Label(currentMessage);
+			hintLabel.setStyleName(SCB.STYLE_VALUE_NOT_OKAY);
+			validateErrorTable.setWidget(i, 1, hintLabel);
+		}
 	}
 
 }
