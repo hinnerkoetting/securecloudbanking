@@ -50,7 +50,7 @@ public class SCB implements EntryPoint {
 	public static final String PAGEID_FEHLER = "fehler";
 	public static final String PAGEID_SIGN = "signInOut";
 
-	private final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
+	public final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
 	String currentLanguage="en";
 	
 

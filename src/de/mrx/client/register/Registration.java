@@ -1,6 +1,7 @@
 package de.mrx.client.register;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.RootPanel;
 
 import de.mrx.client.SCB;
@@ -16,7 +17,8 @@ public class Registration implements EntryPoint {
 	public void onModuleLoad() {
 		
 		RootPanel r = RootPanel.get(SCB.PAGEID_CONTENT);
-		RegistrationForm regForm=new RegistrationForm();		
+		Anchor a=new Anchor("LinkTest");
+		RegistrationForm regForm=new RegistrationForm(a);		
 		r.add(regForm);
 
 	}

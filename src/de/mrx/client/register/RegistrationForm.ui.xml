@@ -5,6 +5,13 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     <ui:style src="../SCB.css" />
    <g:HTMLPanel> 
     
+    <g:Label ui:field="hintLogIn" visible="false" styleName="{style.hint}">
+    	<ui:msg description="hintLogIn">We recommend you to log in first with your google account before proceeding</ui:msg>
+    </g:Label>
+    
+    
+    <g:VerticalPanel ui:field="signInLinkWrapper" visible="false"/>
+    
     <table >
     <tr>
     	<td> <ui:msg description="regLblLastName">Last Name</ui:msg></td>
@@ -37,12 +44,14 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
 
     <tr>
     	<td><g:CheckBox ui:field='agb'><ui:msg description="agbhint">I accept the Terms Of Services</ui:msg></g:CheckBox></td>
-    	<td><g:Anchor ui:field='agblink'><ui:msg description="agbhint">ToS</ui:msg></g:Anchor></td>
+    	<td><g:Anchor ui:field='agblink' target="_blank"><ui:msg description="agbhint">ToS</ui:msg></g:Anchor></td>
     	
     	
     	<td> <g:Button ui:field='registerBtn'><ui:msg description="registerBtn">Register</ui:msg></g:Button> </td>
     </tr>
     </table> 
+    
+    <g:FlexTable ui:field="validateErrorTable"/>
     
   </g:HTMLPanel>
 </ui:UiBinder>
