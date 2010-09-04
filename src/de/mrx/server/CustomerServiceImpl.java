@@ -632,11 +632,17 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			pm.currentTransaction().commit();
 			return transfer.getDTO();
 
+			
+			
 		} catch (Exception e) {
 			log.severe(e.getMessage());
 			e.printStackTrace();
-			throw new SCBException(
-					"�berweisung kann derzeit nicht ausgef�hrt werden", e);
+			if (e instanceof SCBException ){
+				throw (SCBException)e;
+			}
+			else{	throw new SCBException(
+					"Can not executed transaction.", e);
+			}
 		}
 		finally {
 			if (pm.currentTransaction().isActive()) {
