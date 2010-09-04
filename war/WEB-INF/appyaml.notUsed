@@ -1,0 +1,34 @@
+application: securecloudbanking
+version: 0_9
+runtime: java
+
+handlers:
+  - url: /scb/banking
+	  servlet:de.mrx.server.BankingServiceImpl
+      name: bankingServlet
+    
+    
+    -url: /scb/register
+    servlet: de.mrx.server.RegisterServiceImpl
+    name: registerServlet
+    
+      
+  - url:  /scb/gwt-log
+  	servlet:com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl
+  	name: remoteLoggerServiceImpl
+  	
+  	
+  	
+  static_files:
+  - include: **
+  - include: **.nocache.* 
+  		expiration: 0s
+  - include: **.cache.*
+  		expiration:365d
+  - exclude: **.gwt.rpc
+  
+  
+  system-properties:
+    <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+  
+  

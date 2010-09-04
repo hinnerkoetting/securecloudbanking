@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+
+
+<!--admin -->
+<servlet-mapping>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <url-pattern>/de.mrx.Admin/gwt-log</url-pattern>
+</servlet-mapping>
+
+
+
+<!-- Admin banking Servlet-->
+<servlet-mapping>
+    <servlet-name>adminBankingServlet</servlet-name>
+    <url-pattern>/de.mrx.Admin/admin</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>adminBankingServlet</servlet-name>
+    <servlet-class>de.mrx.server.admin.AdminbankingImpl</servlet-class>
+</servlet>
+
+  
+  
+  <servlet-mapping>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <url-pattern>/de.mrx.Admin/gwt-log</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <url-pattern>/register/gwt-log</url-pattern>
+</servlet-mapping>
+
+
+  <servlet>
+    <servlet-name>registerServlet</servlet-name>
+    <servlet-class>de.mrx.server.RegisterServiceImpl</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>bankingServlet</servlet-name>
+    <servlet-class>de.mrx.server.CustomerServiceImpl</servlet-class>
+  </servlet>
+
+
+  <servlet-mapping>
+    <servlet-name>bankingServlet</servlet-name>
+    <url-pattern>/scb/banking</url-pattern>
+  </servlet-mapping>
+
+<servlet>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
+</servlet>
+<servlet-mapping>
+  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+  <url-pattern>/scb/gwt-log</url-pattern>
+</servlet-mapping>
+
+
+  <servlet-mapping>
+    <servlet-name>registerServlet</servlet-name>
+    <url-pattern>/scb/register</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>registerServlet</servlet-name>
+    <url-pattern>/Register/register</url-pattern>
+  </servlet-mapping>
+  
+  
+  
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>SCB.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>
