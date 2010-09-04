@@ -28,6 +28,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import de.mrx.client.moneytransfer.MoneyTransferForm;
 import de.mrx.client.register.RegistrationForm;
 import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.WrongTANException;
@@ -38,7 +39,7 @@ import de.mrx.shared.WrongTANException;
  * TODO: This class is too big! Split!
  * 
  */
-public class SCB implements EntryPoint {
+public class SCB implements EntryPoint, Observer {
 
 	// private static final Logger log = Logger.getLogger(SCB.class.getName());
 //	Widget divLogger = Log.getLogger(DivLogger.class).getWidget();
@@ -748,7 +749,10 @@ public class SCB implements EntryPoint {
 		transferForm.setWidget(4, 1, sendMoneyBtn);
 
 		accountsDetailsPanel.add(transferForm);
-
+		
+		MoneyTransferForm newMoneyTransferForm=new MoneyTransferForm(currentAccount);
+		newMoneyTransferForm.addObserver(this);
+		accountsDetailsPanel.add(newMoneyTransferForm);
 	}
 
 	private void doSendMoneyFast(){
@@ -968,5 +972,16 @@ public class SCB implements EntryPoint {
 
 		
 		Window.open(reloadURL,"_self",null);
+	}
+
+
+	@Override
+	public void update(Observable o, Object arg) {
+		System.out.println("Updated");
+		if (o instanceof MoneyTransferForm){
+			showAccountDetails((String) arg);
+		}
+
+		
 	}
 }
