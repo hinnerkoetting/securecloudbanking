@@ -6,80 +6,79 @@
 <web-app>
 
 
-
-<!--admin -->
-<servlet-mapping>
-  <servlet-name>remoteLoggerServiceImpl</servlet-name>
-  <url-pattern>/de.mrx.Admin/gwt-log</url-pattern>
-</servlet-mapping>
+	<servlet>
+		<servlet-name>adminBankingServlet</servlet-name>
+		<servlet-class>de.mrx.server.admin.AdminbankingImpl</servlet-class>
+	</servlet>
 
 
-
-<!-- Admin banking Servlet-->
-<servlet-mapping>
-    <servlet-name>adminBankingServlet</servlet-name>
-    <url-pattern>/de.mrx.Admin/admin</url-pattern>
-</servlet-mapping>
-
-<servlet>
-    <servlet-name>adminBankingServlet</servlet-name>
-    <servlet-class>de.mrx.server.admin.AdminbankingImpl</servlet-class>
-</servlet>
-
-  
-  
-  <servlet-mapping>
-  <servlet-name>remoteLoggerServiceImpl</servlet-name>
-  <url-pattern>/de.mrx.Admin/gwt-log</url-pattern>
-</servlet-mapping>
-
-<servlet-mapping>
-  <servlet-name>remoteLoggerServiceImpl</servlet-name>
-  <url-pattern>/register/gwt-log</url-pattern>
-</servlet-mapping>
+	<servlet>
+		<servlet-name>registerServlet</servlet-name>
+		<servlet-class>de.mrx.server.RegisterServiceImpl</servlet-class>
+	</servlet>
 
 
-  <servlet>
-    <servlet-name>registerServlet</servlet-name>
-    <servlet-class>de.mrx.server.RegisterServiceImpl</servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>bankingServlet</servlet-name>
-    <servlet-class>de.mrx.server.CustomerServiceImpl</servlet-class>
-  </servlet>
+	<servlet>
+		<servlet-name>bankingServlet</servlet-name>
+		<servlet-class>de.mrx.server.CustomerServiceImpl</servlet-class>
+	</servlet>
 
 
-  <servlet-mapping>
-    <servlet-name>bankingServlet</servlet-name>
-    <url-pattern>/scb/banking</url-pattern>
-  </servlet-mapping>
+	<servlet>
+		<servlet-name>remoteLoggerServiceImpl</servlet-name>
+		<servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
+	</servlet>
 
-<servlet>
-  <servlet-name>remoteLoggerServiceImpl</servlet-name>
-  <servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
-</servlet>
-<servlet-mapping>
-  <servlet-name>remoteLoggerServiceImpl</servlet-name>
-  <url-pattern>/scb/gwt-log</url-pattern>
-</servlet-mapping>
+	<!--admin -->
+	<servlet-mapping>
+		<servlet-name>remoteLoggerServiceImpl</servlet-name>
+		<url-pattern>/de.mrx.Admin/gwt-log</url-pattern>
+	</servlet-mapping>
 
 
-  <servlet-mapping>
-    <servlet-name>registerServlet</servlet-name>
-    <url-pattern>/scb/register</url-pattern>
-  </servlet-mapping>
-  
-  <servlet-mapping>
-    <servlet-name>registerServlet</servlet-name>
-    <url-pattern>/Register/register</url-pattern>
-  </servlet-mapping>
-  
-  
-  
-  <!-- Default page to serve -->
-  <welcome-file-list>
-    <welcome-file>SCB.html</welcome-file>
-  </welcome-file-list>
+	<!-- Admin banking Servlet -->
+	<servlet-mapping>
+		<servlet-name>adminBankingServlet</servlet-name>
+		<url-pattern>/de.mrx.Admin/admin</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>remoteLoggerServiceImpl</servlet-name>
+		<url-pattern>/de.mrx.Admin/gwt-log</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>remoteLoggerServiceImpl</servlet-name>
+		<url-pattern>/register/gwt-log</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet-mapping>
+		<servlet-name>bankingServlet</servlet-name>
+		<url-pattern>/scb/banking</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>remoteLoggerServiceImpl</servlet-name>
+		<url-pattern>/scb/gwt-log</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet-mapping>
+		<servlet-name>registerServlet</servlet-name>
+		<url-pattern>/scb/register</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>registerServlet</servlet-name>
+		<url-pattern>/Register/register</url-pattern>
+	</servlet-mapping>
+
+
+
+	<!-- Default page to serve -->
+	<welcome-file-list>
+		<welcome-file>SCB.html</welcome-file>
+	</welcome-file-list>
 
 </web-app>
