@@ -1,12 +1,9 @@
 package de.mrx.server;
 
-import java.io.Serializable;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Logger;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -21,13 +18,12 @@ import com.google.appengine.api.datastore.Key;
  *
  */
 @PersistenceCapable
-public class TANList implements Serializable{
+public class TANList{
 	
 	@PrimaryKey	
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
 	
-	private final static Logger log = Logger.getLogger(TANList.class.getName());
 
 	@Persistent
 	private List<String> tan=new ArrayList<String>();

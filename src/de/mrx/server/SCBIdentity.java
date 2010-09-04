@@ -1,8 +1,5 @@
 package de.mrx.server;
 
-import java.io.Serializable;
-import java.util.List;
-
 import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;

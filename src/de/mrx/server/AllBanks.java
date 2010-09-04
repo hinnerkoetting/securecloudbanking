@@ -66,7 +66,7 @@ public class AllBanks {
 	 * @return
 	 */
 	public static AllBanks getBankWrapper(PersistenceManager pm){
-		Extent e=pm.getExtent(AllBanks.class);
+		Extent<AllBanks> e=pm.getExtent(AllBanks.class);
 		Query query=pm.newQuery(e);
 //		query.setFilter("accountNr == accountNrParam");
 //		query.declareParameters("java.lang.String accountNrParam");

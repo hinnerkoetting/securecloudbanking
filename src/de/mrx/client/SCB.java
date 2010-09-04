@@ -15,7 +15,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
@@ -25,13 +24,12 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import de.mrx.client.register.RegistrationForm;
 import de.mrx.shared.AccountNotExistException;
-import de.mrx.shared.SCBException;
 import de.mrx.shared.WrongTANException;
 
 /**
@@ -53,20 +51,21 @@ public class SCB implements EntryPoint {
 	public final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
 	String currentLanguage="en";
 	
+	RegistrationForm regForm;
 
 	private SCBConstants constants = GWT.create(SCBConstants.class);
-	private SCBMessages messages = GWT.create(SCBMessages.class);
+//	private SCBMessages messages = GWT.create(SCBMessages.class);
 	RegisterServiceAsync registerSvc;
 	private CustomerServiceAsync bankingService;
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
 	 */
-	private static final String SERVER_ERROR = "An error occurred while "
-			+ "attempting to contact the server. Please check your network "
-			+ "connection and try again.";
+//	private static final String SERVER_ERROR = "An error occurred while "
+//			+ "attempting to contact the server. Please check your network "
+//			+ "connection and try again.";
 
-	private CheckBox agbBox;;
+	
 	MenuBar generalMenu = new MenuBar(true);
 
 	private VerticalPanel mainPanel = new VerticalPanel();
@@ -77,34 +76,14 @@ public class SCB implements EntryPoint {
 
 	FlexTable validateErrorTable = new FlexTable();
 
-	private TextBox nameTxt;
-	private TextBox firstNameTxt;
-	private TextBox streetTxt;
-	private TextBox houseTxt;
-	private TextBox plzTxt;
-	private TextBox cityTxt;
-	private TextBox emailTxt;
+
 
 	
-	RadioButton languageGerman;
-	RadioButton languageEnglish;
 
-	private Label nameLbl;
-	private Label firstNameLbl;
-	private Label streetLbl;
-	private Label houseLbl;
-	private Label plzLbl;
-	private Label cityLbl;
-	private Label emailLbl;
-	private Label languageLbl;
 
-	
-	private Button registerButton = new Button(constants.menuRegister());
-
-	private VerticalPanel registrationPanel;
 	private VerticalPanel informationPanel;
 
-	private HTMLTable registrationTable;
+
 
 	private SCBIdentityDTO identityInfo = null;
 	private VerticalPanel loginPanel = new VerticalPanel();
@@ -172,149 +151,11 @@ public class SCB implements EntryPoint {
 	private void doOpenRegisterMenu() {
 		RootPanel.get(PAGEID_CONTENT).clear();
 		doShowAbout(false);
-		
-		RootPanel.get(PAGEID_CONTENT).add(createRegistrationPanel());
-	}
-
-	/**
-	 * creates the registration panel
-	 * @return registration panel
-	 */
-	public VerticalPanel createRegistrationPanel() {		
-
-		registrationPanel = new VerticalPanel();
-		
-		if (identityInfo==null || !identityInfo.isLoggedIn()  ){
-			Label hint=new Label(constants.hintRegistration());
-			hint.setStyleName("hint");
-			registrationPanel.add(hint);
-			registrationPanel.add(signInLink);
-		}
-		registrationTable = new Grid(7, 6);
-		nameLbl = new Label(constants.registrationName());
-		firstNameLbl=new Label(constants.registrationFirstName());
-		streetLbl = new Label(constants.registrationStreet());
-		houseLbl=new Label(constants.registrationHouseNr());
-		plzLbl = new Label(constants.registrationPostalCode());
-		cityLbl = new Label(constants.registrationCity());
-		emailLbl = new Label(constants.registrationEmail());
-		languageLbl = new Label(constants.registrationLanguage());
-		nameTxt = new TextBox();
-		firstNameTxt=new TextBox();
-		streetTxt = new TextBox();
-		plzTxt = new TextBox();
-		cityTxt = new TextBox();
-		emailTxt = new TextBox();		
-		languageGerman=new RadioButton("language",constants.languageGerman());
-		languageEnglish=new RadioButton("language",constants.languageEnglish());
-		languageGerman.setValue(true);
-		houseTxt=new TextBox();
-		if (identityInfo != null && (identityInfo.getEmail() != null)) {
-			emailTxt.setText(identityInfo.getEmail());
-			emailTxt.setReadOnly(true);
-		} else {
-			Log.info("User logged in yet. He should enter a gmail-adress to be able to use this service");
+		if (regForm==null){
+			regForm=new RegistrationForm(signInLink);
 		}
 		
-		agbBox = new CheckBox(constants.registrationtoSAGBHint());
-		Anchor toSLink=new Anchor(constants.registrationtoAGBLink(), GeneralConstants.AGB_LINK);
-		toSLink.setTarget("_blank");
-		registrationTable.setWidget(0, 0, firstNameLbl);
-		registrationTable.setWidget(0, 1, firstNameTxt);
-		registrationTable.setWidget(0, 2, nameLbl);
-		registrationTable.setWidget(0, 3, nameTxt);
-		registrationTable.setWidget(0, 4, emailLbl);
-		registrationTable.setWidget(0, 5, emailTxt);
-		registrationTable.setWidget(1, 0, streetLbl);
-		registrationTable.setWidget(1, 1, streetTxt);
-		registrationTable.setWidget(1, 2, houseLbl);
-		registrationTable.setWidget(1, 3, houseTxt);		
-		registrationTable.setWidget(2, 0, plzLbl);
-		registrationTable.setWidget(2, 1, plzTxt);
-		registrationTable.setWidget(2, 2, cityLbl);
-		registrationTable.setWidget(2, 3, cityTxt);
-		
-		registrationTable.setWidget(3, 0, languageLbl);
-		registrationTable.setWidget(3, 1, languageGerman);
-		registrationTable.setWidget(4, 1, languageEnglish);
-		 registrationTable.setWidget(6, 0, agbBox);
-		 registrationTable.setWidget(6, 1, toSLink);
-		registrationTable.setWidget(6, 3, registerButton);
-
-		registerButton.addClickHandler(new ClickHandler() {
-
-			public void onClick(ClickEvent event) {
-				validateErrorTable.clear();
-
-				if (isRegisterFormValid()) {
-					doRegister();
-				} else {
-
-					createHintTable();
-					registrationPanel.add(validateErrorTable);
-				}
-
-			}
-		});
-		registrationPanel.add(registrationTable);
-
-		return registrationPanel;
-	}
-
-	/**
-	 * performes the registration
-	 */
-	protected void doRegister() {
-		
-
-		String n = nameTxt.getText();
-		String str = streetTxt.getText();
-		String city = cityTxt.getText();
-		String plz = plzTxt.getText();
-		String email = emailTxt.getText();
-		String houseNr=houseTxt.getText();
-		String firstName=firstNameTxt.getText();
-
-		SCBIdentityDTO id = new SCBIdentityDTO(n);
-		id.setStreet(str);
-		id.setCity(city);
-		id.setPlz(plz);
-		id.setEmail(email);
-		id.setHouseNr(houseNr);
-		id.setFirstName(firstName);
-		if (languageGerman.getValue().equals(Boolean.TRUE)){
-			id.setLanguage("de");
-		}
-		else{
-			id.setLanguage("en");
-		}
-		
-		if (registerSvc == null) {
-			registerSvc = GWT.create(RegisterService.class);
-		}
-
-		AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-			public void onFailure(Throwable caught) {
-
-				if (caught instanceof SCBException) {					
-					Window.alert(messages.scbError(caught.getMessage()));
-				} else {
-					caught.printStackTrace();
-					Window.alert(messages.registrationError( caught.getMessage()));					
-				}
-
-			}
-
-			public void onSuccess(Void result) {
-				Window.alert(constants.registrationSuccessMessage());
-				RootPanel.get(PAGEID_CONTENT).clear();
-				checkGoogleStatus();
-			}
-		};
-
-		registerSvc.register(id, callback);
-
+		RootPanel.get(PAGEID_CONTENT).add(regForm);
 	}
 
 	/**
@@ -818,53 +659,7 @@ public class SCB implements EntryPoint {
 		return result;
 	}
 
-	private boolean isRegisterFormValid() {
-		boolean result = true;
-
-		hints.clear();
-
-		if (!isFieldConfirmToExpresion(nameTxt, "[\\w]+",
-				constants.registerValidateName())) {
-			result = false;
-		}
-		
-		if (!isFieldConfirmToExpresion(firstNameTxt, "[\\w]+",
-		constants.registerValidateFirstName())) {
-			result = false;
-		}
-		
-		if (!isFieldConfirmToExpresion(emailTxt,
-				"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
-				constants.registerValidateEmail())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(streetTxt, "[\\w \\d������]+",
-				constants.registerValidateStreet())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(plzTxt, "[\\d]+",
-				constants.registerValidatePLZ())) {
-			result = false;
-		}
-		
-		if (!isFieldConfirmToExpresion(houseTxt, "[\\d]+",
-				constants.registerValidateHouseNr())) {
-	result = false;
-}
-
-		if (!isFieldConfirmToExpresion(cityTxt, "[\\w]+",
-				constants.registerValidateCity())) {
-			result = false;
-		}
-		
-		if (agbBox.getValue()==false){
-			hints.add(constants.registerValidateToS());
-			result = false;			
-		}
-
-		return result;
-	}
-
+	
 	private void sendFastMailMoney(String accNr){
 		accountsDetailsPanel.clear();
 		Label howToLbl=new HTML(constants.sendMoneyHint());
