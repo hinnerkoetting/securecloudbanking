@@ -28,6 +28,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import de.mrx.client.moneytransfer.FastMoneyTransferForm;
 import de.mrx.client.moneytransfer.MoneyTransferForm;
 import de.mrx.client.register.RegistrationForm;
 import de.mrx.shared.AccountNotExistException;
@@ -583,7 +584,11 @@ public class SCB implements EntryPoint, Observer {
 						transferMoneyButton.addClickHandler(new ClickHandler() {
 
 							public void onClick(ClickEvent event) {
-								sendMoney(currentAccount);
+								MoneyTransferForm mTransfer=new MoneyTransferForm(currentAccount);
+								accountsDetailsPanel.clear();
+								mTransfer.addObserver(SCB.this);
+								accountsDetailsPanel.add(mTransfer);
+								
 
 							}
 						});
@@ -591,7 +596,11 @@ public class SCB implements EntryPoint, Observer {
 						transferFastMoneyButton.addClickHandler(new ClickHandler() {
 
 							public void onClick(ClickEvent event) {
-								sendFastMailMoney(currentAccount);
+								FastMoneyTransferForm mTransfer=new FastMoneyTransferForm(currentAccount);
+								mTransfer.addObserver(SCB.this);
+								accountsDetailsPanel.clear();
+								accountsDetailsPanel.add(mTransfer);
+								
 
 							}
 						});
@@ -661,273 +670,6 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	
-	private void sendFastMailMoney(String accNr){
-		accountsDetailsPanel.clear();
-		Label howToLbl=new HTML(constants.sendMoneyHint());
-		transferForm = new Grid(6, 4);
-		
-		Label amountLbl = new Label(constants.sendMoneyFormAmount());
-		Label remarkLbl = new Label(constants.sendMoneyFormRemark());
-		Label emailLbl=new Label(constants.sendMoneyFormEmailRecipient());
-		receiverAccountNrTxt = new TextBox();
-		amountTxt = new TextBox();
-		remarkTxt = new TextBox();
-		receiverEmailTxt=new TextBox();
-		sendMoneyBtn = new Button(constants.sendMoneyFormEmailBtn());
-		sendMoneyBtn.addClickHandler(new ClickHandler() {
-			
-			public void onClick(ClickEvent event) {
-				validateErrorTable.clear();
-
-				if (isSendFastMoneyFormValid()) {
-					doSendMoneyFast();
-				} else {
-
-					createHintTable();
-					accountsDetailsPanel.add(validateErrorTable);
-				}
-
-			}});
-			
-//		transferForm.setWidget(0, 0, receiverAccountNrLbl);
-//		transferForm.setWidget(0, 1, receiverAccountNrTxt);
-		transferForm.setWidget(0, 0, emailLbl);
-		transferForm.setWidget(0, 1, receiverEmailTxt);
-		transferForm.setWidget(1, 0, amountLbl);
-		transferForm.setWidget(1, 1, amountTxt);
-		transferForm.setWidget(1, 2, remarkLbl);
-		transferForm.setWidget(1, 3, remarkTxt);
-		transferForm.setWidget(2, 3, sendMoneyBtn);
-		accountsDetailsPanel.add(howToLbl);
-		accountsDetailsPanel.add(transferForm);
-	}
-	
-	protected void sendMoney(String accNr) {
-		accountsDetailsPanel.clear();
-		transferForm = new Grid(6, 4);
-		Label receiverAccountNrLbl = new Label(constants.sendMoneyFormReceiverAccountNr());
-		Label receiverBankNrLbl = new Label(constants.sendMoneyFormReceiverBankNr());
-		Label amountLbl = new Label(constants.sendMoneyFormAmount());
-		Label remarkLbl = new Label(constants.sendMoneyFormRemark());
-		Label recipientName = new Label(constants.sendMoneyFormReceiverName());
-		Label bankName = new Label(constants.sendMoneyFormReceiverBankName());
-		receiverAccountNrTxt = new TextBox();
-		receiverBankNrTxt = new TextBox();
-		amountTxt = new TextBox();
-		remarkTxt = new TextBox();
-		recipientTxt = new TextBox();
-		bankNameTxt = new TextBox();
-		sendMoneyBtn = new Button(constants.sendMoneyFormEmailBtn());
-		sendMoneyBtn.addClickHandler(new ClickHandler() {
-
-			public void onClick(ClickEvent event) {
-				validateErrorTable.clear();
-
-				if (isSendMoneyFormValid()) {
-					doSendMoney();
-				} else {
-
-					createHintTable();
-					accountsDetailsPanel.add(validateErrorTable);
-				}
-
-			}
-
-		});
-		transferForm.setWidget(0, 0, receiverAccountNrLbl);
-		transferForm.setWidget(0, 1, receiverAccountNrTxt);
-		transferForm.setWidget(0, 2, recipientName);
-		transferForm.setWidget(0, 3, recipientTxt);
-		transferForm.setWidget(1, 0, receiverBankNrLbl);
-		transferForm.setWidget(1, 1, receiverBankNrTxt);
-		transferForm.setWidget(1, 2, bankName);
-		transferForm.setWidget(1, 3, bankNameTxt);
-		transferForm.setWidget(2, 0, amountLbl);
-		transferForm.setWidget(2, 1, amountTxt);
-		transferForm.setWidget(3, 0, remarkLbl);
-		transferForm.setWidget(3, 1, remarkTxt);
-		transferForm.setWidget(4, 1, sendMoneyBtn);
-
-		accountsDetailsPanel.add(transferForm);
-		
-		MoneyTransferForm newMoneyTransferForm=new MoneyTransferForm(currentAccount);
-		newMoneyTransferForm.addObserver(this);
-		accountsDetailsPanel.add(newMoneyTransferForm);
-	}
-
-	private void doSendMoneyFast(){
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
-
-		Double amount = Double.parseDouble(amountTxt.getText());
-		String remark = remarkTxt.getText();
-		String email=receiverEmailTxt.getText();
-		
-		bankingService.sendMoneyAskForConfirmationDataWithEmail(currentAccount, email, amount, remark,
-				new AsyncCallback<MoneyTransferDTO>() {
-					// bankingService.sendMoney(currentAccount,
-					// receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(),
-					// bankNameTxt.getText(), new AsyncCallback<Void>() {
-
-					public void onFailure(Throwable caught) {
-						if (caught instanceof AccountNotExistException){
-							Window.alert(constants.sendMoneyErrorNoAccountInOurInstitute());	
-						}
-						else{						
-							Log.error("Sending money failed", caught);
-						}
-
-					}
-
-					public void onSuccess(MoneyTransferDTO result) {
-						Log.debug("Show confirmation page");
-						showConfirmationPage(result);
-
-					}
-				});
-
-	}
-	
-	protected void doSendMoney() {
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
-
-		Double amount = Double.parseDouble(amountTxt.getText());
-		String remark = remarkTxt.getText();
-
-		bankingService.sendMoneyAskForConfirmationData(currentAccount,
-				receiverBankNrTxt.getText(), receiverAccountNrTxt.getText(),
-				amount, remark, recipientTxt.getText(), bankNameTxt.getText(),
-				new AsyncCallback<MoneyTransferDTO>() {
-					// bankingService.sendMoney(currentAccount,
-					// receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(),
-					// bankNameTxt.getText(), new AsyncCallback<Void>() {
-
-					public void onFailure(Throwable caught) {
-						Log.error("Sending money failed", caught);
-
-					}
-
-					public void onSuccess(MoneyTransferDTO result) {
-						Log.debug("Show confirmation page");
-						showConfirmationPage(result);
-
-					}
-				});
-
-	}
-
-	protected void doConfirmSendMoney() {
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
-
-		Double amount = Double.parseDouble(amountTxt.getText());
-		String remark = remarkTxt.getText();
-		String tan = tanConfirmationTxt.getText();
-
-		bankingService.sendMoney(currentAccount, receiverBankNrTxt.getText(),
-				receiverAccountNrTxt.getText(), amount, remark, recipientTxt
-						.getText(), bankNameTxt.getText(), tan,
-				new AsyncCallback<Void>() {
-
-					public void onFailure(Throwable caught) {
-						if (caught instanceof WrongTANException) {
-							WrongTANException wte = (WrongTANException) caught;
-							Window.alert("Falsche TAN eingegeben: "
-									+ wte.getTrials() + " x");
-						} else {
-
-							Log.error("Sending money failed", caught);
-							Window.alert("Money sent failed :"
-									+ caught.getMessage());
-						}
-
-					}
-
-					public void onSuccess(Void result) {
-						Window.alert(constants.sendMoneyHintSuccessful());
-
-					}
-				});
-
-	}
-
-	private void showConfirmationPage(MoneyTransferDTO dto) {
-		// accountsDetailsPanel.clear();
-		
-		accountsDetailsPanel.clear();
-		transferForm = new Grid(6, 4);
-		Label receiverAccountNrLbl = new Label(constants.sendMoneyFormReceiverAccountNr());
-		Label receiverBankNrLbl = new Label(constants.sendMoneyFormReceiverBankNr());
-		Label amountLbl = new Label(constants.sendMoneyFormAmount());
-		Label remarkLbl = new Label(constants.sendMoneyFormRemark());
-		Label recipientName = new Label(constants.sendMoneyFormReceiverName());
-		Label bankName = new Label(constants.sendMoneyFormReceiverBankName());
-		receiverAccountNrTxt = new TextBox();
-		receiverBankNrTxt = new TextBox();
-		amountTxt = new TextBox();
-		remarkTxt = new TextBox();
-		recipientTxt = new TextBox();
-		bankNameTxt = new TextBox();
-		transferForm.setWidget(0, 0, receiverAccountNrLbl);
-		transferForm.setWidget(0, 1, receiverAccountNrTxt);
-		transferForm.setWidget(0, 2, recipientName);
-		transferForm.setWidget(0, 3, recipientTxt);
-		transferForm.setWidget(1, 0, receiverBankNrLbl);
-		transferForm.setWidget(1, 1, receiverBankNrTxt);
-		transferForm.setWidget(1, 2, bankName);
-		transferForm.setWidget(1, 3, bankNameTxt);
-		transferForm.setWidget(2, 0, amountLbl);
-		transferForm.setWidget(2, 1, amountTxt);
-		transferForm.setWidget(3, 0, remarkLbl);
-		transferForm.setWidget(3, 1, remarkTxt);
-		transferForm.setWidget(4, 1, sendMoneyBtn);
-
-		accountsDetailsPanel.add(transferForm);
-		
-
-		receiverAccountNrTxt.setText(dto.getReceiverAccountNr());
-
-		receiverBankNrTxt.setText(dto.getReceiverBankNr());
-		amountTxt.setText("" + dto.getAmount());
-		remarkTxt.setText(dto.getRemark());
-		recipientTxt.setText(dto.getReceiverName());
-		receiverAccountNrTxt.setEnabled(false);
-		receiverBankNrTxt.setEnabled(false);
-		bankNameTxt.setEnabled(false);
-		amountTxt.setEnabled(false);
-		remarkTxt.setEnabled(false);
-		recipientTxt.setEnabled(false);
-		receiverAccountNrTxt.setEnabled(false);
-		bankNameTxt.setText(dto.getReceiverBankName());
-		tanConfirmationTxt = new TextBox();
-		tanConfirmationBtn = new Button(constants.confirmTan());
-		transferForm
-				.setWidget(3, 2, new Label(constants.confirmTanNr() + dto.getRequiredTan()));
-		transferForm.setWidget(3, 3, tanConfirmationTxt);
-		transferForm.remove( sendMoneyBtn);
-		transferForm.setWidget(4, 3, tanConfirmationBtn);
-
-		tanConfirmationBtn.addClickHandler(new ClickHandler() {
-
-			public void onClick(ClickEvent event) {
-				validateErrorTable.clear();
-
-				if (isSendMoneyFormValid()) {
-					doConfirmSendMoney();
-					showAccountDetails(currentAccount);
-				} else {
-
-					createHintTable();
-					accountsDetailsPanel.add(validateErrorTable);
-				}
-			}
-		});
-	}
-
 	private void createHintTable() {
 		for (int i = 0; i < hints.size(); i++) {
 			String currentMessage = hints.get(i);
@@ -980,6 +722,16 @@ public class SCB implements EntryPoint, Observer {
 		System.out.println("Updated");
 		if (o instanceof MoneyTransferForm){
 			showAccountDetails((String) arg);
+		}
+		else if (o instanceof FastMoneyTransferForm){
+			if (arg instanceof MoneyTransferDTO){
+				MoneyTransferForm confirmPage=new MoneyTransferForm(currentAccount,(MoneyTransferDTO) arg);
+				accountsDetailsPanel.clear();
+				accountsDetailsPanel.add(confirmPage);
+				
+			}
+			
+			
 		}
 
 		
