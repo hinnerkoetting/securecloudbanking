@@ -5,7 +5,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+
+
+
+
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
@@ -41,10 +47,11 @@ AdminService {
 		log.log(Level.INFO, "Admins requests accounts");
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
-		String query = "SELECT FROM " + InternalSCBAccount.class.getName();
-		log.finest("Query: " + query);
-		
-		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>) pm.newQuery(query).execute();
+		Extent<InternalSCBAccount> extent = pm.getExtent(InternalSCBAccount.class);
+		Query query = pm.newQuery(extent);
+
+		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>)query.execute();
+		 
 		List<AccountDTO> accountsDTO = new ArrayList<AccountDTO>();
 		
 		for (InternalSCBAccount account: accounts) {

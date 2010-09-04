@@ -14,12 +14,9 @@ import java.util.List;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTMLTable;
@@ -27,10 +24,14 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCB;
+import de.mrx.client.admin.forms.AccountOverview;
+import de.mrx.client.admin.forms.AdminWelcome;
+import de.mrx.client.admin.forms.Adminmenu;
 
 
 public class Admin implements EntryPoint {
@@ -48,7 +49,7 @@ public class Admin implements EntryPoint {
      * show alle transactions
      * TODO: the same code is also in SCB.java
      */
-	private void showAccountTransfers(List<MoneyTransferDTO> transfers) {
+	public void showAccountTransfers(List<MoneyTransferDTO> transfers) {
 		GWT.log("temp code");
 		HTMLTable accountDetailTable = new FlexTable();
 		Label dateLbl = new Label("Date");
@@ -114,144 +115,46 @@ public class Admin implements EntryPoint {
 		pageGrid.setWidget(0, 1, accountDetailTable);
 	}
 
+	public void showNewTransaction() {
+		setContent(new Label("PLaceholder1"));
+	}
 	
-	/*
-	 * create menu on the left 
+	public void showExternalBanks() {
+		setContent(new Label("PLaceholder2"));
+	}
+	
+	/**
+	 * show information about all accounts
 	 */
-	private VerticalPanel createAdminMenu() {
+	public void showAccounts() {
+		final AccountOverview accountOverview = new AccountOverview(this);
 		
-		/**
-		 * overview of all accounts
-		 */
-		ClickHandler clickOverview = new ClickHandler() {
+		AdminServiceAsync bankingService = GWT.create(AdminService.class);
+		bankingService.getAllAccounts(new AsyncCallback<List<AccountDTO>>() {
+
 			@Override
-			public void onClick(ClickEvent event) {
-				
-				
-				AdminServiceAsync bankingService = GWT.create(AdminService.class);
-				bankingService.getAllAccounts(new AsyncCallback<List<AccountDTO>>() {
-
-					@Override
-					public void onFailure(Throwable caught) {					
-						GWT.log(caught.toString());
-					}
-
-					@Override
-					public void onSuccess(List<AccountDTO> result) {
-						
-						if (result == null) {
-							GWT.log("Error: empty result");
-							return;
-						}
-						//arrange page layout
-						FlexTable table = new FlexTable();
-						pageGrid.setWidget(0, 1, table);
-						
-
-						
-						//add header
-						table.setWidget(0, 0, new Label("Account No."));
-						table.setWidget(0, 1, new Label("Balance"));
-						table.setWidget(0, 2, new Label("Owner"));
-						table.setWidget(0, 3, new Label("Transactions"));
-						
-						//add all accounts to table
-						int row = 1;
-						for (AccountDTO account: result) {	
-							table.setWidget(row, 0, new Label(account.getAccountNr()));
-							table.setWidget(row, 1, new Label(""+account.getBalance()));
-							table.setWidget(row, 2, new Label(account.getOwner()));
-							Button showTransactions = new Button("Display");
-							final String finalAccNr = account.getAccountNr();
-							
-							/**
-							 * show transactions of this account
-							 */
-							showTransactions.addClickHandler(new ClickHandler() {	
-								public void onClick(ClickEvent event) {
-									GWT.log("Requesting transactions of Account "+finalAccNr);
-									AdminServiceAsync service = GWT.create(AdminService.class);
-									service.getTransaction(finalAccNr, new AsyncCallback<List<MoneyTransferDTO>>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											GWT.log(caught.toString());											
-										}
-
-										@Override
-										public void onSuccess(List<MoneyTransferDTO> result) {
-											showAccountTransfers(result);
-											
-										}
-									});
-									
-								}
-							});
-							
-							table.setWidget(row, 3, showTransactions);
-							row++;
-						}
-						
-					}
-					
-				});
-				
-			}	
-		};
-		
-		ClickHandler clickNewTransaction = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				pageGrid.setWidget(0, 1, new Label("New Transaction"));				
-			}	
-		};
-		
-		ClickHandler clickExternalBanks = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				pageGrid.setWidget(0, 1, new Label("External Banks"));				
-			}			
-		};
-		
-		ClickHandler clickHistory = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				pageGrid.setWidget(0, 1, new Label("History"));
+			public void onFailure(Throwable caught) {					
+				GWT.log(caught.toString());
 			}
-		};
-		
-		VerticalPanel panel = new VerticalPanel();		
-		
-		
-		//add all buttons
-		Button btn = new Button(constants.overviewAccount(), clickOverview);
-		panel.add(btn);
-		
-		btn = new Button(constants.newTransaction(), clickNewTransaction);
-		panel.add(btn);
-		
-		btn = new Button(constants.externalBanks(), clickExternalBanks);
-		panel.add(btn);
-		
-		btn = new Button(constants.history(), clickHistory);
-		panel.add(btn);
-		
-		
-		return panel;
+
+			@Override
+			public void onSuccess(List<AccountDTO> result) {
+				
+				accountOverview.setAccounts(result);
+				setContent(accountOverview);
+			}
+			
+		});
+	}
+	/**
+	 * 
+	 * @param widget
+	 * set content of the admin page
+	 */
+	private void setContent(Widget widget) {
+		pageGrid.setWidget(0, 1, widget);
 	}
 	
-	/*
-	 * create content for overview of admin page
-	 */
-	private VerticalPanel createContentOverview() {
-
-		VerticalPanel content = new VerticalPanel();
-		
-		Label label = new Label("PLACEHOLDER");		
-		content.add(label);
-		
-		return content;
-	}
 	
 	@Override
 	public void onModuleLoad() {
@@ -271,11 +174,9 @@ public class Admin implements EntryPoint {
 		page.add(pageGrid);
 		r.add(page);
 		
-		VerticalPanel adminMenu = createAdminMenu();
-		adminMenu.setSpacing(10);
 		
-		pageGrid.setWidget(0, 0, adminMenu);
-		pageGrid.setWidget(0, 1, createContentOverview());
+		pageGrid.setWidget(0, 0, new Adminmenu(this));
+		pageGrid.setWidget(0, 1, new AdminWelcome());
 		
 		//temp workaround for header
 		SCB scb = new SCB();
