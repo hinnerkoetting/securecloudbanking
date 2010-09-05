@@ -1,0 +1,43 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'
+ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+    <ui:style src="../SCB.css" />
+   <g:HTMLPanel>
+   	<table >
+   		<tr>
+    		<td> <ui:msg description="receiverAccountNr">Account Number</ui:msg></td>
+    		<td> <g:TextBox ui:field='receiverAccountNr'/></td>
+    		<td> <ui:msg description="receiverName">Receiver</ui:msg></td>
+    		<td> <g:TextBox ui:field='receiverName'/></td>
+    	</tr>
+    	<tr>
+    		<td> <ui:msg description="receiverBLZ">Bank Number</ui:msg></td>
+    		<td> <g:TextBox ui:field='receiverBLZ'/></td>
+    		<td> <ui:msg description="receiverBankName">Bank Name</ui:msg></td>
+    		<td> <g:TextBox ui:field='receiverBankName'/></td>
+    	</tr>
+    	<tr>
+    		<td> <ui:msg description="amount">Amount</ui:msg></td>
+    		<td> <g:TextBox ui:field='amount'/></td>
+    		<td> <ui:msg description="remark">Remark</ui:msg></td>
+    		<td> <g:TextBox ui:field='remark'/></td>    		
+    	</tr>
+    	<tr>
+    		<td> <g:Label ui:field="requiredTanNr" visible="false"/></td>
+    		<td> <g:TextBox ui:field='tan' visible="false"/></td>
+    	</tr>
+    	<tr>
+    		<td/><td/><td/>
+    		<td>
+    			<g:Button ui:field="sendMoney"><ui:msg description="sendMoney Button">Send Money</ui:msg></g:Button>
+    			<g:Button ui:field="sendMoneyConfirm"><ui:msg description="sendMoneyConfirm  Button" visible="false">Confirm Transaction</ui:msg></g:Button>
+    		
+    		</td>
+		</tr>
+    </table>
+    
+    <g:FlexTable ui:field="validateErrorTable"/>
+   
+   </g:HTMLPanel>
+</ui:UiBinder>
