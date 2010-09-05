@@ -29,6 +29,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import de.mrx.client.RegisterService;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.SCBException;
+import de.mrx.shared.UserAlreadyUsedException;
 
 /**
  * implementation class for the RegisterService
@@ -52,6 +53,11 @@ public class RegisterServiceImpl extends RemoteServiceServlet implements
 	public void register(SCBIdentityDTO identity) throws SCBException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
+			SCBIdentity existingIDentity=SCBIdentity.getByEmail(pm,identity.getEmail());
+			if (existingIDentity!=null){
+				throw new UserAlreadyUsedException();
+			}
+			
 			SCBIdentity id = new SCBIdentity(identity);
 			// At the moment, directly activate the user
 			id.setActivated(true);
@@ -83,37 +89,28 @@ public class RegisterServiceImpl extends RemoteServiceServlet implements
 					.setText("Congratulations. You have activated your account at Secure Cloud Banking");
 			msg.setContent(outboundMultipart);
 			Transport.send(msg);
-
+			pm.currentTransaction().begin();
 			pm.makePersistent(id);
 			log.info("Registration received: " + id);
+			
+			pm.currentTransaction().commit();
+			
 
 		}
-		// catch (MessagingException e){
-		// log.severe(e.getMessage());
-		// e.printStackTrace();
-		// throw new SCBException("Registration currently not possible1",e);
-		// }
-		//		
-		// catch (UnsupportedEncodingException e){
-		// log.severe(e.getMessage());
-		// e.printStackTrace();
-		// throw new SCBException("Registration currently not possible2",e);
-		// }
-		//		
-		// catch (DocumentException e){
-		// log.severe(e.getMessage());
-		// e.printStackTrace();
-		// throw new SCBException("Einladung konnte nicht verschickt werden!",
-		// e);
-		// }
-
+		catch (SCBException e){
+			log.warning("Problem Registering: "+e.getMessage());
+			throw e;
+		}
 		catch (Exception e) {
-			log.severe(e.getMessage());
+			
 			e.printStackTrace();
-			throw new SCBException(
-					"Registrierung konnte nicht durchgeführt werden!", e);
+			throw new SCBException("Registrierung konnte nicht durchgeführt werden!", e);
 		} finally {
+			if (pm.currentTransaction().isActive()) {
+				pm.currentTransaction().rollback();
+			}
 			pm.close();
+
 		}
 
 	}
