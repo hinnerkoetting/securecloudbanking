@@ -40,15 +40,19 @@ public class AccountOverview extends Composite {
 	public void setAccounts(List<AccountDTO> accounts){
 
 		initWidget(uiBinder.createAndBindUi(this));
-		
+
 	
 		//add header
 		overviewTable.setWidget(0, 0, new Label("Account No."));
 		overviewTable.setWidget(0, 1, new Label("Balance"));
 		overviewTable.setWidget(0, 2, new Label("Owner"));
 		overviewTable.setWidget(0, 3, new Label("Transactions"));
-		
-		
+
+	
+		for (int i = 0; i < 4; i++) {
+			
+			overviewTable.getCellFormatter().setStyleName(0, i, "TransfersHeader");
+		}
 		
 		//add all accounts to table
 		int row = 1;

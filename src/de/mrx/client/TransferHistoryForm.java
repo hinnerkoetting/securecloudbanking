@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -21,20 +20,9 @@ public class TransferHistoryForm extends Composite {
 			UiBinder<Widget, TransferHistoryForm> {
 	}
 
-
-	interface Style extends CssResource {
-		String header();
-		String transfersOdd();
-		String transfersEven();
-		String positiveMoney();
-		String negativeMoney();
-	}
 	
 	@UiField
 	FlexTable flexTable;
-	
-	@UiField
-	Style style;
 	
 	/**
 	 * Creates a table of all transfers
@@ -49,7 +37,6 @@ public class TransferHistoryForm extends Composite {
 		
 		//set header labels
 		Label lbl = new Label(constants.accountDetailHeaderDate());
-		lbl.setStyleName(style.header());
 		flexTable.setWidget(0, 0, lbl);
 		
 		lbl = new Label(constants.accountDetailHeaderAccount());
@@ -64,7 +51,7 @@ public class TransferHistoryForm extends Composite {
 
 		//set style for header
 		for (int i = 0; i < 4; i++)
-			flexTable.getCellFormatter().setStyleName(0, i, style.header());
+			flexTable.getCellFormatter().setStyleName(0, i, "TransfersHeader");
 		
 		int row = 1;
 		for (MoneyTransferDTO transfer: transfers) {
@@ -85,16 +72,16 @@ public class TransferHistoryForm extends Composite {
 			//set style
 			if (row %2 == 0) { //even row
 				for (int i = 0; i < 4; i++)
-					flexTable.getCellFormatter().setStyleName(row, i, style.transfersEven());
+					flexTable.getCellFormatter().setStyleName(row, i, "TransfersEven");
 			}
 			else //odd row
 				for (int i = 0; i < 4; i++)
-					flexTable.getCellFormatter().setStyleName(row, i, style.transfersOdd());
+					flexTable.getCellFormatter().setStyleName(row, i, "TransfersOdd");
 			
 			if (transfer.getAmount() < 0)
-				flexTable.getCellFormatter().addStyleName(row, 3, style.negativeMoney());
+				flexTable.getCellFormatter().addStyleName(row, 3, "negativeMoney");
 			else //amount >= 0
-				flexTable.getCellFormatter().addStyleName(row, 3, style.positiveMoney());
+				flexTable.getCellFormatter().addStyleName(row, 3, "positiveMoney");
 			row++;
 		}
 

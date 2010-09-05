@@ -1,34 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<ui:style type='de.mrx.client.TransferHistoryForm.Style'>
-		.header { 
-			background:blue;
-  			color: white;
-   			font-style:italic;
-   			width: 150px;
-		}
-		.transfersOdd{
-		  background:white;
-		  color: black;
-		   font-style:normal;     
-		}
-
-		.transfersEven{
-		  	background:#F2F2F2;
-		  	color: black;
-		   	font-style:normal;     
-		}
-
-
-		.positiveMoney{
-			color: blue;
-		}
-		.negativeMoney{
-			color: red;
-		}
-		
-	</ui:style>
+	<ui:style src="SCB.css" />
 	<g:HTMLPanel>
 		<g:FlexTable  ui:field="flexTable"/>
 	</g:HTMLPanel>
