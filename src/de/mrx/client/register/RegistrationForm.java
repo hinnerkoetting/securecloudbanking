@@ -31,6 +31,7 @@ import de.mrx.client.SCBConstants;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.SCBMessages;
 import de.mrx.shared.SCBException;
+import de.mrx.shared.UserAlreadyUsedException;
 
 /**
  * Form for the customer registration process
@@ -134,7 +135,11 @@ public class RegistrationForm extends Composite {
 
 			public void onFailure(Throwable caught) {
 
-				if (caught instanceof SCBException) {					
+				if (caught instanceof UserAlreadyUsedException) {
+					Window.alert("User is already in use!. Please use a different email adress!");				
+				}
+
+				else if (caught instanceof SCBException) {					
 					Window.alert(messages.scbError(caught.getMessage()));
 				} else {
 					caught.printStackTrace();
