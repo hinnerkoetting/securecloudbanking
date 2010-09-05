@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCB;
+import de.mrx.client.TransferHistoryForm;
 import de.mrx.client.admin.forms.AccountOverview;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
@@ -46,73 +47,11 @@ public class Admin implements EntryPoint {
 	private Grid pageGrid;
 	
     /**
-     * show alle transactions
-     * TODO: the same code is also in SCB.java
+     * show all transactions
+     * 
      */
 	public void showAccountTransfers(List<MoneyTransferDTO> transfers) {
-		GWT.log("temp code");
-		HTMLTable accountDetailTable = new FlexTable();
-		Label dateLbl = new Label("Date");
-		Label commentLbl = new Label("Comment");
-		Label accountLbl = new Label("Account");
-		Label amountLbl = new Label("Amount");
-		commentLbl.setStyleName("TransfersHeader");
-		dateLbl.setStyleName("TransfersHeader");
-		accountLbl.setStyleName("TransfersHeader");
-		amountLbl.setStyleName("TransfersHeader");
-
-		accountDetailTable.setWidget(0, 0, dateLbl);
-		accountDetailTable.setWidget(0, 1, commentLbl);
-		accountDetailTable.setWidget(0, 2, accountLbl);
-		accountDetailTable.setWidget(0, 3, amountLbl);
-		int pos = 1;
-		Log
-				.debug("Money transfer entries: "
-						+ transfers.size());
-		for (MoneyTransferDTO transfer : transfers) {
-			Log.info("Transfer: " + transfer);
-			Label entryDateLbl = new Label(DateTimeFormat
-					.getMediumDateFormat().format(
-							transfer.getTimestamp()));
-			Label entryRemarkLbl = new Label(transfer
-					.getRemark());
-			Label entryReceiverDetailsLbl = new Label(transfer
-					.getReceiverBankNr()
-					+ ": " + transfer.getReceiverAccountNr());
-
-			Label entryAmountLbl = new Label(NumberFormat
-					.getCurrencyFormat().format(
-							transfer.getAmount()));
-			if (pos % 2 == 0) {
-				entryDateLbl.setStyleName("TransfersOdd");
-				entryRemarkLbl.setStyleName("TransfersOdd");
-				entryReceiverDetailsLbl
-						.setStyleName("TransfersOdd");
-
-			} else {
-				entryDateLbl.setStyleName("TransfersEven");
-				entryRemarkLbl.setStyleName("TransfersEven");
-				entryReceiverDetailsLbl
-						.setStyleName("TransfersEven");
-
-			}
-			if (transfer.getAmount() >= 0) {
-				entryAmountLbl.setStyleName("positiveMoney");
-			} else {
-				entryAmountLbl.setStyleName("negativeMoney");
-			}
-			
-			accountDetailTable.setWidget(pos, 0, entryDateLbl);
-			accountDetailTable
-					.setWidget(pos, 1, entryRemarkLbl);
-			accountDetailTable.setWidget(pos, 2,
-					entryReceiverDetailsLbl);
-			accountDetailTable
-					.setWidget(pos, 3, entryAmountLbl);
-			pos++;
-			
-		}
-		pageGrid.setWidget(0, 1, accountDetailTable);
+		setContent(new TransferHistoryForm(transfers));
 	}
 
 	public void showNewTransaction() {
