@@ -8,7 +8,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
@@ -18,7 +17,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -31,8 +29,6 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import de.mrx.client.moneytransfer.FastMoneyTransferForm;
 import de.mrx.client.moneytransfer.MoneyTransferForm;
 import de.mrx.client.register.RegistrationForm;
-import de.mrx.shared.AccountNotExistException;
-import de.mrx.shared.WrongTANException;
 
 /**
  * Complete GUI for Secure Cloud Banking. Includes Registration process, general information, and online banking
@@ -104,24 +100,11 @@ public class SCB implements EntryPoint, Observer {
 	private MenuItem registerMItem;
 	private String currentAccount;
 
-	private TextBox receiverAccountNrTxt;
-	private TextBox tanConfirmationTxt;
-	private Button tanConfirmationBtn;
-	private TextBox receiverEmailTxt;
-
-	private TextBox receiverBankNrTxt;
-
-	private TextBox amountTxt;
-	private TextBox remarkTxt;
-	private TextBox recipientTxt;
-	private TextBox bankNameTxt;
 
 	private List<String> hints = new ArrayList<String>();
 
-	private Button sendMoneyBtn;
-
-	private HTMLTable transferForm;
-
+	
+	
 	private Image scbLogo;
 
 	private void doShowNoService() {
@@ -509,12 +492,6 @@ public class SCB implements EntryPoint, Observer {
 						}
 
 						
-						List<MoneyTransferDTO> transfers = result
-								.getTransfers();
-						
-													
-							
-						
 						Button transferMoneyButton = new Button(constants.accountDetailSendMoneyBtn());
 						transferMoneyButton.addClickHandler(new ClickHandler() {
 
@@ -566,42 +543,8 @@ public class SCB implements EntryPoint, Observer {
 
 	}
 
-	private boolean isSendFastMoneyFormValid() {
-		boolean result = true;
-		
-		hints.clear();
-		if (!isFieldConfirmToExpresion(receiverEmailTxt,"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
-				constants.fastMoneyValidateEmail())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(amountTxt,
-				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
-				constants.fastMoneyValidateAmount())) {				
-			result = false;
-		}
-		return result;
-	}
 	
-	private boolean isSendMoneyFormValid() {
-		boolean result = true;
-		Log.info("Text: " + receiverAccountNrTxt.getText());
-		hints.clear();
-		if (!isFieldConfirmToExpresion(receiverAccountNrTxt, "^[0-9]{1,10}$",
-				constants.sendMoneyValidateaccount())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(receiverBankNrTxt, "^[0-9]{1,10}$",
-				constants.sendMoneyValidateBLZ())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(amountTxt,
-				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
-				constants.fastMoneyValidateAmount())) {
-			result = false;
-		}
-		return result;
-	}
-
+	
 	
 	private void createHintTable() {
 		for (int i = 0; i < hints.size(); i++) {
