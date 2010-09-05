@@ -112,11 +112,10 @@ public class RegistrationForm extends Composite {
 			return;
 		}
 		
-		SCBIdentityDTO id = new SCBIdentityDTO(lastName.getText());
+		SCBIdentityDTO id = new SCBIdentityDTO(lastName.getText(), email.getText());
 		id.setStreet(street.getText());
 		id.setCity(city.getText());
-		id.setPlz(plz.getText());
-		id.setEmail(email.getText());
+		id.setPlz(plz.getText());		
 		id.setHouseNr(houseNr.getText());
 		id.setFirstName(firstName.getText());
 		
