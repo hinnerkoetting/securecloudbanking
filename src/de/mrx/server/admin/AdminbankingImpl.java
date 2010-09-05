@@ -50,6 +50,7 @@ AdminService {
 		Extent<InternalSCBAccount> extent = pm.getExtent(InternalSCBAccount.class);
 		Query query = pm.newQuery(extent);
 
+		@SuppressWarnings("unchecked")
 		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>)query.execute();
 		 
 		List<AccountDTO> accountsDTO = new ArrayList<AccountDTO>();

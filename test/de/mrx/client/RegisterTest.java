@@ -10,9 +10,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.google.gwt.core.client.GWT;
 
-import de.mrx.server.CustomerServiceImpl;
 import de.mrx.server.RegisterServiceImpl;
 import de.mrx.shared.UserAlreadyUsedException;
 
