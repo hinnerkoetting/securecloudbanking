@@ -12,7 +12,7 @@
 		<g:VerticalPanel>
 			<g:Button styleName="{style.menuButton}" ui:field="accounts" />
 			<g:Button styleName="{style.menuButton}" ui:field="externalBanks" />
-			<g:Button styleName="{style.menuButton}" ui:field="newTransaction" />
 		</g:VerticalPanel>
+		
 	</g:HTMLPanel>
 </ui:UiBinder> 

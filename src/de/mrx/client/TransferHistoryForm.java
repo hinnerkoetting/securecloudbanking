@@ -49,10 +49,6 @@ public class TransferHistoryForm extends Composite {
 		lbl = new Label(constants.accountDetailHeaderAmount());
 		flexTable.setWidget(0, 3, lbl);
 
-		//set style for header
-		for (int i = 0; i < 4; i++)
-			flexTable.getCellFormatter().setStyleName(0, i, "TransfersHeader");
-		
 		int row = 1;
 		for (MoneyTransferDTO transfer: transfers) {
 			//add each transfer
@@ -69,21 +65,15 @@ public class TransferHistoryForm extends Composite {
 			lbl = new Label(""+transfer.getAmount());
 			flexTable.setWidget(row, 3, lbl);
 
-			//set style
-			if (row %2 == 0) { //even row
-				for (int i = 0; i < 4; i++)
-					flexTable.getCellFormatter().setStyleName(row, i, "TransfersEven");
-			}
-			else //odd row
-				for (int i = 0; i < 4; i++)
-					flexTable.getCellFormatter().setStyleName(row, i, "TransfersOdd");
-			
 			if (transfer.getAmount() < 0)
 				flexTable.getCellFormatter().addStyleName(row, 3, "negativeMoney");
 			else //amount >= 0
 				flexTable.getCellFormatter().addStyleName(row, 3, "positiveMoney");
 			row++;
 		}
+		
+		TableStyler.setTableStyle(flexTable);
+
 
 	}
 

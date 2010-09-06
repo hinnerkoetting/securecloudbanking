@@ -15,8 +15,10 @@ import javax.jdo.Query;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
+import de.mrx.client.BankDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.admin.AdminService;
+import de.mrx.server.Bank;
 import de.mrx.server.BankServiceImpl;
 import de.mrx.server.InternalSCBAccount;
 import de.mrx.server.PMF;
@@ -43,8 +45,8 @@ AdminService {
 	 */
 	@Override
 	public List<AccountDTO> getAllAccounts() {
-		log.setLevel(Level.OFF);
-		log.log(Level.INFO, "Admins requests accounts");
+//		log.setLevel(Level.OFF);
+		log.log(Level.INFO, "Admin requests accounts");
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		Extent<InternalSCBAccount> extent = pm.getExtent(InternalSCBAccount.class);
@@ -72,6 +74,27 @@ AdminService {
 	public SCBIdentityDTO login(String requestUri) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<BankDTO> getAllBanks() {
+		log.log(Level.INFO,  "Admin requests list of banks");
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		Extent<Bank> extent = pm.getExtent(Bank.class);
+		Query query = pm.newQuery(extent);
+		
+		@SuppressWarnings("unchecked")
+		List<Bank> banks = (List<Bank>)query.execute();
+		
+		List<BankDTO> banksDTO = new ArrayList<BankDTO>();
+		
+		for (Bank bank: banks) {
+			banksDTO.add(bank.getDTO());
+		}
+		
+		
+		return banksDTO;
 	}
 
 

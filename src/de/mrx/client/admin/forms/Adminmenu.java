@@ -22,9 +22,6 @@ public class Adminmenu extends Composite {
 	@UiField
 	Button accounts;
 
-	@UiField 
-	Button newTransaction;
-	
 	@UiField
 	Button externalBanks;
 	
@@ -35,7 +32,6 @@ public class Adminmenu extends Composite {
 		adminpage = admin;
 		initWidget(uiBinder.createAndBindUi(this));
 		accounts.setText("Accounts");
-		newTransaction.setText("New Transaction");
 		externalBanks.setText("Manage external Banks");
 	}
 
@@ -44,11 +40,7 @@ public class Adminmenu extends Composite {
 		adminpage.showAccounts();
 	}
 	
-	@UiHandler("newTransaction")
-	void onClickTransaction(ClickEvent e) {
-		adminpage.showNewTransaction();
-	}
-	
+
 	@UiHandler("externalBanks")
 	void onClickExternalBanks(ClickEvent e) {
 		adminpage.showExternalBanks();
