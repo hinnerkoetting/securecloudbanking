@@ -22,10 +22,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
+import de.mrx.client.BankDTO;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCB;
 import de.mrx.client.TransferHistoryForm;
 import de.mrx.client.admin.forms.AccountOverview;
+import de.mrx.client.admin.forms.AdminExternalBanks;
 import de.mrx.client.admin.forms.AdminTransfer;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
@@ -56,7 +58,27 @@ public class Admin implements EntryPoint {
 	}
 	
 	public void showExternalBanks() {
-		setContent(new Label("PLaceholder2"));
+		final AdminExternalBanks externalBanks = new AdminExternalBanks(this);
+		
+		AdminServiceAsync bankingService = GWT.create(AdminService.class);
+		bankingService.getAllBanks(new AsyncCallback<List<BankDTO>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log(caught.toString());
+				
+			}
+
+			@Override
+			public void onSuccess(List<BankDTO> result) {
+				externalBanks.setBanks(result);
+				setContent(externalBanks);				
+			}
+
+			
+		});
+		
+		setContent(new AdminExternalBanks(null));
 	}
 	
 	/**
@@ -107,12 +129,7 @@ public class Admin implements EntryPoint {
 			return;
 		page = new VerticalPanel();
 
-		Label title = new Label("Administration");
-		title.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-
-		
-		r.add(title);
-		
+			
 		pageGrid = new Grid(1, 2 );
 		page.add(pageGrid);
 		r.add(page);

@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.MoneyTransferDTO;
+import de.mrx.client.TableStyler;
 import de.mrx.client.admin.Admin;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
@@ -55,13 +56,7 @@ public class AccountOverview extends Composite {
 		overviewTable.setWidget(0, posTransaction, new Label("Transactions"));
 		overviewTable.setWidget(0, posTransfer, new Label("Transfer Money"));
 		
-		int numColumns = 5;
-	
-		for (int i = 0; i < numColumns; i++) {
-			
-			overviewTable.getCellFormatter().setStyleName(0, i, "TransfersHeader");
-		}
-		
+
 		//add all accounts to table
 		int row = 1;
 		for (AccountDTO account: accounts) {	
@@ -116,21 +111,14 @@ public class AccountOverview extends Composite {
 			
 			
 			
-			//set style
-			if (row %2 == 0) { //even row
-				for (int i = 0; i < numColumns; i++)
-					overviewTable.getCellFormatter().setStyleName(row, i, "TransfersEven");
-			}
-			else //odd row
-				for (int i = 0; i < numColumns; i++)
-					overviewTable.getCellFormatter().setStyleName(row, i, "TransfersOdd");
+			
 			if (account.getBalance() < 0)
 				overviewTable.getCellFormatter().addStyleName(row, 1, "negativeMoney");
 			else //balance >= 0
 				overviewTable.getCellFormatter().addStyleName(row, 1, "positiveMoney");
 			row++;
 		}
-
+		TableStyler.setTableStyle(overviewTable);
 
 
 	}
