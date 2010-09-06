@@ -1,5 +1,7 @@
 package de.mrx.client;
 
+import javax.jdo.PersistenceManager;
+
 import junit.framework.Assert;
 
 import org.junit.After;
@@ -11,7 +13,9 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
+import de.mrx.server.PMF;
 import de.mrx.server.RegisterServiceImpl;
+import de.mrx.server.SCBIdentity;
 import de.mrx.shared.UserAlreadyUsedException;
 
 /**
@@ -22,16 +26,19 @@ import de.mrx.shared.UserAlreadyUsedException;
 public class RegisterTest {
 	private final LocalServiceTestHelper helper =
         new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
-	DatastoreService ds=DatastoreServiceFactory.getDatastoreService();
+	
+	PersistenceManager pmf;
 	
 	@Before 
 	public void setUp() {
 		helper.setUp();
+		pmf=PMF.get().getPersistenceManager();
 	}
 	
 	 @After
 	    public void tearDown() {
 	        helper.tearDown();
+	        pmf.close();
 	    }
 	
 	 private SCBIdentityDTO getStandardDummyUser(String email){
@@ -50,9 +57,13 @@ public class RegisterTest {
 	  */
 	@Test 
 	public void simpleRegisterWithGoogleMail() throws Exception{
-		SCBIdentityDTO id=getStandardDummyUser("testtesttest@googlemail.com");
+		String emailAdress="testtesttest@googlemail.com";
+		SCBIdentityDTO id=getStandardDummyUser(emailAdress);
 		RegisterServiceImpl regService=new RegisterServiceImpl();
 		regService.register(id);
+		PersistenceManager pmf=PMF.get().getPersistenceManager();
+		SCBIdentity idInDB= SCBIdentity.getByEmail(pmf, emailAdress);
+		Assert.assertEquals(emailAdress, idInDB.getEmail());		
 	}
 	
 	
