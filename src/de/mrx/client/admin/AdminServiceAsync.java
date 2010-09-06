@@ -20,6 +20,8 @@ public interface AdminServiceAsync extends BankServiceAsync {
 
 	void getAllBanks(AsyncCallback<List<BankDTO>> callback);
 
+	void addBank(BankDTO bank, AsyncCallback<Boolean> callback);
+
 
 
 }

@@ -31,6 +31,7 @@ import de.mrx.client.admin.forms.AdminExternalBanks;
 import de.mrx.client.admin.forms.AdminTransfer;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
+import de.mrx.client.admin.forms.NewBank;
 import de.mrx.client.moneytransfer.MoneyTransferForm;
 
 
@@ -111,6 +112,11 @@ public class Admin implements EntryPoint {
 			
 		});
 	}
+	
+	public void showNewBank() {
+		setContent(new NewBank());
+	}
+	
 	/**
 	 * 
 	 * @param widget

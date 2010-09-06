@@ -5,8 +5,10 @@ package de.mrx.client.admin.forms;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -33,13 +35,17 @@ public class AdminExternalBanks extends Composite {
 	@UiField
 	FlexTable table;
 	
+	@UiField
+	Button addBank;
+	
 	Admin adminpage;
 	
 	public AdminExternalBanks(Admin admin) {
 		this.adminpage = admin;
 		
 		initWidget(uiBinder.createAndBindUi(this));
-		title.setText("Manage external Banks");
+		title.setText("External Banks");
+		addBank.setText("Add Bank");
 	}
 	
 	public void setBanks(List<BankDTO> banks) {
@@ -62,6 +68,11 @@ public class AdminExternalBanks extends Composite {
 			table.setWidget(row, editPos, new Button("Edit"));
 			row++;
 		}
+	}
+	
+	@UiHandler("addBank")
+	public void onClickAddBank(ClickEvent event) {
+		adminpage.showNewBank();
 	}
 
 }

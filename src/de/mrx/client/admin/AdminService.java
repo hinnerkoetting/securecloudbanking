@@ -20,4 +20,6 @@ public interface AdminService extends BankService {
 	public List<AccountDTO> getAllAccounts();
 		
 	public List<BankDTO> getAllBanks();
+	
+	public boolean addBank(BankDTO bank);
 }

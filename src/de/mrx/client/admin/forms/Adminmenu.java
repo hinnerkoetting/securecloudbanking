@@ -32,7 +32,7 @@ public class Adminmenu extends Composite {
 		adminpage = admin;
 		initWidget(uiBinder.createAndBindUi(this));
 		accounts.setText("Accounts");
-		externalBanks.setText("Manage external Banks");
+		externalBanks.setText("External Banks");
 	}
 
 	@UiHandler("accounts")

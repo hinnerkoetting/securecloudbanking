@@ -9,6 +9,9 @@ import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+
 
 
 
@@ -18,6 +21,7 @@ import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.admin.AdminService;
+import de.mrx.server.AllBanks;
 import de.mrx.server.Bank;
 import de.mrx.server.BankServiceImpl;
 import de.mrx.server.InternalSCBAccount;
@@ -95,6 +99,23 @@ AdminService {
 		
 		
 		return banksDTO;
+	}
+
+	@Override
+	public boolean addBank(BankDTO bankDTO) {	
+		//TODO: check for unique, check for valid input
+		//check ID
+		log.setLevel(Level.ALL);
+		log.log(Level.INFO, "Requesting to add new bank. Name: " + bankDTO.getName() + " - BLZ: " + bankDTO.getBlz());
+		AllBanks bankWrapper = AllBanks.getBankWrapper(PMF.get()
+					.getPersistenceManager());
+		
+		Bank bank = new Bank(bankDTO.getBlz(), bankDTO.getName());
+		bank.setId(KeyFactory.createKey(bankWrapper.getId(),
+				Bank.class.getSimpleName(), bankDTO.getName()));
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		pm.makePersistent(bank);
+		return true;
 	}
 
 

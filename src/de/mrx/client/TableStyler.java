@@ -13,8 +13,7 @@ public class TableStyler {
 		for (int i = 0; i < table.getCellCount(0); i++)
 			table.getCellFormatter().setStyleName(0, i, "TransfersHeader");
 		
-		for (int row = 1; row < table.getRowCount(); row++) {
-			
+		for (int row = 1; row < table.getRowCount(); row++) {			
 			if (row %2 == 0) { //even row
 				for (int i = 0; i < 4; i++)
 					table.getCellFormatter().setStyleName(row, i, "TransfersEven");
