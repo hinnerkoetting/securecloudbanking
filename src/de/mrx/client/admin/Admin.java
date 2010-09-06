@@ -26,8 +26,10 @@ import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCB;
 import de.mrx.client.TransferHistoryForm;
 import de.mrx.client.admin.forms.AccountOverview;
+import de.mrx.client.admin.forms.AdminTransfer;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
+import de.mrx.client.moneytransfer.MoneyTransferForm;
 
 
 public class Admin implements EntryPoint {
@@ -55,6 +57,13 @@ public class Admin implements EntryPoint {
 	
 	public void showExternalBanks() {
 		setContent(new Label("PLaceholder2"));
+	}
+	
+	/**
+	 * 
+	 */
+	public void showTransferMoney(String accNr, String accOwner) {
+		setContent(new AdminTransfer(accNr, accOwner));
 	}
 	
 	/**

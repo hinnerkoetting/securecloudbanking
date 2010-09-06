@@ -42,14 +42,22 @@ public class AccountOverview extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 
 	
+		final int posAccount 		= 0;
+		final int posBalance 		= 1;
+		final int posOwner 			= 2;
+		final int posTransaction 	= 3;
+		final int posTransfer 		= 4;
+		
 		//add header
-		overviewTable.setWidget(0, 0, new Label("Account No."));
-		overviewTable.setWidget(0, 1, new Label("Balance"));
-		overviewTable.setWidget(0, 2, new Label("Owner"));
-		overviewTable.setWidget(0, 3, new Label("Transactions"));
-
+		overviewTable.setWidget(0, posAccount, new Label("Account No."));
+		overviewTable.setWidget(0, posBalance, new Label("Balance"));
+		overviewTable.setWidget(0, posOwner, new Label("Owner"));
+		overviewTable.setWidget(0, posTransaction, new Label("Transactions"));
+		overviewTable.setWidget(0, posTransfer, new Label("Transfer Money"));
+		
+		int numColumns = 5;
 	
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < numColumns; i++) {
 			
 			overviewTable.getCellFormatter().setStyleName(0, i, "TransfersHeader");
 		}
@@ -57,20 +65,22 @@ public class AccountOverview extends Composite {
 		//add all accounts to table
 		int row = 1;
 		for (AccountDTO account: accounts) {	
-			overviewTable.setWidget(row, 0, new Label(account.getAccountNr()));
-			overviewTable.setWidget(row, 1, new Label(""+account.getBalance()));
-			overviewTable.setWidget(row, 2, new Label(account.getOwner()));
-			Button showTransactions = new Button("Display");
-			final String finalAccNr = account.getAccountNr();
-			
+			overviewTable.setWidget(row, posAccount, new Label(account.getAccountNr()));
+			overviewTable.setWidget(row, posBalance, new Label(""+account.getBalance()));
+			overviewTable.setWidget(row, posOwner, new Label(account.getOwner()));
+
+			final String accNr = account.getAccountNr();
+			final String accOwner = account.getOwner();
 			/**
 			 * show transactions of this account
 			 */
+			Button showTransactions = new Button("Display");			
+			
 			showTransactions.addClickHandler(new ClickHandler() {	
 				public void onClick(ClickEvent event) {
-					GWT.log("Requesting transactions of Account "+finalAccNr);
+					GWT.log("Requesting transactions of Account "+accNr);
 					AdminServiceAsync service = GWT.create(AdminService.class);
-					service.getTransaction(finalAccNr, new AsyncCallback<List<MoneyTransferDTO>>() {
+					service.getTransaction(accNr, new AsyncCallback<List<MoneyTransferDTO>>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -79,15 +89,45 @@ public class AccountOverview extends Composite {
 
 						@Override
 						public void onSuccess(List<MoneyTransferDTO> result) {
-							adminPage.showAccountTransfers(result);
-							
+							adminPage.showAccountTransfers(result);							
 						}
 					});
 					
 				}
 			});
 			
-			overviewTable.setWidget(row, 3, showTransactions);
+			overviewTable.setWidget(row, posTransaction, showTransactions);
+			
+			
+			/**
+			 * add money to this account
+			 */
+			Button transferMoney = new Button("Transfer");
+			
+			transferMoney.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					adminPage.showTransferMoney(accNr, accOwner);
+					
+				}
+			});
+			overviewTable.setWidget(row, posTransfer, transferMoney);
+			
+			
+			
+			//set style
+			if (row %2 == 0) { //even row
+				for (int i = 0; i < numColumns; i++)
+					overviewTable.getCellFormatter().setStyleName(row, i, "TransfersEven");
+			}
+			else //odd row
+				for (int i = 0; i < numColumns; i++)
+					overviewTable.getCellFormatter().setStyleName(row, i, "TransfersOdd");
+			if (account.getBalance() < 0)
+				overviewTable.getCellFormatter().addStyleName(row, 1, "negativeMoney");
+			else //balance >= 0
+				overviewTable.getCellFormatter().addStyleName(row, 1, "positiveMoney");
 			row++;
 		}
 
