@@ -103,8 +103,7 @@ AdminService {
 
 	@Override
 	public boolean addBank(BankDTO bankDTO) {	
-		//TODO: check for unique, check for valid input
-		//check ID
+		//TODO: check for valid input
 		log.setLevel(Level.ALL);
 		log.log(Level.INFO, "Requesting to add new bank. Name: " + bankDTO.getName() + " - BLZ: " + bankDTO.getBlz());
 		AllBanks bankWrapper = AllBanks.getBankWrapper(PMF.get()
@@ -112,7 +111,7 @@ AdminService {
 		
 		Bank bank = new Bank(bankDTO.getBlz(), bankDTO.getName());
 		bank.setId(KeyFactory.createKey(bankWrapper.getId(),
-				Bank.class.getSimpleName(), bankDTO.getName()));
+				Bank.class.getSimpleName(), bankDTO.getBlz()));
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.makePersistent(bank);
 		return true;
