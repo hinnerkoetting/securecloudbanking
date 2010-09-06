@@ -199,7 +199,11 @@ public class SCB implements EntryPoint, Observer {
 		languageMenubar.addItem(languageEnglishMenuItem);
 		menu.addItem(constants.languageMenu(), languageMenubar);
 		VerticalPanel tempMainpanel = new VerticalPanel();
+		
+		
+		SCBMenu scbMenu=new SCBMenu();
 		tempMainpanel.add(menu);
+//		tempMainpanel.add(scbMenu);
 		return tempMainpanel;
 	}
 
