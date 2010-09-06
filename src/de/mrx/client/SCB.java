@@ -126,6 +126,7 @@ public class SCB implements EntryPoint, Observer {
 		doShowAbout(false);
 		if (regForm == null) {
 			regForm = new RegistrationForm(signInLink);
+			regForm.setUser(identityInfo);
 		}
 
 		RootPanel.get(PAGEID_CONTENT).add(regForm);
@@ -371,7 +372,11 @@ public class SCB implements EntryPoint, Observer {
 
 					public void onSuccess(SCBIdentityDTO result) {
 						identityInfo = result;
+						
 						if (identityInfo.isLoggedIn()) {
+							if (regForm!=null){
+								regForm.setUser(identityInfo);
+							}
 							Log.info("User is logged in with email-adress "
 									+ result.getEmail());
 							if (identityInfo.isActivated()) {

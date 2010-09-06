@@ -16,6 +16,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import de.mrx.server.PMF;
 import de.mrx.server.RegisterServiceImpl;
 import de.mrx.server.SCBIdentity;
+import de.mrx.shared.EmailAdressNotAcceptedException;
 import de.mrx.shared.UserAlreadyUsedException;
 
 /**
@@ -68,14 +69,21 @@ public class RegisterTest {
 	
 	
 	 /**
-	  * standard registration with a googlemail account. Expected to create a user, even though the user can not log in later
+	  * registration with a non googlemail account. Expected to fail
 	  * @throws Exception
 	  */
 	@Test 
 	public void simpleRegisterWithNotGoogleMail() throws Exception{		
 		SCBIdentityDTO id=getStandardDummyUser("testtesttest@gmx.com");
 		RegisterServiceImpl regService=new RegisterServiceImpl();
+		try{
 		regService.register(id);
+		}
+		catch (EmailAdressNotAcceptedException e){
+			//this was expected
+			return;
+		}
+		Assert.fail("A non Googlemail User was accepted");
 	}
 	
 	/**
@@ -84,7 +92,7 @@ public class RegisterTest {
 	  */
 	@Test 
 	public void registerTwiceWithSameEmail() throws Exception{		
-		SCBIdentityDTO id=getStandardDummyUser("testtesttest@gmx.com");	
+		SCBIdentityDTO id=getStandardDummyUser("test@googlemail.com");	
 		RegisterServiceImpl regService=new RegisterServiceImpl();
 		regService.register(id);
 		try{
