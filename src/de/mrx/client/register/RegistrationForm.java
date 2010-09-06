@@ -30,6 +30,7 @@ import de.mrx.client.SCB;
 import de.mrx.client.SCBConstants;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.SCBMessages;
+import de.mrx.shared.EmailAdressNotAcceptedException;
 import de.mrx.shared.SCBException;
 import de.mrx.shared.UserAlreadyUsedException;
 
@@ -137,7 +138,9 @@ public class RegistrationForm extends Composite {
 				if (caught instanceof UserAlreadyUsedException) {
 					Window.alert("User is already in use!. Please use a different email adress!");				
 				}
-
+				else if (caught instanceof EmailAdressNotAcceptedException) {
+					Window.alert("Currently only googlemail Adresses are accepted!. Please use a different email adress!");				
+				}
 				else if (caught instanceof SCBException) {					
 					Window.alert(messages.scbError(caught.getMessage()));
 				} else {
@@ -249,13 +252,14 @@ public class RegistrationForm extends Composite {
 		if (identity==null || !identity.isLoggedIn()  ){
 			hintLogIn.setVisible(true);
 			signInLinkWrapper.setVisible(true);
-			email.setReadOnly(false);
+			email.setReadOnly(false);			
 			Log.info("User logged in yet. This would ease the registration!");
 		}
 		else{
 			hintLogIn.setVisible(false);
 			signInLinkWrapper.setVisible(false);
 			email.setReadOnly(true);
+			email.setText(identity.getEmail());
 		}
 			
 	}
@@ -281,7 +285,7 @@ public class RegistrationForm extends Composite {
 				constants.registerValidateEmail())) {
 			result = false;
 		}
-		if (!isFieldConfirmToExpresion(street, "[\\w \\d������]+",
+		if (!isFieldConfirmToExpresion(street, "[\\w]+",
 				constants.registerValidateStreet())) {
 			result = false;
 		}
