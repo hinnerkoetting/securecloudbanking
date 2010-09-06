@@ -12,6 +12,11 @@ public class AccountNotExistException extends SCBException {
 	 */
 	private static final long serialVersionUID = 1216342195730542424L;
 
+	private int accountNr;
+	public int getAccountNr() {
+		return accountNr;
+	}
+
 	public AccountNotExistException(){
 		 
 	 }
@@ -19,5 +24,9 @@ public class AccountNotExistException extends SCBException {
 public AccountNotExistException(String message){
 		 super(message);
 	 }
+
+public AccountNotExistException(int accountNr){
+	 this.accountNr=accountNr;
+}
 
 }

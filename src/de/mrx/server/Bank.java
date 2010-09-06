@@ -44,6 +44,7 @@ public class Bank {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((blz == null) ? 0 : blz.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
@@ -57,6 +58,11 @@ public class Bank {
 		if (getClass() != obj.getClass())
 			return false;
 		Bank other = (Bank) obj;
+		if (blz == null) {
+			if (other.blz != null)
+				return false;
+		} else if (!blz.equals(other.blz))
+			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
