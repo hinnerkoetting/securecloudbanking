@@ -41,6 +41,7 @@ import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
+import de.mrx.shared.WrongTANException;
 
 /**
  * implementation class for the bankingservice
@@ -52,7 +53,7 @@ import de.mrx.shared.SCBException;
 public class CustomerServiceImpl extends BankServiceImpl implements
 		CustomerService {
 
-	private static final String SCB_BLZ = "1502222";
+	
 	
 	PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -110,7 +111,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			if (ownBank == null) {
 				ownBank = new Bank(SCB_BLZ, "Secure Cloud Bank");
 				ownBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-						Bank.class.getSimpleName(), "SCB"));
+						Bank.class.getSimpleName(), SCB_BLZ));
 				bankWrapper.setOwnBanks(ownBank);
 
 			}
@@ -234,6 +235,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			e.printStackTrace();
 			throw new SCBException("Error opening the account", e);
 		} finally {
+			if (pm.isClosed()) {
+				return;
+			}
 			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
 			}
@@ -244,6 +248,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 	/*
 	 * sends money. For this service, the sender must be a customer of SCB
+	 * the receiver must now already be known, he is created before confirmation
 	 */
 	public void sendMoney(String senderAccountNr, String blz,
 			String receiveraccountNr, double amount, String remark,
@@ -258,58 +263,28 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 					senderAccountNr);
 			if (senderAccount == null) {
 				throw new RuntimeException("Sender Account " + senderAccountNr
-						+ " existiert nicht!");
+						+ " doesn't exist! Bug?");
 			}
 
 			Bank receiverBank = Bank.getByBLZ(pm, blz);
 			if (receiverBank == null) {
-				if (bankName == null || bankName.trim().equals("")) {
-					bankName = "Neue Bank";
-				}
-				receiverBank = new Bank(blz.trim(), bankName);
-				receiverBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-						Bank.class.getSimpleName(), blz));
-
-				bankWrapper.getOtherBanks().add(receiverBank);
-				log.info("Create external bank");
-				pm.currentTransaction().begin();
-				pm.makePersistent(bankWrapper);
-				pm.currentTransaction().commit();
-
+					throw new RuntimeException ("Bank with BLZ "+blz+ " is not known. Bug?");
 			}
 
 			GeneralAccount recAccount;
 			if (receiverBank.equals(ownBank)) {
 				recAccount = InternalSCBAccount.getOwnByAccountNr(pm, receiveraccountNr);
 				if (recAccount == null) {
-					throw new AccountNotExistException(
-							"Dieser Account existiert nicht bei der Bank "
-									+ receiveraccountNr);
+					throw new AccountNotExistException(receiveraccountNr);
 				}
 
-			} else {
+			} else {//external Bank
 				recAccount = ExternalAccount.getAccountByBLZAndAccountNr(pm,
 						receiverBank, receiveraccountNr);
 
 				if (recAccount == null) {
-					log.info("Account" + receiveraccountNr
-							+ " is not yet known at " + receiverBank.getName()
-							+ "(" + receiverBank.getBlz() + "). Create it.");
-					log.info("Create external account");
-					pm.currentTransaction().begin();
-					recAccount = new ExternalAccount(receiverName,
-							receiveraccountNr, receiverBank);
-					recAccount.setId(KeyFactory.createKey(receiverBank.getId(),
-							ExternalAccount.class.getSimpleName(), receiverBank
-									.getBlz()
-									+ "_" + receiveraccountNr));
-					receiverBank.addAccount(recAccount);
-					pm.makePersistent(recAccount);
-
-					pm.currentTransaction().commit();
-				}
+					throw new RuntimeException ("this account must exist by now");				}
 			}
-			// pm.currentTransaction().commit();
 			MoneyTransferPending pendingTrans = senderAccount
 					.getPendingTransaction();
 			if (pendingTrans == null) {
@@ -338,7 +313,6 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			log.info("Save Moneytransfer");
 			pm.currentTransaction().begin();
 
-			// pm.makePersistent(transfer);
 			senderAccount.addMoneyTransfer(transfer);
 			// recAccount.addMoneyTransfer(transfer);Sp�ter eine Kopie anlegen
 
@@ -567,7 +541,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			log.severe(e.getMessage());
 			e.printStackTrace();
 			throw new SCBException(
-					"�berweisung kann derzeit nicht ausgef�hrt werden", e);
+					"Transaction can not be executed", e);
 		}
 		finally {
 			if (pm.currentTransaction().isActive()) {

@@ -13,7 +13,7 @@ import de.mrx.shared.SCBException;
 @RemoteServiceRelativePath("banking")
 public interface CustomerService extends BankService {
 	
-	
+	public static final String SCB_BLZ = "1502222";
 	
 	/**
 	 * fetches information about all account of a user
