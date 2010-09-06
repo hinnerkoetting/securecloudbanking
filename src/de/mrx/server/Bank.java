@@ -10,6 +10,7 @@ import javax.jdo.Query;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Unique;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -25,6 +26,7 @@ public class Bank {
 	private final static Logger log = Logger.getLogger(Bank.class.getName());
 
 	@Persistent	
+	@Unique
 	private String blz;
 
 	@PrimaryKey	
@@ -98,6 +100,7 @@ public class Bank {
 	}
 
 	@Persistent
+	@Unique
 	private String name;
 
 	public Bank(String blz, String name) {
