@@ -118,23 +118,11 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			pm.currentTransaction().commit();
 
 		} finally {
-			if (pm.currentTransaction().isActive()) {
+			if (!pm.isClosed()){
 				pm.currentTransaction().rollback();
-
+				pm.close();
 			}
-			pm.close();
 		}
-		// String query = "SELECT FROM " + Bank.class.getName() +
-		// " WHERE blz=='"
-		// + SCB_BLZ + "'";
-		//
-		// List<Bank> ownBanks = (List<Bank>) pm.newQuery(query).execute();
-		// if (ownBanks.size() == 0) {
-		// ownBank = new Bank(SCB_BLZ, "Secure Cloud Bank");
-		// pm.makePersistent(ownBank);
-		// } else {
-		// ownBank = ownBanks.get(0);
-		// }
 	}
 
 	/**
@@ -244,13 +232,14 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			e.printStackTrace();
 			throw new SCBException("Error opening the account", e);
 		} finally {
-			if (pm.currentTransaction().isActive()) {
+			if (!pm.isClosed()){
 				pm.currentTransaction().rollback();
+				pm.close();
 			}
-			pm.close();
+		}
+			
 		}
 
-	}
 
 	/*
 	 * sends money. For this service, the sender must be a customer of SCB
@@ -369,10 +358,10 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			pm.currentTransaction().commit();
 
 		} finally {
-			if (pm.currentTransaction().isActive()) {
+			if (!pm.isClosed()){
 				pm.currentTransaction().rollback();
+				pm.close();
 			}
-			pm.close();
 		}
 	}
 
@@ -580,10 +569,10 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 					"�berweisung kann derzeit nicht ausgef�hrt werden", e);
 		}
 		finally {
-			if (pm.currentTransaction().isActive()) {
+			if (!pm.isClosed()){
 				pm.currentTransaction().rollback();
+				pm.close();
 			}
-			pm.close();
 		}
 	}
 
@@ -645,10 +634,11 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 		}
 		finally {
-			if (pm.currentTransaction().isActive()) {
+			if (!pm.isClosed()){
 				pm.currentTransaction().rollback();
+				pm.close();
 			}
-			pm.close();
+			
 		}
 	}
 }
