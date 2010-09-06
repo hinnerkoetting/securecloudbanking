@@ -31,15 +31,15 @@ import de.mrx.client.moneytransfer.MoneyTransferForm;
 import de.mrx.client.register.RegistrationForm;
 
 /**
- * Complete GUI for Secure Cloud Banking. Includes Registration process, general information, and online banking
- * Entry point classes define <code>onModuleLoad()</code>.
- * TODO: This class is too big! Split!
+ * Complete GUI for Secure Cloud Banking. Includes Registration process, general
+ * information, and online banking Entry point classes define
+ * <code>onModuleLoad()</code>. TODO: This class is too big! Split!
  * 
  */
 public class SCB implements EntryPoint, Observer {
 
 	// private static final Logger log = Logger.getLogger(SCB.class.getName());
-//	Widget divLogger = Log.getLogger(DivLogger.class).getWidget();
+	// Widget divLogger = Log.getLogger(DivLogger.class).getWidget();
 
 	public static final String PAGEID_HEADER = "cloudbanking";
 	public static final String PAGEID_CONTENT = "content";
@@ -47,23 +47,22 @@ public class SCB implements EntryPoint, Observer {
 	public static final String PAGEID_SIGN = "signInOut";
 
 	public final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
-	String currentLanguage="en";
-	
+	String currentLanguage = "en";
+
 	RegistrationForm regForm;
 
 	private SCBConstants constants = GWT.create(SCBConstants.class);
-//	private SCBMessages messages = GWT.create(SCBMessages.class);
+	// private SCBMessages messages = GWT.create(SCBMessages.class);
 	RegisterServiceAsync registerSvc;
 	private CustomerServiceAsync bankingService;
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
 	 */
-//	private static final String SERVER_ERROR = "An error occurred while "
-//			+ "attempting to contact the server. Please check your network "
-//			+ "connection and try again.";
+	// private static final String SERVER_ERROR = "An error occurred while "
+	// + "attempting to contact the server. Please check your network "
+	// + "connection and try again.";
 
-	
 	MenuBar generalMenu = new MenuBar(true);
 
 	private VerticalPanel mainPanel = new VerticalPanel();
@@ -74,14 +73,7 @@ public class SCB implements EntryPoint, Observer {
 
 	FlexTable validateErrorTable = new FlexTable();
 
-
-
-	
-
-
 	private VerticalPanel informationPanel;
-
-
 
 	private SCBIdentityDTO identityInfo = null;
 	private VerticalPanel loginPanel = new VerticalPanel();
@@ -100,11 +92,8 @@ public class SCB implements EntryPoint, Observer {
 	private MenuItem registerMItem;
 	private String currentAccount;
 
-
 	private List<String> hints = new ArrayList<String>();
 
-	
-	
 	private Image scbLogo;
 
 	private void doShowNoService() {
@@ -112,34 +101,33 @@ public class SCB implements EntryPoint, Observer {
 		Window.alert(constants.outOfServiceNotice());
 
 	}
-	
-	
-	private void doShowAbout(boolean picture){
+
+	private void doShowAbout(boolean picture) {
 		RootPanel r = RootPanel.get(PAGEID_CONTENT);
 		if (r == null)
 			return;
 		r.clear();
-		informationPanel=new VerticalPanel();
-		HTML text=new HTML(constants.registrationIntroductionText());
+		informationPanel = new VerticalPanel();
+		HTML text = new HTML(constants.registrationIntroductionText());
 		text.setStyleName("centerAligned");
 		scbLogo = new Image("images/banking.jpg");
 		scbLogo.setStyleName("centerAligned");
-		
+
 		informationPanel.add(text);
-		if (picture){
+		if (picture) {
 			informationPanel.add(scbLogo);
 		}
-		
+
 		RootPanel.get(PAGEID_CONTENT).add(informationPanel);
 	}
 
 	private void doOpenRegisterMenu() {
 		RootPanel.get(PAGEID_CONTENT).clear();
 		doShowAbout(false);
-		if (regForm==null){
-			regForm=new RegistrationForm(signInLink);
+		if (regForm == null) {
+			regForm = new RegistrationForm(signInLink);
 		}
-		
+
 		RootPanel.get(PAGEID_CONTENT).add(regForm);
 	}
 
@@ -148,74 +136,73 @@ public class SCB implements EntryPoint, Observer {
 	 */
 	public VerticalPanel createMainPanel() {
 		Command cmdShowImpressum = new Command() {
-				public void execute() {
-					GWT.log("Impressum follows");
-					Window
-							.alert(constants.impressumText());
+			public void execute() {
+				GWT.log("Impressum follows");
+				Window.alert(constants.impressumText());
 
-				}
-			};
+			}
+		};
 
-			Command cmdShowInfoSCB = new Command() {
-				public void execute() {
-					GWT.log("SCB Info");
-					Window
-							.alert(constants.aboutText());
+		Command cmdShowInfoSCB = new Command() {
+			public void execute() {
+				GWT.log("SCB Info");
+				Window.alert(constants.aboutText());
 
-				}
-			};
+			}
+		};
 
-			Command cmdShowNoService = new Command() {
-				public void execute() {
-					GWT.log("Show No Service starts");
-					doShowNoService();
+		Command cmdShowNoService = new Command() {
+			public void execute() {
+				GWT.log("Show No Service starts");
+				doShowNoService();
 
-				}
-			};
+			}
+		};
 
-			Command cmdRegister = new Command() {
-				public void execute() {
-					GWT.log("Registration starts");
-					doOpenRegisterMenu();
+		Command cmdRegister = new Command() {
+			public void execute() {
+				GWT.log("Registration starts");
+				doOpenRegisterMenu();
 
-				}
-			};
+			}
+		};
 
+		informationMenu = new MenuBar(true);
+		informationMenu.addItem("Impressum", cmdShowImpressum);
+		informationMenu.addItem("About Secure Cloud Computing", cmdShowInfoSCB);
 
-			informationMenu = new MenuBar(true);
-			informationMenu.addItem("Impressum", cmdShowImpressum);
-			informationMenu.addItem("About Secure Cloud Computing",
-					cmdShowInfoSCB);
+		menu = new MenuBar();
+		registerMItem = new MenuItem(constants.menuRegister(), cmdRegister);
+		menu.addItem(registerMItem);
+		menu.addItem(constants.menuInformation(), informationMenu);
+		userInformationMenuItem = new MenuItem(constants.menuUserInformation(),
+				cmdShowNoService);
+		menu.addItem(userInformationMenuItem);
+		languageMenubar = new MenuBar(true);
+		Command cmdChangeToEnglish = new Command() {
+			public void execute() {
+				changeToLocalisedVersion("en");
 
-			menu = new MenuBar();
-			registerMItem = new MenuItem(constants.menuRegister(), cmdRegister);
-			menu.addItem(registerMItem);			
-			menu.addItem(constants.menuInformation(), informationMenu);
-			userInformationMenuItem = new MenuItem(constants.menuUserInformation(), cmdShowNoService);
-			menu.addItem(userInformationMenuItem);
-			languageMenubar =new MenuBar(true);
-			Command cmdChangeToEnglish = new Command() {
-				public void execute() {
-					changeToLocalisedVersion("en");
+			}
+		};
+		Command cmdChangeToGerman = new Command() {
+			public void execute() {
+				changeToLocalisedVersion("de");
 
-				}
-			};
-			Command cmdChangeToGerman = new Command() {
-				public void execute() {
-					changeToLocalisedVersion("de");
-
-				}
-			};
-			languageEnglishMenuItem=new MenuItem(constants.languageEnglish(), cmdChangeToEnglish);
-			languageGermanMenuItem=new MenuItem(constants.languageGerman(), cmdChangeToGerman);
-			languageMenubar.addItem(languageGermanMenuItem);
-			languageMenubar.addItem(languageEnglishMenuItem);
-			menu.addItem(constants.languageMenu(), languageMenubar);
-			VerticalPanel tempMainpanel = new VerticalPanel();
-			tempMainpanel.add(menu);
+			}
+		};
+		languageEnglishMenuItem = new MenuItem(constants.languageEnglish(),
+				cmdChangeToEnglish);
+		languageGermanMenuItem = new MenuItem(constants.languageGerman(),
+				cmdChangeToGerman);
+		languageMenubar.addItem(languageGermanMenuItem);
+		languageMenubar.addItem(languageEnglishMenuItem);
+		menu.addItem(constants.languageMenu(), languageMenubar);
+		VerticalPanel tempMainpanel = new VerticalPanel();
+		tempMainpanel.add(menu);
 		return tempMainpanel;
 	}
-	
+
 	/**
 	 * This is the entry point method.
 	 */
@@ -229,16 +216,13 @@ public class SCB implements EntryPoint, Observer {
 				return;
 			}
 
-//			RootPanel.get(PAGEID_FEHLER).add(divLogger);
+			// RootPanel.get(PAGEID_FEHLER).add(divLogger);
 			Log.setUncaughtExceptionHandler();
 
-			
-
 			mainPanel = createMainPanel();
-			
 
 			r.add(mainPanel);
-			
+
 			checkGoogleStatus();
 			doShowAbout(true);
 			GWT.log("Module loaded");
@@ -269,13 +253,14 @@ public class SCB implements EntryPoint, Observer {
 
 			}
 
-			public void onSuccess(List<AccountDTO> result) {				
+			public void onSuccess(List<AccountDTO> result) {
 				if (result == null) {
 					Log.warn("No accounts");
 
 				} else {
 					Log.info("Number of Accounts: " + result.size());
-					Button overviewBtn = new Button(constants.overViewBtnFinancialState());
+					Button overviewBtn = new Button(constants
+							.overViewBtnFinancialState());
 					overviewBtn.setStyleName("OverViewButton");
 					overviewBtn.addClickHandler(new ClickHandler() {
 
@@ -300,7 +285,8 @@ public class SCB implements EntryPoint, Observer {
 					}
 
 					if (result.size() == 0) {
-						Button neuerAccountBtn = new Button(constants.overViewBtnOpenSavingAccount());
+						Button neuerAccountBtn = new Button(constants
+								.overViewBtnOpenSavingAccount());
 						neuerAccountBtn.setStyleName("OverViewButton");
 						neuerAccountBtn.addClickHandler(new ClickHandler() {
 
@@ -325,17 +311,19 @@ public class SCB implements EntryPoint, Observer {
 
 	protected void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
 		accountsDetailsPanel.clear();
-		if (result.size()==0){
-			Label noAccountHint=new Label(constants.accountOverviewHintNoAccount());
+		if (result.size() == 0) {
+			Label noAccountHint = new Label(constants
+					.accountOverviewHintNoAccount());
 			accountsDetailsPanel.add(noAccountHint);
 			return;
-		}		
+		}
 		Label accHeaderLbl = new Label(constants.accountOverviewLblTitel());
 		accountsDetailsPanel.add(accHeaderLbl);
 		Grid grid = new Grid(result.size() + 1, 2);
 		accountsDetailsPanel.add(grid);
 		Label accHeader = new Label(constants.accountOverviewLblHeaderAccount());
-		Label amountHeader = new Label(constants.accountOverviewLblHeaderBalance());
+		Label amountHeader = new Label(constants
+				.accountOverviewLblHeaderBalance());
 		accHeader.setStyleName("TransfersHeader");
 		amountHeader.setStyleName("TransfersHeader");
 		grid.setWidget(0, 0, accHeader);
@@ -374,14 +362,14 @@ public class SCB implements EntryPoint, Observer {
 					public void onFailure(Throwable error) {
 						error.printStackTrace();
 						Log.error("Login state can not be retrieved! ", error);
-						Window
-								.alert(constants.loginFailedText());
+						Window.alert(constants.loginFailedText());
 					}
 
 					public void onSuccess(SCBIdentityDTO result) {
 						identityInfo = result;
 						if (identityInfo.isLoggedIn()) {
-							Log.info("User is logged in with email-adress "+result.getEmail());
+							Log.info("User is logged in with email-adress "
+									+ result.getEmail());
 							if (identityInfo.isActivated()) {
 								Log.info("Valid Account " + identityInfo);
 								String userInfo = identityInfo.getEmail();
@@ -401,13 +389,15 @@ public class SCB implements EntryPoint, Observer {
 										.getEmail());
 							}
 							loadLoggedInSetup();
-							String language=identityInfo.getLanguage();
-							GWT.log("Language: "+language);
-							if (language!=null && !currentLanguage.equals(language)){
-								changeToLocalisedVersion(language);								
+							String language = identityInfo.getLanguage();
+							GWT.log("Language: " + language);
+							if (language != null
+									&& !currentLanguage.equals(language)) {
+								changeToLocalisedVersion(language);
 							}
 						} else {
-							Log.info("User is not yet logged in with his Google account");
+							Log
+									.info("User is not yet logged in with his Google account");
 							loadLogin();
 						}
 					}
@@ -438,7 +428,7 @@ public class SCB implements EntryPoint, Observer {
 		RootPanel.get(PAGEID_SIGN).remove(signInLink);
 		RootPanel.get(PAGEID_SIGN).remove(signOutLink);
 		RootPanel.get(PAGEID_SIGN).add(signOutLink);
-		
+
 	}
 
 	private void createAccount() {
@@ -477,52 +467,11 @@ public class SCB implements EntryPoint, Observer {
 
 					}
 
-					
-
 					public void onSuccess(AccountDetailDTO result) {
-						Log.info("Balance: " + result);
-						TransferHistoryForm transferHistoryForm=new TransferHistoryForm(result.getTransfers());
-						Label accBalanceLbl = new Label(constants.accountDetailCurrentBalance()
-								+ NumberFormat.getCurrencyFormat().format(
-										result.getBalance()));
-						if (result.getBalance() >= 0) {
-							accBalanceLbl.setStyleName("positiveMoney");
-						} else {
-							accBalanceLbl.setStyleName("negativeMoney");
-						}
+						CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(result);
+						customerTransfer.addObserver(SCB.this);
 
-						
-						Button transferMoneyButton = new Button(constants.accountDetailSendMoneyBtn());
-						transferMoneyButton.addClickHandler(new ClickHandler() {
-
-							public void onClick(ClickEvent event) {
-								MoneyTransferForm mTransfer=new MoneyTransferForm(currentAccount);
-								accountsDetailsPanel.clear();
-								mTransfer.addObserver(SCB.this);
-								accountsDetailsPanel.add(mTransfer);
-								
-
-							}
-						});
-						Button transferFastMoneyButton = new Button(constants.accountDetailSendMoneyFastBtn());
-						transferFastMoneyButton.addClickHandler(new ClickHandler() {
-
-							public void onClick(ClickEvent event) {
-								FastMoneyTransferForm mTransfer=new FastMoneyTransferForm(currentAccount);
-								mTransfer.addObserver(SCB.this);
-								accountsDetailsPanel.clear();
-								accountsDetailsPanel.add(mTransfer);
-								
-
-							}
-						});
-						HorizontalPanel btnPanel=new HorizontalPanel();
-						btnPanel.add(transferFastMoneyButton);
-						btnPanel.add(transferMoneyButton);
-
-						accountsDetailsPanel.insert(accBalanceLbl, 0);
-						accountsDetailsPanel.insert(transferHistoryForm, 1);
-						accountsDetailsPanel.insert(btnPanel,2);
+						accountsDetailsPanel.add(customerTransfer);
 
 					}
 				});
@@ -543,9 +492,6 @@ public class SCB implements EntryPoint, Observer {
 
 	}
 
-	
-	
-	
 	private void createHintTable() {
 		for (int i = 0; i < hints.size(); i++) {
 			String currentMessage = hints.get(i);
@@ -567,49 +513,69 @@ public class SCB implements EntryPoint, Observer {
 		}
 
 	}
-	
+
 	/*
-	 * change the language during runtime
-	 * keeps the debug flag
-	 */	
-	private void changeToLocalisedVersion(String language){
-		String queryPart=Window.Location.getQueryString();
-		
-		
+	 * change the language during runtime keeps the debug flag
+	 */
+	private void changeToLocalisedVersion(String language) {
+		String queryPart = Window.Location.getQueryString();
+
 		String reloadURL;
-		String debugFlag=Window.Location.getParameter("gwt.codesvr");
-		
-		if (debugFlag!=null){
-			reloadURL=GWT.getHostPageBaseURL()+queryPart+"&locale="+language;	
+		String debugFlag = Window.Location.getParameter("gwt.codesvr");
+
+		if (debugFlag != null) {
+			reloadURL = GWT.getHostPageBaseURL() + queryPart + "&locale="
+					+ language;
+		} else {
+			reloadURL = GWT.getHostPageBaseURL() + "?locale=" + language;
 		}
-		else{
-			reloadURL=GWT.getHostPageBaseURL()+"?locale="+language;
-		}
-		
+
 		GWT.log(reloadURL);
 
-		
-		Window.open(reloadURL,"_self",null);
+		Window.open(reloadURL, "_self", null);
 	}
-
 
 	@Override
 	public void update(Observable o, Object arg) {
 		System.out.println("Updated");
-		if (o instanceof MoneyTransferForm){
+		if (o instanceof MoneyTransferForm) {
 			showAccountDetails((String) arg);
-		}
-		else if (o instanceof FastMoneyTransferForm){
-			if (arg instanceof MoneyTransferDTO){
-				MoneyTransferForm confirmPage=new MoneyTransferForm(currentAccount,(MoneyTransferDTO) arg);
-				accountsDetailsPanel.clear();
-				accountsDetailsPanel.add(confirmPage);
-				
+		} else if (o instanceof FastMoneyTransferForm) {
+			if (arg instanceof MoneyTransferDTO) {
+				showMoneyTransferConfirmationForm((MoneyTransferDTO) arg);
+
 			}
-			
-			
+		} else if (o instanceof CustomerTransferHistoryForm) {
+			if (arg == CustomerTransferHistoryForm.EVENT_SEND_MONEY) {
+				showStandardMoneyTransferForm();
+			} else if (arg == CustomerTransferHistoryForm.EVENT_SEND_FAST_MONEY) {
+				showFastMoneyTransferForm();
+			}
+
 		}
 
-		
+	}
+
+	private void showFastMoneyTransferForm() {
+		FastMoneyTransferForm mTransfer = new FastMoneyTransferForm(
+				currentAccount);
+		mTransfer.addObserver(SCB.this);
+		accountsDetailsPanel.clear();
+		accountsDetailsPanel.add(mTransfer);
+	}
+
+	private void showStandardMoneyTransferForm() {
+		MoneyTransferForm mTransfer = new MoneyTransferForm(
+				currentAccount);
+		accountsDetailsPanel.clear();
+		mTransfer.addObserver(SCB.this);
+		accountsDetailsPanel.add(mTransfer);
+	}
+
+	private void showMoneyTransferConfirmationForm(MoneyTransferDTO moneyTranfer) {
+		MoneyTransferForm confirmPage = new MoneyTransferForm(
+				currentAccount, moneyTranfer);
+		accountsDetailsPanel.clear();
+		accountsDetailsPanel.add(confirmPage);
 	}
 }
