@@ -8,7 +8,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
@@ -18,7 +17,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -31,8 +29,6 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import de.mrx.client.moneytransfer.FastMoneyTransferForm;
 import de.mrx.client.moneytransfer.MoneyTransferForm;
 import de.mrx.client.register.RegistrationForm;
-import de.mrx.shared.AccountNotExistException;
-import de.mrx.shared.WrongTANException;
 
 /**
  * Complete GUI for Secure Cloud Banking. Includes Registration process, general information, and online banking
@@ -104,24 +100,11 @@ public class SCB implements EntryPoint, Observer {
 	private MenuItem registerMItem;
 	private String currentAccount;
 
-	private TextBox receiverAccountNrTxt;
-	private TextBox tanConfirmationTxt;
-	private Button tanConfirmationBtn;
-	private TextBox receiverEmailTxt;
-
-	private TextBox receiverBankNrTxt;
-
-	private TextBox amountTxt;
-	private TextBox remarkTxt;
-	private TextBox recipientTxt;
-	private TextBox bankNameTxt;
 
 	private List<String> hints = new ArrayList<String>();
 
-	private Button sendMoneyBtn;
-
-	private HTMLTable transferForm;
-
+	
+	
 	private Image scbLogo;
 
 	private void doShowNoService() {
@@ -494,10 +477,11 @@ public class SCB implements EntryPoint, Observer {
 
 					}
 
-					private HTMLTable accountDetailTable;
+					
 
 					public void onSuccess(AccountDetailDTO result) {
 						Log.info("Balance: " + result);
+						TransferHistoryForm transferHistoryForm=new TransferHistoryForm(result.getTransfers());
 						Label accBalanceLbl = new Label(constants.accountDetailCurrentBalance()
 								+ NumberFormat.getCurrencyFormat().format(
 										result.getBalance()));
@@ -507,79 +491,7 @@ public class SCB implements EntryPoint, Observer {
 							accBalanceLbl.setStyleName("negativeMoney");
 						}
 
-						if (accountDetailTable != null) {
-							accountsDetailsPanel.remove(accountDetailTable);
-						}
-						List<MoneyTransferDTO> transfers = result
-								.getTransfers();
 						
-						accountDetailTable = new Grid(transfers.size() + 2, 4);
-						if (transfers.size()==0){
-							Label noTransferHint=new Label(constants.accountDetailHintNoTransaction());
-							accountDetailTable.setWidget(0,0,noTransferHint);
-						}
-						else{
-						
-						Label dateLbl = new Label(constants.accountDetailHeaderDate());
-						Label commentLbl = new Label(constants.accountDetailHeaderComment());
-						Label accountLbl = new Label(constants.accountDetailHeaderAccount());
-						Label amountLbl = new Label(constants.accountDetailHeaderAmount());
-						commentLbl.setStyleName("TransfersHeader");
-						dateLbl.setStyleName("TransfersHeader");
-						accountLbl.setStyleName("TransfersHeader");
-						amountLbl.setStyleName("TransfersHeader");
-
-						accountDetailTable.setWidget(0, 0, dateLbl);
-						accountDetailTable.setWidget(0, 1, commentLbl);
-						accountDetailTable.setWidget(0, 2, accountLbl);
-						accountDetailTable.setWidget(0, 3, amountLbl);
-						int pos = 1;
-						Log
-								.debug("Money transfer entries: "
-										+ transfers.size());
-						for (MoneyTransferDTO transfer : transfers) {
-							Log.info("Transfer: " + transfer);
-							Label entryDateLbl = new Label(DateTimeFormat
-									.getMediumDateFormat().format(
-											transfer.getTimestamp()));
-							Label entryRemarkLbl = new Label(transfer
-									.getRemark());
-							Label entryReceiverDetailsLbl = new Label(transfer
-									.getReceiverBankNr()
-									+ ": " + transfer.getReceiverAccountNr());
-
-							Label entryAmountLbl = new Label(NumberFormat
-									.getCurrencyFormat().format(
-											transfer.getAmount()));
-							if (pos % 2 == 0) {
-								entryDateLbl.setStyleName("TransfersOdd");
-								entryRemarkLbl.setStyleName("TransfersOdd");
-								entryReceiverDetailsLbl
-										.setStyleName("TransfersOdd");
-
-							} else {
-								entryDateLbl.setStyleName("TransfersEven");
-								entryRemarkLbl.setStyleName("TransfersEven");
-								entryReceiverDetailsLbl
-										.setStyleName("TransfersEven");
-
-							}
-							if (transfer.getAmount() >= 0) {
-								entryAmountLbl.setStyleName("positiveMoney");
-							} else {
-								entryAmountLbl.setStyleName("negativeMoney");
-							}
-							
-							accountDetailTable.setWidget(pos, 0, entryDateLbl);
-							accountDetailTable
-									.setWidget(pos, 1, entryRemarkLbl);
-							accountDetailTable.setWidget(pos, 2,
-									entryReceiverDetailsLbl);
-							accountDetailTable
-									.setWidget(pos, 3, entryAmountLbl);
-							pos++;
-						}
-						}
 						Button transferMoneyButton = new Button(constants.accountDetailSendMoneyBtn());
 						transferMoneyButton.addClickHandler(new ClickHandler() {
 
@@ -604,15 +516,13 @@ public class SCB implements EntryPoint, Observer {
 
 							}
 						});
-						accountDetailTable.setWidget(accountDetailTable
-								.getRowCount() - 1, 2, transferFastMoneyButton);
-
-
-						accountDetailTable.setWidget(accountDetailTable
-								.getRowCount() - 1, 3, transferMoneyButton);
+						HorizontalPanel btnPanel=new HorizontalPanel();
+						btnPanel.add(transferFastMoneyButton);
+						btnPanel.add(transferMoneyButton);
 
 						accountsDetailsPanel.insert(accBalanceLbl, 0);
-						accountsDetailsPanel.insert(accountDetailTable, 1);
+						accountsDetailsPanel.insert(transferHistoryForm, 1);
+						accountsDetailsPanel.insert(btnPanel,2);
 
 					}
 				});
@@ -633,42 +543,8 @@ public class SCB implements EntryPoint, Observer {
 
 	}
 
-	private boolean isSendFastMoneyFormValid() {
-		boolean result = true;
-		
-		hints.clear();
-		if (!isFieldConfirmToExpresion(receiverEmailTxt,"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
-				constants.fastMoneyValidateEmail())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(amountTxt,
-				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
-				constants.fastMoneyValidateAmount())) {				
-			result = false;
-		}
-		return result;
-	}
 	
-	private boolean isSendMoneyFormValid() {
-		boolean result = true;
-		Log.info("Text: " + receiverAccountNrTxt.getText());
-		hints.clear();
-		if (!isFieldConfirmToExpresion(receiverAccountNrTxt, "^[0-9]{1,10}$",
-				constants.sendMoneyValidateaccount())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(receiverBankNrTxt, "^[0-9]{1,10}$",
-				constants.sendMoneyValidateBLZ())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(amountTxt,
-				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
-				constants.fastMoneyValidateAmount())) {
-			result = false;
-		}
-		return result;
-	}
-
+	
 	
 	private void createHintTable() {
 		for (int i = 0; i < hints.size(); i++) {
