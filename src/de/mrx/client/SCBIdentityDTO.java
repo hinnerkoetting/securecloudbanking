@@ -67,9 +67,10 @@ public class SCBIdentityDTO implements Serializable {
 		
 	}
 
-	public SCBIdentityDTO(String name) {
+	public SCBIdentityDTO(String name, String email) {
 		super();
 		this.name = name;
+		this.email=email;
 	}
 
 	public String getCity() {
