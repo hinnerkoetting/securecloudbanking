@@ -118,11 +118,13 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			pm.currentTransaction().commit();
 
 		} finally {
-			if (!pm.isClosed()){
+			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
-				pm.close();
+
 			}
+			pm.close();
 		}
+		
 	}
 
 	/**
@@ -232,14 +234,13 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			e.printStackTrace();
 			throw new SCBException("Error opening the account", e);
 		} finally {
-			if (!pm.isClosed()){
+			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
-				pm.close();
 			}
-		}
-			
+			pm.close();
 		}
 
+	}
 
 	/*
 	 * sends money. For this service, the sender must be a customer of SCB
@@ -358,10 +359,10 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			pm.currentTransaction().commit();
 
 		} finally {
-			if (!pm.isClosed()){
+			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
-				pm.close();
 			}
+			pm.close();
 		}
 	}
 
@@ -569,10 +570,10 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 					"�berweisung kann derzeit nicht ausgef�hrt werden", e);
 		}
 		finally {
-			if (!pm.isClosed()){
+			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
-				pm.close();
 			}
+			pm.close();
 		}
 	}
 
@@ -634,11 +635,10 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 		}
 		finally {
-			if (!pm.isClosed()){
+			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
-				pm.close();
 			}
-			
+			pm.close();
 		}
 	}
 }
