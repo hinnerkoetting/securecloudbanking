@@ -304,9 +304,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			// if (pendingT)
 
 			MoneyTransfer transfer = new MoneyTransfer(senderAccount,
-					recAccount, amount);
-			transfer.setRemark(remark);
-			transfer.setReceiverName(receiverName);
+					recAccount, amount,recAccount.getOwner(),remark);
+			
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
 			// MoneyTransfer.class.getSimpleName(), 1));
 			log.info("Save Moneytransfer");
@@ -317,9 +316,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			senderAccount.setBalance(senderAccount.getBalance() - amount);
 			MoneyTransfer receivertransfer = new MoneyTransfer(recAccount,
-					senderAccount, -amount);
-			receivertransfer.setRemark(remark);
-			receivertransfer.setReceiverName(receiverName);
+					senderAccount, -amount,senderAccount.getOwner(),remark);
+			
 			recAccount.addMoneyTransfer(receivertransfer);
 			if (recAccount instanceof InternalSCBAccount){
 				InternalSCBAccount scbAccount=(InternalSCBAccount) recAccount;				
