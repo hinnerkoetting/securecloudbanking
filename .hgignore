@@ -1,0 +1,8 @@
+
+syntax: regexp
+^war/WEB-INF/classes$
+^war/WEB-INF/appengine-generated$
+^war/scb$
+^war/register$
+^war/Register$
+^war/de\.mrx\.Admin$
