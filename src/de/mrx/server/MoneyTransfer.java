@@ -72,7 +72,7 @@ public class MoneyTransfer {
 		
 	}
 	
-	public MoneyTransfer( GeneralAccount sender, GeneralAccount receiver, double amount) {
+	public MoneyTransfer( GeneralAccount sender, GeneralAccount receiver, double amount, String receiverName, String remark) {
 		super();
 		if (sender==null){
 			throw new RuntimeException("Sender may not be null");
@@ -85,6 +85,8 @@ public class MoneyTransfer {
 		senderBLZ=sender.getBank().getBlz();
 		receiverAccountNr=receiver.getAccountNr();
 		receiverBLZ=receiver.getBank().getBlz();
+		this.receiverName=receiverName;
+		this.remark=remark;
 		timestamp=new Date();
 		
 	}
@@ -100,9 +102,15 @@ public class MoneyTransfer {
 	public MoneyTransferDTO getDTO(PersistenceManager pm){		
 		InternalSCBAccount s=(InternalSCBAccount)InternalSCBAccount.getOwnByAccountNr(pm,senderAccountNr);
 		Bank b=Bank.getByBLZ(pm,receiverBLZ);
-		ExternalAccount r=(ExternalAccount)ExternalAccount.getAccountByBLZAndAccountNr(pm,b,receiverAccountNr);
-		if (r!=null){
-		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank().getBlz(),s.getAccountNr(),r.getBank().getBlz(),r.getAccountNr(),getAmount());
+		GeneralAccount receiverAccount;
+		if (b.getBlz()==CustomerServiceImpl.SCB_BLZ){
+			receiverAccount=InternalSCBAccount.getOwnByAccountNr(pm,receiverAccountNr);
+		}
+		else{
+			receiverAccount=(ExternalAccount)ExternalAccount.getAccountByBLZAndAccountNr(pm,b,receiverAccountNr);	
+		}		
+		if (receiverAccount!=null){
+		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank().getBlz(),s.getAccountNr(),receiverAccount.getBank().getBlz(),receiverAccount.getAccountNr(),getAmount());
 		dto.setTimestamp(getTimestamp());
 		dto.setRemark(getRemark());
 		dto.setReceiverName(getReceiverName());
