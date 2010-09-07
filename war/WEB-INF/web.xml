@@ -47,11 +47,7 @@
 		<url-pattern>/de.mrx.Admin/gwt-log</url-pattern>
 	</servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>remoteLoggerServiceImpl</servlet-name>
-		<url-pattern>/register/gwt-log</url-pattern>
-	</servlet-mapping>
-
+	
 
 	<servlet-mapping>
 		<servlet-name>bankingServlet</servlet-name>
@@ -69,10 +65,7 @@
 		<url-pattern>/scb/register</url-pattern>
 	</servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>registerServlet</servlet-name>
-		<url-pattern>/Register/register</url-pattern>
-	</servlet-mapping>
+	
 
 
 
