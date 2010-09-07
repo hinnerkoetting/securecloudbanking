@@ -15,7 +15,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Grid;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -32,7 +31,6 @@ import de.mrx.client.admin.forms.AdminTransfer;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
 import de.mrx.client.admin.forms.NewBank;
-import de.mrx.client.moneytransfer.MoneyTransferForm;
 
 
 public class Admin implements EntryPoint {
