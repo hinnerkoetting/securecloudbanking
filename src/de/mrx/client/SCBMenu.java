@@ -43,12 +43,6 @@ public class SCBMenu extends Composite implements Observable{
 		return menuItemRegister;
 	}
 
-
-
-
-
-
-
 	@UiField 
 	MenuItem menuItemEnglish;
 	
@@ -64,7 +58,7 @@ public class SCBMenu extends Composite implements Observable{
 		menuAbout.setCommand(cmdShowInfoSCB);
 		menuImpressum.setCommand(cmdShowImpressum);
 		menuItemGerman.setCommand(cmdChangeToGerman);
-		menuItemGerman.setCommand(cmdChangeToEnglish);
+		menuItemEnglish.setCommand(cmdChangeToEnglish);
 		menuItemRegister.setCommand(cmdRegister);
 		
 	}
