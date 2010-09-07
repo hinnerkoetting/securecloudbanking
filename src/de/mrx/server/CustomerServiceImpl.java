@@ -514,6 +514,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			MoneyTransferPending transfer = new MoneyTransferPending();
 			transfer.setRemark(remark);
 			transfer.setReceiverName(receiverName);
+			transfer.setReceiverBankName(bankName);
 			transfer.setSenderAccountNr(senderAccountNr);
 			transfer.setReceiverBLZ(blz);
 			transfer.setReceiverAccountNr(receiveraccountNr);
