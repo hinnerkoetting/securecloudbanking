@@ -52,19 +52,22 @@ public class AdminExternalBanks extends Composite {
 		
 		final int namePos = 0;
 		final int blzPos =  1;
-		final int editPos = 2;
+		final int viewPos = 2;
+		final int editPos = 3;
 		
 		//add header
 		
 		table.setWidget(0, namePos, new Label("Name"));
 		table.setWidget(0, blzPos, new Label("BLZ"));
-		table.setWidget(0, editPos, new Label("Edit Details"));
+		table.setWidget(0, viewPos, new Label("View accounts"));
+		table.setWidget(0, editPos, new Label("Edit details"));
 		TableStyler.setTableStyle(table);
 		
 		int row= 1;
 		for (BankDTO bank: banks) {
 			table.setWidget(row, namePos, new Label(bank.getName()));
 			table.setWidget(row, blzPos, new Label(bank.getBlz()));
+			table.setWidget(row, viewPos, new Button("View"));
 			table.setWidget(row, editPos, new Button("Edit"));
 			row++;
 		}

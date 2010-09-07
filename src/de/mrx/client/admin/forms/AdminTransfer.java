@@ -3,11 +3,11 @@ package de.mrx.client.admin.forms;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.itextpdf.text.pdf.TextField;
 
 public class AdminTransfer extends Composite {
 
@@ -50,6 +50,9 @@ public class AdminTransfer extends Composite {
 	@UiField
 	TextBox amount;
 	
+	@UiField
+	Button submit;
+	
 	public AdminTransfer(String accNr, String accOwner) {
 		initWidget(uiBinder.createAndBindUi(this));
 		title.setText("Transfer Money");
@@ -67,6 +70,7 @@ public class AdminTransfer extends Composite {
 				
 		
 		descAmount.setText("Amount");
+		submit.setText("Submit");
 		
 	}
 

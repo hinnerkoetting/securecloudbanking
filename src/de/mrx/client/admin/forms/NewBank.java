@@ -1,7 +1,5 @@
 package de.mrx.client.admin.forms;
 
-import java.util.List;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -15,14 +13,9 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import de.mrx.client.AccountDTO;
-import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.BankDTO;
-import de.mrx.client.MoneyTransferDTO;
-import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
-import de.mrx.shared.SCBException;
 
 public class NewBank extends Composite {
 
