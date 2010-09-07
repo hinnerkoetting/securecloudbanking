@@ -41,7 +41,6 @@ import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
-import de.mrx.shared.WrongTANException;
 
 /**
  * implementation class for the bankingservice

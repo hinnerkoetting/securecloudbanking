@@ -25,7 +25,6 @@ import de.mrx.client.Observable;
 import de.mrx.client.Observer;
 import de.mrx.client.SCB;
 import de.mrx.client.SCBConstants;
-import de.mrx.client.SCBMessages;
 import de.mrx.shared.WrongTANException;
 
 /**
