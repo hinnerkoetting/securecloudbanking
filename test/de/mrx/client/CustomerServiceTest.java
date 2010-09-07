@@ -24,7 +24,7 @@ public class CustomerServiceTest {
         new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 	
 	PersistenceManager pmf;
-	String emailAdress="JohnDoegooglemail.com";
+	String emailAdress="JohnDoe@googlemail.com";
 	
 	@Before 
 	public void setUp() {

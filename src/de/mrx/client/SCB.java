@@ -80,27 +80,18 @@ public class SCB implements EntryPoint, Observer {
 
 	private Anchor signInLink = new Anchor(constants.signIn());
 	private Anchor signOutLink = new Anchor(constants.signOut());
-	private MenuBar informationMenu;
 
 	private MenuBar menu;
 
-	private MenuItem userInformationMenuItem;
-	private MenuBar languageMenubar;
-	private MenuItem languageGermanMenuItem;
-	private MenuItem languageEnglishMenuItem;
 
-	private MenuItem registerMItem;
+	
 	private String currentAccount;
 
 	private List<String> hints = new ArrayList<String>();
 
 	private Image scbLogo;
+	private SCBMenu scbMenu;
 
-	private void doShowNoService() {
-
-		Window.alert(constants.outOfServiceNotice());
-
-	}
 
 	private void doShowAbout(boolean picture) {
 		RootPanel r = RootPanel.get(PAGEID_CONTENT);
@@ -136,76 +127,13 @@ public class SCB implements EntryPoint, Observer {
 	 * REMOVEME: temporal workaround until refactoring
 	 */
 	public VerticalPanel createMainPanel() {
-		Command cmdShowImpressum = new Command() {
-			public void execute() {
-				GWT.log("Impressum follows");
-				Window.alert(constants.impressumText());
-
-			}
-		};
-
-		Command cmdShowInfoSCB = new Command() {
-			public void execute() {
-				GWT.log("SCB Info");
-				Window.alert(constants.aboutText());
-
-			}
-		};
-
-		Command cmdShowNoService = new Command() {
-			public void execute() {
-				GWT.log("Show No Service starts");
-				doShowNoService();
-
-			}
-		};
-
-		Command cmdRegister = new Command() {
-			public void execute() {
-				GWT.log("Registration starts");
-				doOpenRegisterMenu();
-
-			}
-		};
-
-		informationMenu = new MenuBar(true);
-		informationMenu.addItem("Impressum", cmdShowImpressum);
-		informationMenu.addItem("About Secure Cloud Computing", cmdShowInfoSCB);
-
-		menu = new MenuBar();
-		registerMItem = new MenuItem(constants.menuRegister(), cmdRegister);
-		menu.addItem(registerMItem);
-		menu.addItem(constants.menuInformation(), informationMenu);
-		userInformationMenuItem = new MenuItem(constants.menuUserInformation(),
-				cmdShowNoService);
-		menu.addItem(userInformationMenuItem);
-		languageMenubar = new MenuBar(true);
-		Command cmdChangeToEnglish = new Command() {
-			public void execute() {
-				changeToLocalisedVersion("en");
-
-			}
-		};
-		Command cmdChangeToGerman = new Command() {
-			public void execute() {
-				changeToLocalisedVersion("de");
-
-			}
-		};
-		languageEnglishMenuItem = new MenuItem(constants.languageEnglish(),
-				cmdChangeToEnglish);
-		languageGermanMenuItem = new MenuItem(constants.languageGerman(),
-				cmdChangeToGerman);
-		languageMenubar.addItem(languageGermanMenuItem);
-		languageMenubar.addItem(languageEnglishMenuItem);
-		menu.addItem(constants.languageMenu(), languageMenubar);
-		VerticalPanel tempMainpanel = new VerticalPanel();
 		
-		
-		SCBMenu scbMenu=new SCBMenu();
-		tempMainpanel.add(menu);
-//		tempMainpanel.add(scbMenu);
-		return tempMainpanel;
+		VerticalPanel v=new VerticalPanel();
+		scbMenu = new SCBMenu();
+		scbMenu.addObserver(this);
+//		tempMainpanel.add(menu);
+		v.add(scbMenu);
+		return v;
 	}
 
 	/**
@@ -386,15 +314,15 @@ public class SCB implements EntryPoint, Observer {
 									userInfo = identityInfo.getNickName()
 											+ " (" + userInfo + ")";
 								}
-								userInformationMenuItem.setText(userInfo);
-								menu.removeItem(registerMItem);
+								scbMenu.getMenuUserInfo().setText(userInfo);
+								scbMenu.getMenuItemRegister().setVisible(false);
 
 								showAccountOverview();
 
 							} else {
 								Log.info("Account not yet activated in SCB: "
 										+ identityInfo);
-								userInformationMenuItem.setText(identityInfo
+								scbMenu.getMenuUserInfo().setText(identityInfo
 										.getEmail());
 							}
 							loadLoggedInSetup();
@@ -526,7 +454,7 @@ public class SCB implements EntryPoint, Observer {
 	/*
 	 * change the language during runtime keeps the debug flag
 	 */
-	private void changeToLocalisedVersion(String language) {
+	public static  void changeToLocalisedVersion(String language) {
 		String queryPart = Window.Location.getQueryString();
 
 		String reloadURL;
@@ -561,6 +489,11 @@ public class SCB implements EntryPoint, Observer {
 				showFastMoneyTransferForm();
 			}
 
+		}
+		else if (o instanceof SCBMenu){
+			if (arg==SCBMenu.EVENT_SHOW_REGISTRATION_MENU){
+				doOpenRegisterMenu();
+			}
 		}
 
 	}
