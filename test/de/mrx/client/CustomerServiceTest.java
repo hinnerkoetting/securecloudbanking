@@ -94,15 +94,13 @@ public class CustomerServiceTest {
 	 
 	 @Test
 	 public void transferMoneyWithWrongTAN() throws Exception{
-		 PersistenceManager pm= PMF.get().getPersistenceManager();
 		 openAccountTest();
 		 CustomerServiceImpl customerService=new CustomerServiceImpl();
 		 List<AccountDTO> accounts=customerService.getAccounts();
 		 //only one saving account
 		 AccountDTO savingAccount=accounts.get(0);
-		 savingAccount.getAccountNr();
-		 double beforeMoney=savingAccount.getBalance();
-		 MoneyTransferDTO confirmation=customerService.sendMoneyAskForConfirmationData(savingAccount.getAccountNr(),TEST_FREMDBANK_BLZ, TEST_FREMDBANK_RECEIVER_ACC_NR, TEST_SEND_AMOUNT, "Test", TEST_FREMDBANK_RECEIVER_NAME,TEST_FREMDBANK_NAME);		 		 
+		 savingAccount.getAccountNr();		 
+		 customerService.sendMoneyAskForConfirmationData(savingAccount.getAccountNr(),TEST_FREMDBANK_BLZ, TEST_FREMDBANK_RECEIVER_ACC_NR, TEST_SEND_AMOUNT, "Test", TEST_FREMDBANK_RECEIVER_NAME,TEST_FREMDBANK_NAME);		 		 
 		 String TAN="WRONG TAN";
 		 try{
 		 customerService.sendMoney(savingAccount.getAccountNr(),TEST_FREMDBANK_BLZ, TEST_FREMDBANK_RECEIVER_ACC_NR, TEST_SEND_AMOUNT, "Test", TEST_FREMDBANK_RECEIVER_NAME,TEST_FREMDBANK_NAME,TAN);
