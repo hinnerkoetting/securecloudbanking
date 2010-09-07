@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.BankService;
+import de.mrx.server.Bank;
 
 
 /**
@@ -23,5 +24,7 @@ public interface AdminService extends BankService {
 	
 	public boolean addBank(BankDTO bank);
 	
-	public boolean generateTestData();
+	public String generateTestData();
+	
+	public BankDTO getBankByBLZ(String blz);
 }

@@ -161,7 +161,7 @@ AdminService {
 	}
 	
 	@Override
-	public boolean generateTestData() {
+	public String generateTestData() {
 		resetData();
 		
 		//number of test data
@@ -257,7 +257,19 @@ AdminService {
 		
 //		MoneyTransfer transfer = new MoneyTransfer(
 		
-		return true;
+		return "Success!\nGenerated: \n -" + EXTERNAL_BANKS + " external banks.\n -"+ EXTERNAL_ACCS + " external accounts each \n -" + INTERNAL_ACCS + " internal accounts\n -" + TRANSACTIONS + " transactions";
+	}
+
+	@Override
+	public BankDTO getBankByBLZ(String blz) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		Extent<Bank> e=pm.getExtent(Bank.class);
+		Query query=pm.newQuery(e, "blz==param");
+		query.declareParameters("java.lang.String param");
+		List<Bank> banks = (List<Bank>)query.execute(blz);
+		
+		return banks.get(0).getDTO();
 	}
 
 

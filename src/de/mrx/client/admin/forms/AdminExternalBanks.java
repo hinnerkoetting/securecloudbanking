@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -49,7 +50,7 @@ public class AdminExternalBanks extends Composite {
 	}
 	
 	public void setBanks(List<BankDTO> banks) {
-		
+		final Admin admin = adminpage;
 		final int namePos = 0;
 		final int blzPos =  1;
 		final int viewPos = 2;
@@ -64,10 +65,18 @@ public class AdminExternalBanks extends Composite {
 		TableStyler.setTableStyle(table);
 		
 		int row= 1;
-		for (BankDTO bank: banks) {
+		for (final BankDTO bank: banks) {
 			table.setWidget(row, namePos, new Label(bank.getName()));
 			table.setWidget(row, blzPos, new Label(bank.getBlz()));
-			table.setWidget(row, viewPos, new Button("View"));
+			Button viewButton = new Button("View");
+			
+			viewButton.addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					admin.showExternalAccounts(bank.getBlz());					
+				}
+			});
+			table.setWidget(row, viewPos, viewButton);
 			table.setWidget(row, editPos, new Button("Edit"));
 			row++;
 		}

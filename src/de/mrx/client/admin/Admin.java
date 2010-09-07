@@ -30,7 +30,9 @@ import de.mrx.client.admin.forms.AdminExternalBanks;
 import de.mrx.client.admin.forms.AdminTransfer;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
+import de.mrx.client.admin.forms.ExternalAccountOverview;
 import de.mrx.client.admin.forms.NewBank;
+import de.mrx.server.Bank;
 
 
 public class Admin implements EntryPoint {
@@ -112,7 +114,26 @@ public class Admin implements EntryPoint {
 	}
 	
 	public void showNewBank() {
-		setContent(new NewBank());
+		setContent(new NewBank(this));
+	}
+	
+	public void showExternalAccounts(String blz) {
+		AdminServiceAsync bankingService = GWT.create(AdminService.class);
+		bankingService.getBankByBLZ(blz, new AsyncCallback<BankDTO>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log(caught.toString());
+				
+			}
+
+			@Override
+			public void onSuccess(BankDTO result) {
+				setContent(new ExternalAccountOverview(result));
+				
+			}
+		});
+		
 	}
 	
 	/**

@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.BankDTO;
+import de.mrx.client.admin.Admin;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
@@ -42,7 +43,9 @@ public class NewBank extends Composite {
 	@UiField
 	Button submit;
 	
-	public NewBank() {
+	Admin adminPage;
+	public NewBank(Admin admin) {
+		this.adminPage = admin;
 		initWidget(uiBinder.createAndBindUi(this));
 		title.setText("Add new Bank");
 		descName.setText("Name");
@@ -61,10 +64,11 @@ public class NewBank extends Composite {
 			@Override
 			public void onSuccess(Boolean result) {
 				if (result.equals(Boolean.FALSE)) {
-					Window.alert("Adding a new bank failed");
+					Window.alert("Adding a new bank failed");					
 				}
 				else { //result==true
-					
+					Window.alert("Success");
+					adminPage.showExternalBanks();
 				}
 				
 			}

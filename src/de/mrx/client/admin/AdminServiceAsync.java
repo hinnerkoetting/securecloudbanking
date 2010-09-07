@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.BankServiceAsync;
+import de.mrx.server.Bank;
 
 /**
  * 
@@ -22,7 +23,9 @@ public interface AdminServiceAsync extends BankServiceAsync {
 
 	void addBank(BankDTO bank, AsyncCallback<Boolean> callback);
 
-	void generateTestData(AsyncCallback<Boolean> callback);
+	void generateTestData(AsyncCallback<String> callback);
+
+	void getBankByBLZ(String blz, AsyncCallback<BankDTO> callback);
 
 
 
