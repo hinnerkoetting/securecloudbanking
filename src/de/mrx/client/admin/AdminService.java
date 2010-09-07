@@ -22,4 +22,6 @@ public interface AdminService extends BankService {
 	public List<BankDTO> getAllBanks();
 	
 	public boolean addBank(BankDTO bank);
+	
+	public boolean generateTestData();
 }
