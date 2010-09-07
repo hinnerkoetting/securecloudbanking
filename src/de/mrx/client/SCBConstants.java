@@ -61,7 +61,7 @@ public interface SCBConstants extends Constants{
 	@DefaultStringValue("ToS")
 	String registrationtoAGBLink();
 
-	@DefaultStringValue("This is a academic technology study in Cloud Computing. At the moment you see an internal development state.\n This site is provided by J. Oetting")
+	@DefaultStringValue("This is a academic technology study in Cloud Computing. At the moment you see an internal development state.\n This site is provided by Hinnerk and Jan Oetting")
 	String impressumText();
 
 	@DefaultStringValue("This site demonstrates cloud security technology.")

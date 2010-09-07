@@ -3,8 +3,33 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<ui:style src="SCB.css" />
 	<g:HTMLPanel>
+		
 		<g:MenuBar>
-			<g:MenuItem><ui:msg description="menuRegister">Register</ui:msg></g:MenuItem>
+			<g:MenuItem ui:field="menuItemRegister"><ui:msg description="menuRegister">Register</ui:msg></g:MenuItem>
+			<g:MenuItem ui:field="menuInformation"><ui:msg description="menuInformation">Information</ui:msg>
+					<g:MenuBar vertical="true">
+						<g:MenuItem ui:field="menuAbout"> 
+							<ui:msg description="menuItemAbout">About</ui:msg>
+						</g:MenuItem>					
+						<g:MenuItem ui:field="menuImpressum"> 
+							<ui:msg description="menuItemImpressum">Impressum</ui:msg>
+						</g:MenuItem>
+					</g:MenuBar>
+			</g:MenuItem>
+			<g:MenuItem ui:field="menuLanguage"><ui:msg description="menuLanguage">Language</ui:msg>
+					<g:MenuBar vertical="true">
+						<g:MenuItem ui:field="menuItemGerman"> 
+							<ui:msg description="menuItemGerman">German</ui:msg>
+						</g:MenuItem>					
+						<g:MenuItem ui:field="menuItemEnglish">   
+							<ui:msg description="menuItemEnglish">English</ui:msg>
+						</g:MenuItem>
+					</g:MenuBar>
+			</g:MenuItem>
+			<g:MenuItem ui:field="menuUserInfo">
+				<ui:msg description="menuUserInfo">not logged in</ui:msg>				
+			</g:MenuItem>			
 		</g:MenuBar>
+			
 	</g:HTMLPanel>
 </ui:UiBinder> 
