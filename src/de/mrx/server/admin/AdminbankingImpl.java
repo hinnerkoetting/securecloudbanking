@@ -247,9 +247,7 @@ AdminService {
 			int pos2 = random.nextInt(numInternal - 2);
 			InternalSCBAccount acc1 = internalAccounts.get(pos1);
 			InternalSCBAccount acc2 = internalAccounts.get(pos2);
-			MoneyTransfer transfer = new MoneyTransfer(acc1, acc2, (random.nextDouble()- 0.5) * 100);
-			transfer.setReceiverName(acc2.getOwner());
-			transfer.setRemark("testcomment" + i);
+			MoneyTransfer transfer = new MoneyTransfer(acc1, acc2, (random.nextDouble()- 0.5) * 100,acc2.getOwner(),"testcomment" + i);
 			acc1.addMoneyTransfer(transfer);
 
 		}

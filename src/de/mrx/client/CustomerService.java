@@ -14,6 +14,7 @@ import de.mrx.shared.SCBException;
 public interface CustomerService extends BankService {
 	
 	public static final String SCB_BLZ = "1502222";
+	public static final String SCB_NAME="Secure Cloud Bank";
 	
 	/**
 	 * fetches information about all account of a user

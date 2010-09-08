@@ -41,7 +41,6 @@ import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
-import de.mrx.shared.WrongTANException;
 
 /**
  * implementation class for the bankingservice
@@ -305,9 +304,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			// if (pendingT)
 
 			MoneyTransfer transfer = new MoneyTransfer(senderAccount,
-					recAccount, amount);
-			transfer.setRemark(remark);
-			transfer.setReceiverName(receiverName);
+					recAccount, amount,recAccount.getOwner(),remark);
+			
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
 			// MoneyTransfer.class.getSimpleName(), 1));
 			log.info("Save Moneytransfer");
@@ -318,9 +316,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			senderAccount.setBalance(senderAccount.getBalance() - amount);
 			MoneyTransfer receivertransfer = new MoneyTransfer(recAccount,
-					senderAccount, -amount);
-			receivertransfer.setRemark(remark);
-			receivertransfer.setReceiverName(receiverName);
+					senderAccount, -amount,senderAccount.getOwner(),remark);
+			
 			recAccount.addMoneyTransfer(receivertransfer);
 			if (recAccount instanceof InternalSCBAccount){
 				InternalSCBAccount scbAccount=(InternalSCBAccount) recAccount;				
@@ -517,6 +514,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			MoneyTransferPending transfer = new MoneyTransferPending();
 			transfer.setRemark(remark);
 			transfer.setReceiverName(receiverName);
+			transfer.setReceiverBankName(bankName);
 			transfer.setSenderAccountNr(senderAccountNr);
 			transfer.setReceiverBLZ(blz);
 			transfer.setReceiverAccountNr(receiveraccountNr);

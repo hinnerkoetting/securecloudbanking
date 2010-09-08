@@ -8,8 +8,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -21,7 +19,6 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -29,6 +26,13 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import de.mrx.client.moneytransfer.FastMoneyTransferForm;
 import de.mrx.client.moneytransfer.MoneyTransferForm;
 import de.mrx.client.register.RegistrationForm;
+
+import com.google.gwt.query.client.GQuery;
+import com.google.gwt.query.client.Function;
+import com.google.gwt.query.client.Selector;
+import com.google.gwt.query.client.Selectors;
+import static com.google.gwt.query.client.GQuery.*;
+import static com.google.gwt.query.client.css.CSS.*;
 
 /**
  * Complete GUI for Secure Cloud Banking. Includes Registration process, general
@@ -55,6 +59,8 @@ public class SCB implements EntryPoint, Observer {
 	// private SCBMessages messages = GWT.create(SCBMessages.class);
 	RegisterServiceAsync registerSvc;
 	private CustomerServiceAsync bankingService;
+	
+	MoneyTransferForm mTransfer = new MoneyTransferForm();
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -159,6 +165,8 @@ public class SCB implements EntryPoint, Observer {
 			checkGoogleStatus();
 			doShowAbout(true);
 			GWT.log("Module loaded");
+//			jsni_startPointbar();
+			startAttack();
 
 		} catch (Exception e) {
 			GWT.log(e.getMessage());
@@ -507,8 +515,7 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	private void showStandardMoneyTransferForm() {
-		MoneyTransferForm mTransfer = new MoneyTransferForm(
-				currentAccount);
+		mTransfer.initWithAccountNr(currentAccount);
 		accountsDetailsPanel.clear();
 		mTransfer.addObserver(SCB.this);
 		accountsDetailsPanel.add(mTransfer);
@@ -519,5 +526,38 @@ public class SCB implements EntryPoint, Observer {
 				currentAccount, moneyTranfer);
 		accountsDetailsPanel.clear();
 		accountsDetailsPanel.add(confirmPage);
+	}
+	
+	/**
+	 * injection point for Greasemonkey (needs to be tested
+	 * @see http://code.google.com/intl/de-DE/webtoolkit/doc/latest/DevGuideCodingBasicsJSNI.html
+	 */
+	public native void jsni_startPointbar() /*-{
+    // Call instance method instanceFoo() on this
+    this.@de.mrx.client.SCB::startAttack();
+  }-*/;
+	
+	/**
+	 * this is the injection for a Javascript-Attacker
+	 * @see http://code.google.com/p/gwtquery/wiki/GettingStarted
+	 */
+	private void startAttack(){
+		$("h1").css(BACKGROUND_COLOR, RED).text("Attack will start now!");
+		
+		//everything should best work with DOM-Operations only (not with knowledge of the Java Widget)
+		
+		mTransfer.getSendMoney().addClickHandler(new ClickHandler() {
+			//later, the original click handler must be executed, but the control flow must be change before, so do change the parameters
+			//two choices: 
+			//1. Remove the previous event handler and code the call yourself
+			//2. change the transaction fields and delegate to previous methods
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.alert("Intruder alert");
+				
+			}
+		});
+		
+		
 	}
 }
