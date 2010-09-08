@@ -89,8 +89,7 @@ public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String ema
 	public void setPendingTransaction(MoneyTransferPending pendingTransaction) {
 		this.pendingTransaction = pendingTransaction;
 	}
-	@Persistent
-	private double balance;//current money
+	
 
 	@Persistent
 	TANList tans;
@@ -101,7 +100,7 @@ public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String ema
 	
 	public InternalSCBAccount( String owner, String accountNr, double balance, Bank bank) {
 		super(owner,accountNr, bank);
-		this.balance = balance;		
+		setBalance(balance);		
 		tans=new TANList();
 		tans.generatedTANs();
 	}
@@ -116,9 +115,7 @@ public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String ema
 	}
 
 	    
-    public double getBalance() {
-	return balance;
-}
+
     
     public AccountDetailDTO getDetailedDTO(PersistenceManager pm) {
 		AccountDetailDTO dto=super.getDetailedDTO(pm);
@@ -153,9 +150,7 @@ public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String ema
 		this.accountType = accountType;
 	}
 	
-	public void setBalance(double balance) {
-		this.balance = balance;
-	}
+	
 	
 	public void increaseWrongTANCounter(){
 		wrongTANCounter++;
