@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -43,12 +40,6 @@ public class SCBMenu extends Composite implements Observable{
 		return menuItemRegister;
 	}
 
-
-
-
-
-
-
 	@UiField 
 	MenuItem menuItemEnglish;
 	
@@ -64,7 +55,7 @@ public class SCBMenu extends Composite implements Observable{
 		menuAbout.setCommand(cmdShowInfoSCB);
 		menuImpressum.setCommand(cmdShowImpressum);
 		menuItemGerman.setCommand(cmdChangeToGerman);
-		menuItemGerman.setCommand(cmdChangeToEnglish);
+		menuItemEnglish.setCommand(cmdChangeToEnglish);
 		menuItemRegister.setCommand(cmdRegister);
 		
 	}

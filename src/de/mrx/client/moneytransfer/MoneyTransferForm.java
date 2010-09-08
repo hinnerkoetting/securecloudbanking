@@ -25,7 +25,6 @@ import de.mrx.client.Observable;
 import de.mrx.client.Observer;
 import de.mrx.client.SCB;
 import de.mrx.client.SCBConstants;
-import de.mrx.client.SCBMessages;
 import de.mrx.shared.WrongTANException;
 
 /**
@@ -36,57 +35,63 @@ public class MoneyTransferForm extends Composite implements Observable{
 	interface MyUiBinder extends UiBinder<Widget, MoneyTransferForm> {
 	}
 	
-	private SCBConstants constants = GWT.create(SCBConstants.class);
-//	private SCBMessages messages = GWT.create(SCBMessages.class);
+	//	private SCBMessages messages = GWT.create(SCBMessages.class);
 	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+@UiField
+	TextBox amount;
 	private CustomerServiceAsync bankingService;
+	private boolean confirmation=false;
+	
+	private SCBConstants constants = GWT.create(SCBConstants.class);
+	
+	private String currentAccountNr;
+	
 	private List<String> hints = new ArrayList<String>();
 	
+	List<Observer>  observers=new ArrayList<Observer>();
+
 	@UiField
 	TextBox receiverAccountNr;
-	
-	@UiField
-	TextBox receiverName;
-	
-	@UiField
-	TextBox receiverBLZ;
-	
+
 	@UiField
 	TextBox receiverBankName;
 
 	@UiField
-	TextBox amount;
+	TextBox receiverBLZ;
+	
+	@UiField
+	TextBox receiverName;
 
 	@UiField
 	TextBox remark;
-
+	
+	@UiField
+	Label requiredTanNr;
+	
 	@UiField
 	Button sendMoney;
 	
 	@UiField
 	Button sendMoneyConfirm;
 	
-	@UiField
-	FlexTable validateErrorTable;
-	
-	@UiField
-	Label requiredTanNr;
 	
 	@UiField
 	TextBox tan;
 	
-	
-	private boolean confirmation=false;
-	
-	private String currentAccountNr;
-	List<Observer>  observers=new ArrayList<Observer>(); 
-	
-	public MoneyTransferForm(String currentAccountNr){
-		initWidget(uiBinder.createAndBindUi(this));
-		this.currentAccountNr=currentAccountNr;
+	@UiField
+	FlexTable validateErrorTable;
+	public MoneyTransferForm(){
+		initWidget(uiBinder.createAndBindUi(this));		
 		updateForm();
 		
-	}
+	} 
+	
+//	public MoneyTransferForm(String currentAccountNr){
+//		initWidget(uiBinder.createAndBindUi(this));
+//		this.currentAccountNr=currentAccountNr;
+//		updateForm();
+//		
+//	}
 	
 	/**
 	 * the MoneyTransferForm directly steps into the confirmation page asking for confirmation of a transaction
@@ -116,52 +121,94 @@ public class MoneyTransferForm extends Composite implements Observable{
 		
 	}
 	
-	@UiHandler("sendMoneyConfirm")
-	public void sendMoneyConfirmation(ClickEvent e){
-		validateErrorTable.clear();
-
-		if (!isSendMoneyFormValid()) {
-			createHintTable();
-			return;
-		}
-		
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
-
-		double amountValue = Double.parseDouble(amount.getText());
-
-		bankingService.sendMoney(currentAccountNr,
-				receiverBLZ.getText(), receiverAccountNr.getText(),
-				amountValue, remark.getText(), receiverName.getText(), receiverBankName.getText(), tan.getText(),
-				new AsyncCallback<Void>() {
-
-					public void onFailure(Throwable caught) {
-						if (caught instanceof WrongTANException) {
-							WrongTANException wte = (WrongTANException) caught;
-							Window.alert("Falsche TAN eingegeben: "
-									+ wte.getTrials() + " x");
-						} else {
-
-							Log.error("Sending money failed", caught);
-							Window.alert("Money sent failed :"
-									+ caught.getMessage());
-						}
-
-					}
-
-					public void onSuccess(Void result) {
-						Window.alert(constants.sendMoneyHintSuccessful());
-						notifyObservers(currentAccountNr);
-
-					}
-				});
-
-
-		
-		
+	@Override
+	public void addObserver(Observer o) {
+		observers.add(o);
 	}
 	
+	
+	
+	private void createHintTable() {
+		for (int i = 0; i < hints.size(); i++) {
+			String currentMessage = hints.get(i);
+			Label hintLabel = new Label(currentMessage);
+			hintLabel.setStyleName(SCB.STYLE_VALUE_NOT_OKAY);
+			validateErrorTable.setWidget(i, 1, hintLabel);
+		}
+	}
+	
+	public TextBox getReceiverAccountNr() {
+		return receiverAccountNr;
+	}
+	
+	public TextBox getReceiverBankName() {
+		return receiverBankName;
+	}
+	
+	public TextBox getReceiverBLZ() {
+		return receiverBLZ;
+	}
+	
+	public TextBox getReceiverName() {
+		return receiverName;
+	}
+	
+	
+	public TextBox getRemark() {
+		return remark;
+	}
+
+	public Button getSendMoney() {
+		return sendMoney;
+	}
+
+	public void initWithAccountNr(String currentAccountNr){
+		this.currentAccountNr=currentAccountNr;
+		updateForm();
+	}
+
+	private boolean isFieldConfirmToExpresion(TextBox input, String expression,
+			String errorMessage) {
+		if (input.getText().trim().toUpperCase().matches(expression)) {
+			input.setStyleName("");
+			return true;
+		} else {
+			input.setStyleName(SCB.STYLE_VALUE_NOT_OKAY);
+			Log.info("Text: '" + input.getText() + "'\tExpression: "
+					+ expression);
+			hints.add(errorMessage);
+			return false;
+		}
+
+	}
+
+	private boolean isSendMoneyFormValid() {
+		boolean result = true;
+		Log.info("Text: " + receiverAccountNr.getText());
+		hints.clear();
+		if (!isFieldConfirmToExpresion(receiverAccountNr, "^[0-9]{1,10}$",
+				constants.sendMoneyValidateaccount())) {
+			result = false;
+		}
+		if (!isFieldConfirmToExpresion(receiverBLZ, "^[0-9]{1,10}$",
+				constants.sendMoneyValidateBLZ())) {
+			result = false;
+		}
+		if (!isFieldConfirmToExpresion(amount,
+				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
+				constants.fastMoneyValidateAmount())) {
+			result = false;
+		}
+		return result;
+	}
+
+	@Override
+	public void notifyObservers(Object arg) {
+		for (Observer o: observers){
+			o.update(this,arg);
+		}		
+	}
+
 	@UiHandler("sendMoney")
 	public void sendMoney(ClickEvent e){
 		validateErrorTable.clear();
@@ -218,76 +265,57 @@ public class MoneyTransferForm extends Composite implements Observable{
 
 		
 	}
+
+	@UiHandler("sendMoneyConfirm")
+	public void sendMoneyConfirmation(ClickEvent e){
+		validateErrorTable.clear();
+
+		if (!isSendMoneyFormValid()) {
+			createHintTable();
+			return;
+		}
+		
+		if (bankingService == null) {
+			bankingService = GWT.create(CustomerService.class);
+		}
+
+		double amountValue = Double.parseDouble(amount.getText());
+
+		bankingService.sendMoney(currentAccountNr,
+				receiverBLZ.getText(), receiverAccountNr.getText(),
+				amountValue, remark.getText(), receiverName.getText(), receiverBankName.getText(), tan.getText(),
+				new AsyncCallback<Void>() {
+
+					public void onFailure(Throwable caught) {
+						if (caught instanceof WrongTANException) {
+							WrongTANException wte = (WrongTANException) caught;
+							Window.alert("Falsche TAN eingegeben: "
+									+ wte.getTrials() + " x");
+						} else {
+
+							Log.error("Sending money failed", caught);
+							Window.alert("Money sent failed :"
+									+ caught.getMessage());
+						}
+
+					}
+
+					public void onSuccess(Void result) {
+						Window.alert(constants.sendMoneyHintSuccessful());
+						notifyObservers(currentAccountNr);
+
+					}
+				});
+
+
+		
+		
+	}
 	
-	private void createHintTable() {
-		for (int i = 0; i < hints.size(); i++) {
-			String currentMessage = hints.get(i);
-			Label hintLabel = new Label(currentMessage);
-			hintLabel.setStyleName(SCB.STYLE_VALUE_NOT_OKAY);
-			validateErrorTable.setWidget(i, 1, hintLabel);
-		}
-	}
-	
-	private boolean isSendMoneyFormValid() {
-		boolean result = true;
-		Log.info("Text: " + receiverAccountNr.getText());
-		hints.clear();
-		if (!isFieldConfirmToExpresion(receiverAccountNr, "^[0-9]{1,10}$",
-				constants.sendMoneyValidateaccount())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(receiverBLZ, "^[0-9]{1,10}$",
-				constants.sendMoneyValidateBLZ())) {
-			result = false;
-		}
-		if (!isFieldConfirmToExpresion(amount,
-				"^[0-9]{1,5}[\\.]?[0-9]{0,2}$",
-				constants.fastMoneyValidateAmount())) {
-			result = false;
-		}
-		return result;
-	}
-	
-	
-	private boolean isFieldConfirmToExpresion(TextBox input, String expression,
-			String errorMessage) {
-		if (input.getText().trim().toUpperCase().matches(expression)) {
-			input.setStyleName("");
-			return true;
-		} else {
-			input.setStyleName(SCB.STYLE_VALUE_NOT_OKAY);
-			Log.info("Text: '" + input.getText() + "'\tExpression: "
-					+ expression);
-			hints.add(errorMessage);
-			return false;
-		}
-
-	}
-
-	public TextBox getReceiverAccountNr() {
-		return receiverAccountNr;
-	}
-
-	public TextBox getReceiverBankName() {
-		return receiverBankName;
-	}
-
-	public TextBox getReceiverBLZ() {
-		return receiverBLZ;
-	}
-
-	public TextBox getReceiverName() {
-		return receiverName;
-	}
-
-	public TextBox getRemark() {
-		return remark;
-	}
-
 	public void setReceiverAccountNr(TextBox receiverAccountNr) {
 		this.receiverAccountNr = receiverAccountNr;
 	}
-
+	
 	public void setReceiverBankName(TextBox receiverBankName) {
 		this.receiverBankName = receiverBankName;
 	}
@@ -295,25 +323,13 @@ public class MoneyTransferForm extends Composite implements Observable{
 	public void setReceiverBLZ(TextBox receiverBLZ) {
 		this.receiverBLZ = receiverBLZ;
 	}
-	
+
 	public void setReceiverName(TextBox receiverName) {
 		this.receiverName = receiverName;
 	}
-	
+
 	public void setRemark(TextBox remark) {
 		this.remark = remark;
-	}
-
-	@Override
-	public void addObserver(Observer o) {
-		observers.add(o);
-	}
-
-	@Override
-	public void notifyObservers(Object arg) {
-		for (Observer o: observers){
-			o.update(this,arg);
-		}		
 	}
 	
 	/**
