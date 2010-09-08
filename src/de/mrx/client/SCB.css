@@ -95,10 +95,10 @@ color: red;
 }
 
 .centerAligned{
-  text-align:center    
+  text-align:center;    
    display:block;  
   color:blue;
-  font-size:130%;
+  font-size:large;
   margin-left: 3cm;
     margin-right: auto;
       
