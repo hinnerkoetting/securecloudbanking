@@ -273,7 +273,8 @@ AdminService {
 	@Override
 	public String adminSendMoney(String senderAccountNr, String blz,
 			String receiveraccountNr, double amount, String remark) {
-		
+		if (amount < 0)
+			return "Amount must be positive!";
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		//reciever bank is internal bank
 		
@@ -286,7 +287,9 @@ AdminService {
 //		Bank senderBank = Bank.getByBLZ(pm, blz);
 		if (blz.equals(CustomerServiceImpl.SCB_BLZ)) {
 			InternalSCBAccount senderAcc = InternalSCBAccount.getOwnByAccountNr(pm, senderAccountNr);
-
+			if (senderAcc == null) {
+				return "Error.\nSender does not exist!";
+			}
 			MoneyTransfer transfer = new MoneyTransfer(senderAcc,
 					recieverAcc, amount,recieverAcc.getOwner(),remark);
 			transferMoney(pm, senderAcc, recieverAcc, transfer, amount, remark);

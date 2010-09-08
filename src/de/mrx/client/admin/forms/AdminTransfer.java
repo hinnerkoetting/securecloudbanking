@@ -108,10 +108,18 @@ public class AdminTransfer extends Composite {
 
 	@UiHandler("submit")
 	public void onClickSubmit(ClickEvent e) {
+		double dAmount = 0;
+		try {
+			dAmount =new Double(amount.getText());
+		}
+		catch(NumberFormatException exception) {
+			Window.alert("Please enter valid number for amount!");
+			return;
+		}
 		AdminServiceAsync adminService = GWT.create(AdminService.class);
 		adminService.adminSendMoney(senderNr.getText(),
 						senderBLZ.getText(), recipientNr.getText(),
-						new Double(amount.getText()), remark.getText(), new AsyncCallback<String>() {
+						dAmount, remark.getText(), new AsyncCallback<String>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -121,8 +129,10 @@ public class AdminTransfer extends Composite {
 
 						@Override
 						public void onSuccess(String result) {
-							Window.alert(result);							
+							Window.alert(result);
+							adminpage.showAccounts();
 						}
 					});
+		
 	}
 }
