@@ -32,7 +32,6 @@ import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
 import de.mrx.client.admin.forms.ExternalAccountOverview;
 import de.mrx.client.admin.forms.NewBank;
-import de.mrx.server.Bank;
 
 
 public class Admin implements EntryPoint {
@@ -86,7 +85,7 @@ public class Admin implements EntryPoint {
 	 * 
 	 */
 	public void showTransferMoney(String accNr, String accOwner) {
-		setContent(new AdminTransfer(accNr, accOwner));
+		setContent(new AdminTransfer(this, accNr, accOwner));
 	}
 	
 	/**

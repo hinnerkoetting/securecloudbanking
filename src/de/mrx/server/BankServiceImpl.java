@@ -20,6 +20,37 @@ BankService {
 	private static final long serialVersionUID = 1L;
 	Logger log = Logger.getLogger(CustomerServiceImpl.class.getName());
 	
+	/**
+	 * transfers money from one account to antother
+	 * @param pm
+	 * @param senderAccount
+	 * @param recAccount
+	 * @param transfer
+	 * @param amount
+	 * @param remark
+	 */
+	protected void transferMoney(PersistenceManager pm, GeneralAccount senderAccount, GeneralAccount recAccount, MoneyTransfer transfer, double amount, String remark) {
+		pm.currentTransaction().begin();
+
+		senderAccount.addMoneyTransfer(transfer);
+		// recAccount.addMoneyTransfer(transfer);Sp�ter eine Kopie anlegen
+
+		senderAccount.setBalance(senderAccount.getBalance() - amount);
+		MoneyTransfer receivertransfer = new MoneyTransfer(recAccount,
+				senderAccount, -amount,senderAccount.getOwner(),remark);
+		
+		recAccount.addMoneyTransfer(receivertransfer);
+		if (recAccount instanceof InternalSCBAccount){
+			InternalSCBAccount scbAccount=(InternalSCBAccount) recAccount;				
+			scbAccount.setBalance(scbAccount.getBalance() + amount);
+		}
+		
+		
+		pm.makePersistent(senderAccount);
+		pm.makePersistent(recAccount);
+		pm.currentTransaction().commit();
+	}
+	
 	
 	/**
 	 * gets all transaction of one account

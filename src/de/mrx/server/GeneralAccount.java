@@ -49,6 +49,9 @@ public abstract class GeneralAccount {
 	@Persistent
 	List<MoneyTransfer> transfers;
 
+	@Persistent
+	private double balance;//current money
+	
 	public void setTransfers(List<MoneyTransfer> transfers) {
 		this.transfers = transfers;
 	}
@@ -128,6 +131,15 @@ public abstract class GeneralAccount {
 
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+	
+	
+    public double getBalance() {
+    	return balance;
+    }
+    
+    public void setBalance(double balance) {
+		this.balance = balance;
 	}
 
 	

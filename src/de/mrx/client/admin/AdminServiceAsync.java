@@ -27,6 +27,10 @@ public interface AdminServiceAsync extends BankServiceAsync {
 
 	void getBankByBLZ(String blz, AsyncCallback<BankDTO> callback);
 
+	void adminSendMoney(String senderAccountNr, String blz,
+			String receiveraccountNr, double amount, String remark,
+			AsyncCallback<String> callback);
+
 
 
 }

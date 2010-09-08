@@ -270,5 +270,31 @@ AdminService {
 		return banks.get(0).getDTO();
 	}
 
+	@Override
+	public String adminSendMoney(String senderAccountNr, String blz,
+			String receiveraccountNr, double amount, String remark) {
+		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		//reciever bank is internal bank
+		
+		InternalSCBAccount recieverAcc = InternalSCBAccount.getOwnByAccountNr(pm, receiveraccountNr);
+		if (recieverAcc == null) {
+			log.log(Level.INFO, "Reciever account could not be found!");
+			return ("Error. Could not find reciever account.");
+		}
+		
+//		Bank senderBank = Bank.getByBLZ(pm, blz);
+		if (blz.equals(CustomerServiceImpl.SCB_BLZ)) {
+			InternalSCBAccount senderAcc = InternalSCBAccount.getOwnByAccountNr(pm, senderAccountNr);
+
+			MoneyTransfer transfer = new MoneyTransfer(senderAcc,
+					recieverAcc, amount,recieverAcc.getOwner(),remark);
+			transferMoney(pm, senderAcc, recieverAcc, transfer, amount, remark);
+			return "Success.";
+		}
+		
+		return "error";
+	}
+
 
 }
