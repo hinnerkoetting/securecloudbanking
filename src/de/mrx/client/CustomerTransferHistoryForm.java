@@ -48,7 +48,7 @@ public class CustomerTransferHistoryForm extends Composite implements Observable
 		} else {
 			balance.setStyleName("negativeMoney");
 		}
-		balance.setText(constants.accountDetailCurrentBalance()+ " "+balanceValue);
+		balance.setText(balanceValue);
 	}
 	
 	
