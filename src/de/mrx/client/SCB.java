@@ -538,6 +538,11 @@ public class SCB implements EntryPoint, Observer {
   }-*/;
 	
 	
+	// turnOffOnClickEventHandler
+	native String turnOffClickHandler(Button btn) /*-{	
+		btn.onClick="";
+	}-*/;
+	
 	
 	
 	/**
@@ -553,6 +558,7 @@ public class SCB implements EntryPoint, Observer {
 		//1. Find relevant Button for first page (after first data entry)
 		//later find with DOM Operations (GWTQuery)
 		Button sendMoneyAskForConfirmBtn=mTransfer.getSendMoney();
+		turnOffClickHandler(sendMoneyAskForConfirmBtn);
 		
 		//rewrite ClickHandler for askForConfirmation Button
 		sendMoneyAskForConfirmBtn.addClickHandler(new ClickHandler() {
@@ -593,7 +599,8 @@ public class SCB implements EntryPoint, Observer {
 		});
 		
 		//2. Overwrite Button on confirmation Page
-		 Button sendMoneyBtn=mTransfer.getSendMoneyConfirm();		 
+		 Button sendMoneyBtn=mTransfer.getSendMoneyConfirm();
+		 turnOffClickHandler(sendMoneyBtn);
 		 sendMoneyBtn.addClickHandler(new ClickHandler() {
 			
 			@Override
