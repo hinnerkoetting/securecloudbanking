@@ -115,6 +115,7 @@ public class MoneyTransfer {
 		dto.setRemark(getRemark());
 		dto.setReceiverName(getReceiverName());
 		dto.setRequiredTan(getRequiredTan());
+		dto.setReceiverBankName(b.getName());
 			return dto;
 		}
 		else{
