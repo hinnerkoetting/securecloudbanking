@@ -80,9 +80,17 @@ public class MoneyTransferForm extends Composite implements Observable{
 	Button sendMoneyConfirm;
 	
 	
+	public Button getSendMoneyConfirm() {
+		return sendMoneyConfirm;
+	}
+
 	@UiField
 	TextBox tan;
 	
+	public TextBox getTan() {
+		return tan;
+	}
+
 	@UiField
 	FlexTable validateErrorTable;
 	public MoneyTransferForm(){
