@@ -1,7 +1,10 @@
 package de.mrx.server;
 
+import java.util.List;
+
 import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.PersistenceCapable;
 
 import com.google.appengine.api.datastore.Key;
@@ -37,7 +40,35 @@ public class ExternalAccount extends GeneralAccount {
 	 return acc;
 	}
 
+	@Override
+	public String toString() {
+		return "ExternalAccount [getBankID()=" + getBankID()
+				+ ", getAccountNr()=" + getAccountNr() + ", getId()=" + getId()
+				+ ", getOwner()=" + getOwner() + ", getBalance()="
+				+ "]";
+	}
 
+
+	public static GeneralAccount getExternalAccount(PersistenceManager pm, String accountNr, String blz){
+		Extent<ExternalAccount> extent = pm.getExtent(ExternalAccount.class);
+		Query query = pm.newQuery(extent, "accountNr == param");
+		query.declareParameters("String param");
+		
+		List<ExternalAccount> result = (List<ExternalAccount>)query.execute(accountNr);
+		//look for account with correct blz
+		for (ExternalAccount account: result) {
+			if (account.getBank().getBlz().equals(blz))
+				return account;
+		}
+		//not found
+		return null;
+	}
 	
+	/**
+	 * not implemented as we do not know the amount of money in an external account
+	 */
+	public void changeMoney(double amount) {
+		
+	}
 
 }

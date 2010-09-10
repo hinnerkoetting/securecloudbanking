@@ -9,24 +9,35 @@
 				<td></td>
 				<td><g:Label ui:field="descName"/></td>
 				<td><g:Label ui:field="descNr"/></td>
-				
+				<td><g:Label ui:field="descBLZ"/></td>
 			</tr>
 			<tr>
 				<td><g:Label ui:field="descRecipient"/></td>
 				<td><g:TextBox ui:field="recipientName"/></td>				
 				<td><g:TextBox ui:field="recipientNr"/></td>
-				
+				<td><g:TextBox ui:field="recipientBLZ"/></td>				
 			</tr>
 			<tr>
 				<td><g:Label ui:field="descSender"/></td>
 				<td><g:TextBox ui:field="senderName"/></td>
 				<td><g:TextBox ui:field="senderNr"/></td>
-				
+				<td><g:TextBox ui:field="senderBLZ"/></td>
+				<td></td>
 			</tr>
 			<tr>
 				<td><g:Label ui:field="descAmount"/> </td>
 				<td><g:TextBox ui:field="amount"/></td>
+				<td></td><td></td>
+			</tr>
+			<tr>
+				<td><g:Label ui:field="descRemark"/></td>
+				<td><g:TextBox ui:field="remark"/></td>
+				<td></td>
+			</tr>
+			<tr>
 				<td><g:Button ui:field="submit"/></td>
+				<td></td>
+				<td></td>
 			</tr>
 		</table>
 		<table>

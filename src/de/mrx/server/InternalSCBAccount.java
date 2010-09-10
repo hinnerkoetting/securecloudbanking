@@ -26,6 +26,8 @@ public class InternalSCBAccount extends GeneralAccount {
 	private static final long serialVersionUID = 1L;
 	
 	
+	@Persistent
+	private Double balance;//current money
 	
 	@Persistent
 	private String ownerEmail;
@@ -39,7 +41,19 @@ public class InternalSCBAccount extends GeneralAccount {
 	}
 
 	
-
+	public Double getBalance() {
+    	return balance;
+    }
+    
+    public void changeMoney(double amount) {
+    	balance += amount;
+    }
+    
+    public void setBalance(Double balance) {
+		this.balance = balance;
+	}
+    
+    
 	public static InternalSCBAccount getOwnByAccountNr(PersistenceManager pm, String accountNr){
 		
 		Extent<InternalSCBAccount> e=pm.getExtent(InternalSCBAccount.class);
@@ -89,8 +103,7 @@ public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String ema
 	public void setPendingTransaction(MoneyTransferPending pendingTransaction) {
 		this.pendingTransaction = pendingTransaction;
 	}
-	@Persistent
-	private double balance;//current money
+	
 
 	@Persistent
 	TANList tans;
@@ -101,7 +114,7 @@ public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String ema
 	
 	public InternalSCBAccount( String owner, String accountNr, double balance, Bank bank) {
 		super(owner,accountNr, bank);
-		this.balance = balance;		
+		setBalance(balance);		
 		tans=new TANList();
 		tans.generatedTANs();
 	}
@@ -116,9 +129,7 @@ public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String ema
 	}
 
 	    
-    public double getBalance() {
-	return balance;
-}
+
     
     public AccountDetailDTO getDetailedDTO(PersistenceManager pm) {
 		AccountDetailDTO dto=super.getDetailedDTO(pm);
@@ -153,9 +164,7 @@ public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String ema
 		this.accountType = accountType;
 	}
 	
-	public void setBalance(double balance) {
-		this.balance = balance;
-	}
+	
 	
 	public void increaseWrongTANCounter(){
 		wrongTANCounter++;

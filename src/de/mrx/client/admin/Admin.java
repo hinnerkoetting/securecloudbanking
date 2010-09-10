@@ -30,6 +30,8 @@ import de.mrx.client.admin.forms.AdminExternalBanks;
 import de.mrx.client.admin.forms.AdminTransfer;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
+import de.mrx.client.admin.forms.EditBankDetails;
+import de.mrx.client.admin.forms.ExternalAccountOverview;
 import de.mrx.client.admin.forms.NewBank;
 
 
@@ -54,6 +56,10 @@ public class Admin implements EntryPoint {
 
 	public void showNewTransaction() {
 		setContent(new Label("PLaceholder1"));
+	}
+	
+	public void showEditBankDetails(String name, String blz) {
+		setContent(new EditBankDetails(this, blz, name));
 	}
 	
 	public void showExternalBanks() {
@@ -84,7 +90,7 @@ public class Admin implements EntryPoint {
 	 * 
 	 */
 	public void showTransferMoney(String accNr, String accOwner) {
-		setContent(new AdminTransfer(accNr, accOwner));
+		setContent(new AdminTransfer(this, accNr, accOwner));
 	}
 	
 	/**
@@ -94,7 +100,7 @@ public class Admin implements EntryPoint {
 		final AccountOverview accountOverview = new AccountOverview(this);
 		
 		AdminServiceAsync bankingService = GWT.create(AdminService.class);
-		bankingService.getAllAccounts(new AsyncCallback<List<AccountDTO>>() {
+		bankingService.getAllInternalAccounts(new AsyncCallback<List<AccountDTO>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {					
@@ -112,7 +118,29 @@ public class Admin implements EntryPoint {
 	}
 	
 	public void showNewBank() {
-		setContent(new NewBank());
+		setContent(new NewBank(this));
+	}
+	
+	public void showExternalAccounts(String blz) {
+		final ExternalAccountOverview accountOverview = new ExternalAccountOverview(this);
+		AdminServiceAsync bankingService = GWT.create(AdminService.class);
+		bankingService.getExternalAccounts(blz, new AsyncCallback<List<AccountDTO>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log(caught.toString());
+				
+			}
+
+			@Override
+			public void onSuccess(List<AccountDTO> result) {
+				
+				accountOverview.setAccounts(result);
+				setContent(accountOverview);
+				
+			}
+		});
+		
 	}
 	
 	/**

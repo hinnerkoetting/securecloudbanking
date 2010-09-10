@@ -16,13 +16,32 @@ import de.mrx.client.BankServiceAsync;
 
 public interface AdminServiceAsync extends BankServiceAsync {
 
-	void getAllAccounts(AsyncCallback<List<AccountDTO>> callback);
+	void getAllInternalAccounts(AsyncCallback<List<AccountDTO>> callback);
 
 	void getAllBanks(AsyncCallback<List<BankDTO>> callback);
 
-	void addBank(BankDTO bank, AsyncCallback<Boolean> callback);
+	void addBank(BankDTO bank, AsyncCallback<String> callback);
 
-	void generateTestData(AsyncCallback<Boolean> callback);
+	void generateTestData(AsyncCallback<String> callback);
+
+	
+
+	void adminSendMoney(String senderAccountNr, String senderBLZ,
+			String receiveraccountNr, double amount, String remark,
+			AsyncCallback<String> callback);
+
+	void getExternalAccounts(String blz,
+			AsyncCallback<List<AccountDTO>> callback);
+
+	void deleteBank(String blz, AsyncCallback<String> callback);
+
+	void deleteInternalAccount(String accountNr, AsyncCallback<String> callback);
+
+	void searchInternalAccounts(String owner, String accountnr,
+			AsyncCallback<List<AccountDTO>> callback);
+
+	void editBankDetails(String oldName, String oldBLZ, String newName,
+			String newBLZ, AsyncCallback<String> callback);
 
 
 

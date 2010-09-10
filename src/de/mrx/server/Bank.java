@@ -25,6 +25,10 @@ public class Bank {
 
 	private final static Logger log = Logger.getLogger(Bank.class.getName());
 
+	public static final String SCB_BLZ = "1502222";
+	public static final String SCB_NAME="Secure Cloud Bank";
+	
+	
 	@Persistent	
 	@Unique
 	private String blz;
