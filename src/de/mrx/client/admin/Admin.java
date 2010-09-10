@@ -30,6 +30,7 @@ import de.mrx.client.admin.forms.AdminExternalBanks;
 import de.mrx.client.admin.forms.AdminTransfer;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
+import de.mrx.client.admin.forms.EditBankDetails;
 import de.mrx.client.admin.forms.ExternalAccountOverview;
 import de.mrx.client.admin.forms.NewBank;
 
@@ -55,6 +56,10 @@ public class Admin implements EntryPoint {
 
 	public void showNewTransaction() {
 		setContent(new Label("PLaceholder1"));
+	}
+	
+	public void showEditBankDetails(String name, String blz) {
+		setContent(new EditBankDetails(this, blz, name));
 	}
 	
 	public void showExternalBanks() {

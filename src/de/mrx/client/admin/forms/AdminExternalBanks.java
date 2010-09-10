@@ -74,8 +74,13 @@ public class AdminExternalBanks extends Composite {
 		for (final BankDTO bank: banks) {
 			if (bank.getName().equals("Secure Cloud Bank"))
 				continue;
+			//name
 			table.setWidget(row, namePos, new Label(bank.getName()));
+			
+			//blz
 			table.setWidget(row, blzPos, new Label(bank.getBlz()));
+			
+			//view
 			Button viewButton = new Button("View");
 			
 			viewButton.addClickHandler(new ClickHandler() {				
@@ -85,8 +90,21 @@ public class AdminExternalBanks extends Composite {
 				}
 			});
 			table.setWidget(row, viewPos, viewButton);
-			table.setWidget(row, editPos, new Button("Edit"));
 			
+			//edit
+			Button editButton = new Button("Edit");
+			editButton.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					adminpage.showEditBankDetails(bank.getName(), bank.getBlz());
+					
+				}
+			});
+			table.setWidget(row, editPos, editButton);
+			
+			
+			//delete
 			Button deleteButton = new Button("Delete");
 			deleteButton.addClickHandler(new ClickHandler() {
 
@@ -112,7 +130,6 @@ public class AdminExternalBanks extends Composite {
 				}
 				
 			});
-			
 			table.setWidget(row, deletePos, deleteButton);
 			
 			row++;

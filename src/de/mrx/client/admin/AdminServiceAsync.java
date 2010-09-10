@@ -20,7 +20,7 @@ public interface AdminServiceAsync extends BankServiceAsync {
 
 	void getAllBanks(AsyncCallback<List<BankDTO>> callback);
 
-	void addBank(BankDTO bank, AsyncCallback<Boolean> callback);
+	void addBank(BankDTO bank, AsyncCallback<String> callback);
 
 	void generateTestData(AsyncCallback<String> callback);
 
@@ -39,6 +39,9 @@ public interface AdminServiceAsync extends BankServiceAsync {
 
 	void searchInternalAccounts(String owner, String accountnr,
 			AsyncCallback<List<AccountDTO>> callback);
+
+	void editBankDetails(String oldName, String oldBLZ, String newName,
+			String newBLZ, AsyncCallback<String> callback);
 
 
 

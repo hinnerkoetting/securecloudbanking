@@ -23,7 +23,7 @@ public interface AdminService extends BankService {
 	
 	public List<BankDTO> getAllBanks();
 	
-	public boolean addBank(BankDTO bank);
+	public String addBank(BankDTO bank);
 	
 	public String generateTestData();
 	
@@ -35,4 +35,6 @@ public interface AdminService extends BankService {
 	public String deleteBank(String blz);
 	
 	public String deleteInternalAccount(String accountNr);
+	
+	public String editBankDetails(String oldName, String oldBLZ, String newName, String newBLZ);
 }

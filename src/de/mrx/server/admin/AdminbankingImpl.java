@@ -141,7 +141,7 @@ AdminService {
 	}
 
 	@Override
-	public boolean addBank(BankDTO bankDTO) {	
+	public String addBank(BankDTO bankDTO) {	
 		//TODO: check for valid input
 		log.setLevel(Level.ALL);
 		log.log(Level.INFO, "Requesting to add new bank. Name: " + bankDTO.getName() + " - BLZ: " + bankDTO.getBlz());
@@ -153,7 +153,7 @@ AdminService {
 				Bank.class.getSimpleName(), bankDTO.getBlz()));
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.makePersistent(bank);
-		return true;
+		return "Success";
 	}
 
 	/**
@@ -373,6 +373,26 @@ AdminService {
 			return "Error. Account not found!";
 		pm.deletePersistent(account);
 		return "Success.";
+	}
+
+	@Override
+	public String editBankDetails(String oldName, String oldBLZ,
+			String newName, String newBLZ) {
+		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		pm.currentTransaction().begin();
+		Extent<Bank> extent = pm.getExtent(Bank.class);
+		Query query = pm.newQuery(extent);
+		query.setFilter("blz == param1 && name == param2");
+		query.declareParameters("String param1, String param2");
+		query.setUnique(true);
+		Bank bank = (Bank)query.execute(oldBLZ, oldName);
+		if (bank == null)
+			return "Error. Bank not found";
+		bank.setName(newName);
+		bank.setBlz(newBLZ);
+		pm.currentTransaction().commit();
+		return "Success";
 	}
 
 
