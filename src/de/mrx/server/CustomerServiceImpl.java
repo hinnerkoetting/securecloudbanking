@@ -108,9 +108,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 			ownBank = bankWrapper.getOwnBanks();
 			if (ownBank == null) {
-				ownBank = new Bank(SCB_BLZ, "Secure Cloud Bank");
+				ownBank = new Bank(Bank.SCB_BLZ, "Secure Cloud Bank");
 				ownBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-						Bank.class.getSimpleName(), SCB_BLZ));
+						Bank.class.getSimpleName(), Bank.SCB_BLZ));
 				bankWrapper.setOwnBanks(ownBank);
 
 			}
@@ -309,25 +309,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
 			// MoneyTransfer.class.getSimpleName(), 1));
 			log.info("Save Moneytransfer");
-			pm.currentTransaction().begin();
-
-			senderAccount.addMoneyTransfer(transfer);
-			// recAccount.addMoneyTransfer(transfer);Sp�ter eine Kopie anlegen
-
-			senderAccount.setBalance(senderAccount.getBalance() - amount);
-			MoneyTransfer receivertransfer = new MoneyTransfer(recAccount,
-					senderAccount, -amount,senderAccount.getOwner(),remark);
+			transferMoney(pm, senderAccount, recAccount, transfer, amount, remark);
 			
-			recAccount.addMoneyTransfer(receivertransfer);
-			if (recAccount instanceof InternalSCBAccount){
-				InternalSCBAccount scbAccount=(InternalSCBAccount) recAccount;				
-				scbAccount.setBalance(scbAccount.getBalance() + amount);
-			}
-			
-			senderAccount.setPendingTransaction(null);
-			pm.makePersistent(senderAccount);
-			pm.makePersistent(recAccount);
-			pm.currentTransaction().commit();
 
 		} finally {
 			if (pm.currentTransaction().isActive()) {

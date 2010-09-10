@@ -5,13 +5,17 @@ import java.util.List;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
@@ -29,41 +33,80 @@ public class AccountOverview extends Composite {
 	interface AccountOverviewUiBinder extends UiBinder<Widget, AccountOverview> {
 	}
 
+	private static String ACCOUNT_OWNER = "Owner";
+	private static String ACCOUNT_NR = "Account No.";
 
 	@UiField
 	FlexTable overviewTable;
 	
+	@UiField
+	Label title;
+	
+	
+	
+	@UiField
+	Label descOwner;
+	
+	@UiField
+	Label descAccountNr;
+	
+	@UiField
+	TextBox searchOwner;
+	
+	@UiField
+	TextBox searchAccountNr;
+	
+	@UiField
+	Button search;
+	
+	@UiField
+	Label titleSearch;
+	
 	Admin adminPage;
+	
 	public AccountOverview(Admin admin) {
 		this.adminPage = admin;
+		
+		initWidget(uiBinder.createAndBindUi(this));
+		
+		title.setText("Account overview");
+		descOwner.setText(ACCOUNT_OWNER);
+		descAccountNr.setText(ACCOUNT_NR);
+		search.setText("Search");
+		titleSearch.setText("Search");
+		
 	}
 	
 	public void setAccounts(List<AccountDTO> accounts){
+		overviewTable.clear();
+		
 
-		initWidget(uiBinder.createAndBindUi(this));
-
-	
-		final int posAccount 		= 0;
-		final int posBalance 		= 1;
-		final int posOwner 			= 2;
+		final int posOwner 			= 0;
+		final int posAccount 		= 1;
+		final int posBalance 		= 2;		
 		final int posTransaction 	= 3;
 		final int posTransfer 		= 4;
+		final int posDelete 		= 5;
 		
 		//add header
-		overviewTable.setWidget(0, posAccount, new Label("Account No."));
+		overviewTable.setWidget(0, posAccount, new Label(ACCOUNT_NR));
 		overviewTable.setWidget(0, posBalance, new Label("Balance"));
-		overviewTable.setWidget(0, posOwner, new Label("Owner"));
+		overviewTable.setWidget(0, posOwner, new Label(ACCOUNT_OWNER));
 		overviewTable.setWidget(0, posTransaction, new Label("Transactions"));
 		overviewTable.setWidget(0, posTransfer, new Label("Transfer Money"));
+		overviewTable.setWidget(0, posDelete, new Label("Delete Account"));
 		
-
+		
 		//add all accounts to table
 		int row = 1;
+		NumberFormat fmt = NumberFormat.getFormat("#0.00");
+
 		for (AccountDTO account: accounts) {	
 			overviewTable.setWidget(row, posAccount, new Label(account.getAccountNr()));
-			overviewTable.setWidget(row, posBalance, new Label(""+account.getBalance()));
+			String balance = fmt.format(account.getBalance());
+			overviewTable.setWidget(row, posBalance, new Label(balance));
 			overviewTable.setWidget(row, posOwner, new Label(account.getOwner()));
-
+			
 			final String accNr = account.getAccountNr();
 			final String accOwner = account.getOwner();
 			/**
@@ -94,6 +137,8 @@ public class AccountOverview extends Composite {
 			overviewTable.setWidget(row, posTransaction, showTransactions);
 			
 			
+			
+			
 			/**
 			 * add money to this account
 			 */
@@ -109,17 +154,59 @@ public class AccountOverview extends Composite {
 			});
 			overviewTable.setWidget(row, posTransfer, transferMoney);
 			
+			Button deleteButton = new Button("Delete");
+			deleteButton.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					if (Window.confirm("Are you sure? This will delete this account!")) {
+						AdminServiceAsync adminService = GWT.create(AdminService.class);
+						adminService.deleteInternalAccount(accNr, new AsyncCallback<String>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GWT.log(caught.toString());								
+							}
+
+							@Override
+							public void onSuccess(String result) {
+								Window.alert(result);
+								adminPage.showAccounts();
+								
+							}
+						});
+					}
+					
+				}
+			});
+			overviewTable.setWidget(row, posDelete, deleteButton);
 			
-			
-			
-			if (account.getBalance() < 0)
-				overviewTable.getCellFormatter().addStyleName(row, 1, "negativeMoney");
-			else //balance >= 0
-				overviewTable.getCellFormatter().addStyleName(row, 1, "positiveMoney");
+		
 			row++;
 		}
 		TableStyler.setTableStyle(overviewTable);
 
 
+	}
+	
+	@UiHandler("search")
+	public void onClickSearch(ClickEvent event) {
+		final AccountOverview overview = this;
+		AdminServiceAsync adminService = GWT.create(AdminService.class);
+		
+		adminService.searchInternalAccounts(searchOwner.getText(), searchAccountNr.getText(), new AsyncCallback<List<AccountDTO>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log(caught.toString());
+				
+			}
+
+			@Override
+			public void onSuccess(List<AccountDTO> result) {
+				overview.setAccounts(result);
+				
+			}
+		});
 	}
 }

@@ -163,16 +163,16 @@ public class CustomerServiceTest {
 		 senderSavingAccount.getAccountNr();
 		 double beforeMoneySender=senderSavingAccount.getBalance();
 		 double beforeMoneyReceiver=senderSavingAccount.getBalance();
-		 MoneyTransferDTO confirmation=customerService.sendMoneyAskForConfirmationData(senderSavingAccount.getAccountNr(),CustomerService.SCB_BLZ,receiverSavingAccount.getAccountNr(),TEST_SEND_AMOUNT,"Eigentransaction", ownName,CustomerService.SCB_NAME);
+		 MoneyTransferDTO confirmation=customerService.sendMoneyAskForConfirmationData(senderSavingAccount.getAccountNr(),Bank.SCB_BLZ,receiverSavingAccount.getAccountNr(),TEST_SEND_AMOUNT,"Eigentransaction", ownName,Bank.SCB_NAME);
 		 InternalSCBAccount accData=InternalSCBAccount.getOwnByAccountNr(pm, senderSavingAccount.getAccountNr());
 		 MoneyTransferPending mtP=accData.getPendingTransaction();
-		 Assert.assertEquals(CustomerService.SCB_NAME, mtP.getReceiverBankName());
+		 Assert.assertEquals(Bank.SCB_NAME, mtP.getReceiverBankName());
 		 Assert.assertEquals(receiverSavingAccount.getAccountNr(), mtP.getReceiverAccountNr());
 		 Assert.assertEquals(ownName, mtP.getReceiverName());
-		 Assert.assertEquals(CustomerService.SCB_BLZ, mtP.getReceiverBLZ());
+		 Assert.assertEquals(Bank.SCB_BLZ, mtP.getReceiverBLZ());
 
 		 String TAN=accData.getTan(confirmation.getRequiredTan());		 
-		 customerService.sendMoney(senderSavingAccount.getAccountNr(),CustomerService.SCB_BLZ,receiverSavingAccount.getAccountNr(),TEST_SEND_AMOUNT,"Eigentransaction", ownName,CustomerService.SCB_NAME,TAN);
+		 customerService.sendMoney(senderSavingAccount.getAccountNr(),Bank.SCB_BLZ,receiverSavingAccount.getAccountNr(),TEST_SEND_AMOUNT,"Eigentransaction", ownName,Bank.SCB_NAME,TAN);
 		 accounts=customerService.getAccounts();		 
 		 senderSavingAccount=accounts.get(0);
 		 receiverSavingAccount=accounts.get(1);
@@ -186,7 +186,7 @@ public class CustomerServiceTest {
 		 GeneralAccount dbSenderAccount=InternalSCBAccount.getOwnByAccountNr(pm, senderSavingAccount.getAccountNr());
 		 MoneyTransfer dbMoneyTransfer=dbSenderAccount.getTransfers().get(dbSenderAccount.getTransfers().size()-1);
 		 Assert.assertEquals(TEST_SEND_AMOUNT, (int)dbMoneyTransfer.getAmount());
-		 Assert.assertEquals(CustomerService.SCB_BLZ, dbMoneyTransfer.getReceiverBLZ());		 
+		 Assert.assertEquals(Bank.SCB_BLZ, dbMoneyTransfer.getReceiverBLZ());		 
 		 Assert.assertEquals(receiverSavingAccount.getAccountNr(), dbMoneyTransfer.getReceiverAccountNr());
 		 Assert.assertEquals("JohnDoe@googlemail.com", dbMoneyTransfer.getReceiverName());
 		 
@@ -195,8 +195,8 @@ public class CustomerServiceTest {
 		 List<MoneyTransferDTO> transfers=	 detailDTO.getTransfers();
 		 MoneyTransferDTO transfer=transfers.get(0);
 		 Assert.assertEquals(TEST_SEND_AMOUNT,(int)transfer.getAmount());
-		 Assert.assertEquals(CustomerService.SCB_BLZ,transfer.getReceiverBankName());
-		 Assert.assertEquals(CustomerService.SCB_BLZ,transfer.getReceiverBankNr());
+		 Assert.assertEquals(Bank.SCB_BLZ,transfer.getReceiverBankName());
+		 Assert.assertEquals(Bank.SCB_BLZ,transfer.getReceiverBankNr());
 		 Assert.assertEquals(receiverSavingAccount.getAccountNr(),transfer.getReceiverAccountNr());
 		 Assert.assertEquals("JohnDoe@googlemail.com",transfer.getReceiverName());
 		 

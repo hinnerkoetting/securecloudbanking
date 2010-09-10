@@ -119,8 +119,11 @@ public interface SCBConstants extends Constants{
 	@DefaultStringValue("Comment")
 	String accountDetailHeaderComment();
 	
-	@DefaultStringValue("Account")
+	@DefaultStringValue("Receiver")
 	String accountDetailHeaderAccount();
+	
+	@DefaultStringValue("Receiver bank")
+	String accountDetailHeaderReceiverBank();
 	
 	
 	@DefaultStringValue("Amount")

@@ -56,25 +56,23 @@ public class Adminmenu extends Composite {
 	
 	@UiHandler("generateData")
 	void onClickGenerateData(ClickEvent e) {
-		AdminServiceAsync bankingService = GWT.create(AdminService.class);
-		bankingService.generateTestData(new AsyncCallback<Boolean>() {
-			
-			@Override
-			public void onSuccess(Boolean result) {
-				if (result.equals(Boolean.FALSE)) {
-					Window.alert("Generating test data failed");
-				}
-				else { //result == true
-					Window.alert("Success");
+		if (Window.confirm("Are you sure?\nThis will delete all current data!")) {
+			AdminServiceAsync bankingService = GWT.create(AdminService.class);
+			bankingService.generateTestData(new AsyncCallback<String>() {
+				
+				@Override
+				public void onSuccess(String result) {
+					
+						Window.alert(result);
+					
 				}
 				
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log(caught.toString());
-				
-			}
-		});
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log(caught.toString());
+					
+				}
+			});
+		}
 	}
 }
