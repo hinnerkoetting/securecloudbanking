@@ -95,7 +95,7 @@ public class Admin implements EntryPoint {
 		final AccountOverview accountOverview = new AccountOverview(this);
 		
 		AdminServiceAsync bankingService = GWT.create(AdminService.class);
-		bankingService.getAllAccounts(new AsyncCallback<List<AccountDTO>>() {
+		bankingService.getAllInternalAccounts(new AsyncCallback<List<AccountDTO>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {					

@@ -16,7 +16,7 @@ import de.mrx.client.BankServiceAsync;
 
 public interface AdminServiceAsync extends BankServiceAsync {
 
-	void getAllAccounts(AsyncCallback<List<AccountDTO>> callback);
+	void getAllInternalAccounts(AsyncCallback<List<AccountDTO>> callback);
 
 	void getAllBanks(AsyncCallback<List<BankDTO>> callback);
 
@@ -36,6 +36,9 @@ public interface AdminServiceAsync extends BankServiceAsync {
 	void deleteBank(String blz, AsyncCallback<String> callback);
 
 	void deleteInternalAccount(String accountNr, AsyncCallback<String> callback);
+
+	void searchInternalAccounts(String owner, String accountnr,
+			AsyncCallback<List<AccountDTO>> callback);
 
 
 
