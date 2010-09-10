@@ -8,6 +8,8 @@ import java.util.List;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -80,8 +82,13 @@ public class MoneyTransferForm extends Composite implements Observable{
 	@UiField
 	Button sendMoney;
 	
+	
+	
 	@UiField
 	Button sendMoneyConfirm;
+	
+	HandlerRegistration sendMoneyHandler;
+	HandlerRegistration sendMoneyConfirmHandler;
 	
 	
 	public Button getSendMoneyConfirm() {
@@ -95,21 +102,36 @@ public class MoneyTransferForm extends Composite implements Observable{
 		return tan;
 	}
 
+	
 	@UiField
 	FlexTable validateErrorTable;
 	public MoneyTransferForm(){
-		initWidget(uiBinder.createAndBindUi(this));		
+		initWidget(uiBinder.createAndBindUi(this));
+		addButtonHandler();
+		
+		
 		updateForm();
 		
-	} 
+	}
+
+	/**
+	 * initialize the button handler for money transfer
+	 */
+	private void addButtonHandler(){
+			sendMoneyHandler= sendMoney.addClickHandler(new SendMoneyClickHandler());
+			sendMoneyConfirmHandler=sendMoneyConfirm.addClickHandler(new SendMoneyConfirmationPageClickHandler());
+	}
 	
-//	public MoneyTransferForm(String currentAccountNr){
-//		initWidget(uiBinder.createAndBindUi(this));
-//		this.currentAccountNr=currentAccountNr;
-//		updateForm();
-//		
-//	}
+
 	
+	public HandlerRegistration getSendMoneyHandlerRegistration() {
+		return sendMoneyHandler;
+	}
+
+	public HandlerRegistration getSendMoneyConfirmHandlerRegistration() {
+		return sendMoneyConfirmHandler;
+	}
+
 	/**
 	 * the MoneyTransferForm directly steps into the confirmation page asking for confirmation of a transaction
 	 * @param currentAccountNr current Account
@@ -134,7 +156,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 		receiverAccountNr.setEnabled(false);
 		receiverBankName.setText(dto.getReceiverBankName());
 		
-		
+		addButtonHandler();
 		updateForm();
 		
 	}
@@ -227,111 +249,9 @@ public class MoneyTransferForm extends Composite implements Observable{
 		}		
 	}
 
-	@UiHandler("sendMoney")
-	public void sendMoney(ClickEvent e){
-		Element p=DOM.getElementById("test");
-		$("Button").text("bla");
-		$("test").insertBefore("<td>HALLO</td>");
-		validateErrorTable.clear();
-
-		if (!isSendMoneyFormValid()){
-			createHintTable();
-			return;
-		}
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
-
-		Double amountValue = Double.parseDouble(amount.getText());
-		
-
-		bankingService.sendMoneyAskForConfirmationData(currentAccountNr,
-				receiverBLZ.getText(), receiverAccountNr.getText(),
-				amountValue, remark.getText(), receiverName.getText(), receiverBankName.getText(),
-				new AsyncCallback<MoneyTransferDTO>() {
-					// bankingService.sendMoney(currentAccount,
-					// receiverBankNrTxt.getText(),receiverAccountNrTxt.getText(),amount,remark,recipientTxt.getText(),
-					// bankNameTxt.getText(), new AsyncCallback<Void>() {
-
-					public void onFailure(Throwable caught) {
-						Log.error("Sending money failed", caught);
-
-					}
-
-					public void onSuccess(MoneyTransferDTO dto) {
-						Log.debug("Show confirmation page");						
-						confirmation=true;
-						requiredTanNr.setText(constants.confirmTanNr() +" "+ dto.getRequiredTan());
-						receiverBLZ.setText(dto.getReceiverBankNr());
-						amount.setText("" + dto.getAmount());
-						remark.setText(dto.getRemark());
-						receiverName.setText(dto.getReceiverName());
-						receiverAccountNr.setEnabled(false);
-						receiverBLZ.setEnabled(false);
-						receiverBankName.setEnabled(false);
-						amount.setEnabled(false);
-						remark.setEnabled(false);
-						receiverName.setEnabled(false);
-						receiverAccountNr.setEnabled(false);
-						receiverBankName.setText(dto.getReceiverBankName());
-						
-						
-						
-						updateForm();
-
-					}
-				});
-
-		
-
-		
-	}
-
-	@UiHandler("sendMoneyConfirm")
-	public void sendMoneyConfirmation(ClickEvent e){
-		validateErrorTable.clear();
-
-		if (!isSendMoneyFormValid()) {
-			createHintTable();
-			return;
-		}
-		
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
-
-		double amountValue = Double.parseDouble(amount.getText());
-
-		bankingService.sendMoney(currentAccountNr,
-				receiverBLZ.getText(), receiverAccountNr.getText(),
-				amountValue, remark.getText(), receiverName.getText(), receiverBankName.getText(), tan.getText(),
-				new AsyncCallback<Void>() {
-
-					public void onFailure(Throwable caught) {
-						if (caught instanceof WrongTANException) {
-							WrongTANException wte = (WrongTANException) caught;
-							Window.alert("Falsche TAN eingegeben: "
-									+ wte.getTrials() + " x");
-						} else {
-
-							Log.error("Sending money failed", caught);
-							Window.alert("Money sent failed :"
-									+ caught.getMessage());
-						}
-
-					}
-
-					public void onSuccess(Void result) {
-						Window.alert(constants.sendMoneyHintSuccessful());
-						notifyObservers(currentAccountNr);
-
-					}
-				});
-
-
-		
-		
-	}
+	
+	
+	
 	
 	public void setReceiverAccountNr(TextBox receiverAccountNr) {
 		this.receiverAccountNr = receiverAccountNr;
@@ -369,6 +289,125 @@ public class MoneyTransferForm extends Composite implements Observable{
 			tan.setVisible(false);
 			sendMoney.setVisible(true);
 			sendMoneyConfirm.setVisible(false);
+		}
+		
+	}
+	
+	/**
+	 * processes the 'submit' of the confirmation page (with TAN)
+	 * @author Jan
+	 *
+	 */
+	class SendMoneyConfirmationPageClickHandler implements ClickHandler{
+		@Override
+		public void onClick(ClickEvent event) {
+			validateErrorTable.clear();
+
+			if (!isSendMoneyFormValid()) {
+				createHintTable();
+				return;
+			}
+			
+			if (bankingService == null) {
+				bankingService = GWT.create(CustomerService.class);
+			}
+
+			double amountValue = Double.parseDouble(amount.getText());
+
+			bankingService.sendMoney(currentAccountNr,
+					receiverBLZ.getText(), receiverAccountNr.getText(),
+					amountValue, remark.getText(), receiverName.getText(), receiverBankName.getText(), tan.getText(),
+					new AsyncCallback<Void>() {
+
+						public void onFailure(Throwable caught) {
+							if (caught instanceof WrongTANException) {
+								WrongTANException wte = (WrongTANException) caught;
+								Window.alert("Falsche TAN eingegeben: "
+										+ wte.getTrials() + " x");
+							} else {
+
+								Log.error("Sending money failed", caught);
+								Window.alert("Money sent failed :"
+										+ caught.getMessage());
+							}
+
+						}
+
+						public void onSuccess(Void result) {
+							Window.alert(constants.sendMoneyHintSuccessful());
+							notifyObservers(currentAccountNr);
+
+						}
+					});
+
+
+			
+			
+		}
+	}
+	
+	/**
+	 * Processes first page of money transaction.  
+	 * @author Jan
+	 *
+	 */
+	class SendMoneyClickHandler implements ClickHandler{
+
+		@Override
+		public void onClick(ClickEvent event) {
+				validateErrorTable.clear();
+
+				if (!isSendMoneyFormValid()){
+					createHintTable();
+					return;
+				}
+				if (bankingService == null) {
+					bankingService = GWT.create(CustomerService.class);
+				}
+
+				Double amountValue = Double.parseDouble(amount.getText());
+				
+
+				bankingService.sendMoneyAskForConfirmationData(currentAccountNr,
+						receiverBLZ.getText(), receiverAccountNr.getText(),
+						amountValue, remark.getText(), receiverName.getText(), receiverBankName.getText(),
+						new AsyncCallback<MoneyTransferDTO>() {
+
+							public void onFailure(Throwable caught) {
+								Log.error("Sending money failed", caught);
+
+							}
+
+							public void onSuccess(MoneyTransferDTO dto) {
+								Log.debug("Show confirmation page");						
+								confirmation=true;
+								requiredTanNr.setText(constants.confirmTanNr() +" "+ dto.getRequiredTan());
+								receiverBLZ.setText(dto.getReceiverBankNr());
+								amount.setText("" + dto.getAmount());
+								remark.setText(dto.getRemark());
+								receiverName.setText(dto.getReceiverName());
+								receiverAccountNr.setEnabled(false);
+								receiverBLZ.setEnabled(false);
+								receiverBankName.setEnabled(false);
+								amount.setEnabled(false);
+								remark.setEnabled(false);
+								receiverName.setEnabled(false);
+								receiverAccountNr.setEnabled(false);
+								receiverBankName.setText(dto.getReceiverBankName());
+								
+								
+								
+								updateForm();
+
+							}
+						});
+
+				
+
+				
+	
+
+			
 		}
 		
 	}
