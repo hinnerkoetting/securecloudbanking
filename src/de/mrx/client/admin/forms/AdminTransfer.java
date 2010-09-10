@@ -5,7 +5,6 @@ import java.util.List;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -20,7 +19,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
-import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.TableStyler;
 import de.mrx.client.admin.Admin;
 import de.mrx.client.admin.AdminService;
@@ -98,6 +96,12 @@ public class AdminTransfer extends Composite {
 	Label searchTitle;
 	
 	@UiField
+	Label descOwner;
+	
+	@UiField
+	Label descAccountNr;
+	
+	@UiField
 	FlexTable searchTable;
 	
 	DialogBox a;
@@ -127,15 +131,14 @@ public class AdminTransfer extends Composite {
 		recipientBLZ.setText(SCB_PLZ);
 		recipientBLZ.setEnabled(false);
 		
-				
-		descRemark.setText("Remark");
-		
+		descOwner.setText("Owner");
+		descAccountNr.setText("Account No.");			
+		descRemark.setText("Remark");		
 		descAmount.setText("Amount");
 		submit.setText("Submit");
-		
-		
 		search.setText("Search");
 		searchTitle.setText("Search for sender");
+		
 	}
 
 	@UiHandler("submit")
@@ -189,6 +192,10 @@ public class AdminTransfer extends Composite {
 		});
 	}
 	
+	/**
+	 * 
+	 * @param accounts
+	 */
 	public void setAccounts(List<AccountDTO> accounts){
 		searchTable.clear();
 		
