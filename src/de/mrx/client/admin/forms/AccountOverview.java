@@ -59,9 +59,6 @@ public class AccountOverview extends Composite {
 	@UiField
 	Button search;
 	
-	@UiField
-	Label titleSearch;
-	
 	Admin adminPage;
 	
 	public AccountOverview(Admin admin) {
@@ -69,12 +66,10 @@ public class AccountOverview extends Composite {
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		title.setText("Account overview");
+		title.setText("SCB accounts");
 		descOwner.setText(ACCOUNT_OWNER);
 		descAccountNr.setText(ACCOUNT_NR);
-		search.setText("Search");
-		titleSearch.setText("Search");
-		
+		search.setText("Search");		
 	}
 	
 	public void setAccounts(List<AccountDTO> accounts){
@@ -170,7 +165,7 @@ public class AccountOverview extends Composite {
 
 							@Override
 							public void onSuccess(String result) {
-								Window.alert(result);
+								GWT.log(result);
 								adminPage.showAccounts();
 								
 							}

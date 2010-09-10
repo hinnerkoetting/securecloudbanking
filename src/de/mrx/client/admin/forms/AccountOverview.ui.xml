@@ -1,34 +1,39 @@
-<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<!DOCTYPE ui:UiBinder SYSTEM 
+"http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<ui:style src="../../SCB.css">
 		.searchDiv {
 			background-color:#DDDDDD;
-			width:40%;
+			position:relative;			
+			margin-top:50px; 
+		}
+		.tableDiv {
+				position:relative;
+				margin-top:20px;
 		}
 	</ui:style>
 	<g:HTMLPanel>
 		<g:Label styleName="{style.title}" ui:field="title"/>
-		<div class="{style.searchDiv}">
-			<g:Label styleName="{style.title}" ui:field="titleSearch"/>
-			<table>
-				<tr>
-					<td><g:Label ui:field="descOwner"/></td>
-					<td><g:Label ui:field="descAccountNr"/></td>
-					<td></td>
-				</tr>
-				<tr>					
-					<td><g:TextBox ui:field ="searchOwner"/></td>
-					<td><g:TextBox ui:field ="searchAccountNr"/></td>
-					<td><g:Button ui:field ="search"/></td>
-				</tr>
-			</table>
-			
-		</div>
 		<div>
-			<g:FlexTable ui:field="overviewTable">
+			<div class="{style.searchDiv}">
+				<table>
+					<tr>
+						<td><g:Label ui:field="descOwner"/></td>
+						<td><g:TextBox ui:field ="searchOwner"/></td>
+						<td><g:Label ui:field="descAccountNr"/></td>
+						<td><g:TextBox ui:field ="searchAccountNr"/></td>
+						<td><g:Button ui:field ="search"/></td>
+					</tr>
+				</table>
+		
+			</div>
+			<div>
+				<g:FlexTable styleName="{style.tableDiv}" ui:field="overviewTable">
+				
+				</g:FlexTable>
+			</div>
 			
-			</g:FlexTable>
 		</div>
 	</g:HTMLPanel>
 </ui:UiBinder> 
