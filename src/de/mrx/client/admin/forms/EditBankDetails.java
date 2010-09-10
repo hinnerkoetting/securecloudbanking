@@ -18,12 +18,16 @@ import de.mrx.client.admin.Admin;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
-public class NewBank extends Composite {
+public class EditBankDetails extends Composite {
 
-	private static NewBankUiBinder uiBinder = GWT.create(NewBankUiBinder.class);
+	private static EditBankDetailsUiBinder uiBinder = GWT
+			.create(EditBankDetailsUiBinder.class);
 
-	interface NewBankUiBinder extends UiBinder<Widget, NewBank> {
+	interface EditBankDetailsUiBinder extends UiBinder<Widget, EditBankDetails> {
 	}
+
+	@UiField
+	Label title;
 
 	@UiField
 	Label descName;
@@ -38,19 +42,26 @@ public class NewBank extends Composite {
 	TextBox blz;
 
 	@UiField
-	Label title;
-	
-	@UiField
 	Button submit;
 	
-	Admin adminPage;
-	public NewBank(Admin admin) {
-		this.adminPage = admin;
+	
+	String oldBLZ;
+	String oldName;
+	
+	Admin adminpage; 
+	
+	public EditBankDetails(Admin admin,String oldBLZ, String oldName) {
+		adminpage = admin;
 		initWidget(uiBinder.createAndBindUi(this));
-		title.setText("Add new Bank");
+		
+		title.setText("Edit bank details");
 		descName.setText("Name");
 		descBlz.setText("Blz");
 		submit.setText("Submit");
+		this.oldBLZ = oldBLZ;
+		this.oldName = oldName;
+		name.setText(oldName);
+		blz.setText(oldBLZ);
 	}
 	
 	@UiHandler("submit")
@@ -59,13 +70,12 @@ public class NewBank extends Composite {
 		newBank.setBlz(blz.getText());
 		newBank.setName(name.getText());
 		AdminServiceAsync adminService = GWT.create(AdminService.class);
-		adminService.addBank(newBank, new AsyncCallback<String>() {
+		adminService.editBankDetails(oldName, oldBLZ, name.getText(), blz.getText(), new AsyncCallback<String>() {
 			
 			@Override
 			public void onSuccess(String result) {
 				Window.alert(result);
-				adminPage.showExternalBanks();				
-				
+				adminpage.showExternalBanks();
 			}
 			
 			@Override
