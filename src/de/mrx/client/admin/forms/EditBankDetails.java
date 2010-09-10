@@ -74,7 +74,7 @@ public class EditBankDetails extends Composite {
 			
 			@Override
 			public void onSuccess(String result) {
-				Window.alert(result);
+				GWT.log(result);
 				adminpage.showExternalBanks();
 			}
 			
