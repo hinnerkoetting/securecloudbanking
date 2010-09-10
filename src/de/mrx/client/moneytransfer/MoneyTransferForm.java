@@ -1,5 +1,7 @@
 package de.mrx.client.moneytransfer;
 
+import static com.google.gwt.query.client.GQuery.$;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -211,6 +215,9 @@ public class MoneyTransferForm extends Composite implements Observable{
 
 	@UiHandler("sendMoney")
 	public void sendMoney(ClickEvent e){
+		Element p=DOM.getElementById("test");
+		$("Button").text("bla");
+		$("test").insertBefore("<td>HALLO</td>");
 		validateErrorTable.clear();
 
 		if (!isSendMoneyFormValid()){

@@ -29,10 +29,9 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     	</tr>
     	<tr>
     		<td/><td/><td/>
-    		<td>
-    			<g:Button ui:field="sendMoney"><ui:msg description="sendMoney Button">Send Money</ui:msg></g:Button>
+    		<td id="btnTD">
+    			<g:Button ui:field="sendMoney" ><ui:msg description="sendMoney Button">Send Money</ui:msg></g:Button>
     			<g:Button ui:field="sendMoneyConfirm"><ui:msg description="sendMoneyConfirm  Button" visible="false">Confirm Transaction</ui:msg></g:Button>
-    		
     		</td>
 		</tr>
     </table>
