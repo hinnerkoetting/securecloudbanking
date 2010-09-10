@@ -7,7 +7,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.BankServiceAsync;
-import de.mrx.server.Bank;
 
 /**
  * 
@@ -33,6 +32,10 @@ public interface AdminServiceAsync extends BankServiceAsync {
 
 	void getExternalAccounts(String blz,
 			AsyncCallback<List<AccountDTO>> callback);
+
+	void deleteBank(String blz, AsyncCallback<String> callback);
+
+	void deleteInternalAccount(String accountNr, AsyncCallback<String> callback);
 
 
 
