@@ -62,7 +62,7 @@ AdminService {
 	 * get all accounts of all users
 	 */
 	@Override
-	public List<AccountDTO> getAllAccounts() {
+	public List<AccountDTO> getAllInternalAccounts() {
 //		log.setLevel(Level.OFF);
 		log.log(Level.INFO, "Admin requests accounts");
 		
@@ -75,6 +75,24 @@ AdminService {
 		return accountsDTO;
 	}
 
+
+	@Override
+	public List<AccountDTO> searchInternalAccounts(String owner,
+			String accountnr) {
+		log.log(Level.INFO, "Admin is searching for account. Name like:" + owner + "Accountnr: " + accountnr);
+		List<AccountDTO> result = new ArrayList<AccountDTO>();
+		
+		//we need to get all accounts and manually filter them as
+		//jdo doesn't have a LIKE filter implemented
+		List<InternalSCBAccount> accounts = getPersistentInternalAccounts();
+		
+		for (InternalSCBAccount account: accounts) {
+			if (account.getOwner().contains(owner) && account.getAccountNr().contains(accountnr))
+				result.add(account.getDTO());
+		}
+		return result;
+	}
+	
 	@Override
 	public double getBalance(String accountNr) {
 		// TODO Auto-generated method stub
@@ -242,6 +260,7 @@ AdminService {
 		//get all external accounts
 		Extent<ExternalAccount> extentExternal = pm.getExtent(ExternalAccount.class);
 		query = pm.newQuery(extentExternal);
+		@SuppressWarnings("unchecked")
 		List<ExternalAccount> externalAccounts = (List<ExternalAccount>)query.execute();
 		@SuppressWarnings("unused")
 		int numExternal = externalAccounts.size();
@@ -310,6 +329,7 @@ AdminService {
 		Extent<ExternalAccount> extent = pm.getExtent(ExternalAccount.class);
 		Query query = pm.newQuery(extent);
 		
+		@SuppressWarnings("unchecked")
 		List<ExternalAccount> externalAccounts = (List<ExternalAccount>)query.execute();
 
 		List<AccountDTO> accountsDTO = new ArrayList<AccountDTO>();
@@ -333,6 +353,7 @@ AdminService {
 		Extent<ExternalAccount> extentAccounts = pm.getExtent(ExternalAccount.class);
 		Query query = pm.newQuery(extentAccounts);
 		
+		@SuppressWarnings("unchecked")
 		List<ExternalAccount> accounts = (List<ExternalAccount>)query.execute();
 		for (ExternalAccount account: accounts) {
 			if (account.getBank().getBlz().equals(blz))
@@ -353,6 +374,7 @@ AdminService {
 		pm.deletePersistent(account);
 		return "Success.";
 	}
+
 
 
 }

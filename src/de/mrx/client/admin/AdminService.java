@@ -17,8 +17,10 @@ import de.mrx.client.BankService;
 @RemoteServiceRelativePath("admin")
 public interface AdminService extends BankService {
 
-	public List<AccountDTO> getAllAccounts();
+	public List<AccountDTO> getAllInternalAccounts();
 		
+	public List<AccountDTO> searchInternalAccounts(String owner, String accountnr);
+	
 	public List<BankDTO> getAllBanks();
 	
 	public boolean addBank(BankDTO bank);
