@@ -24,6 +24,9 @@ public class TransferHistoryForm extends Composite {
 	@UiField
 	FlexTable flexTable;
 	
+	@UiField
+	Label transferHistoryNoTransactionHint;
+	
 	/**
 	 * Creates a table of all transfers
 	 * @param transfers to be shown
@@ -34,6 +37,10 @@ public class TransferHistoryForm extends Composite {
 		
 		
 		initWidget(uiBinder.createAndBindUi(this));
+		if (transfers==null || transfers.size()==0){
+			flexTable.setVisible(false);
+			transferHistoryNoTransactionHint.setVisible(true);
+		}
 		
 		//set header labels
 		Label lbl = new Label(constants.accountDetailHeaderDate());
@@ -42,12 +49,15 @@ public class TransferHistoryForm extends Composite {
 		lbl = new Label(constants.accountDetailHeaderAccount());
 		flexTable.setWidget(0, 1, lbl);
 		
-		
-		lbl = new Label(constants.accountDetailHeaderComment());
+		lbl = new Label(constants.accountDetailHeaderReceiverBank());
 		flexTable.setWidget(0, 2, lbl);
 		
-		lbl = new Label(constants.accountDetailHeaderAmount());
+		
+		lbl = new Label(constants.accountDetailHeaderComment());
 		flexTable.setWidget(0, 3, lbl);
+		
+		lbl = new Label(constants.accountDetailHeaderAmount());
+		flexTable.setWidget(0, 4, lbl);
 
 		int row = 1;
 		for (MoneyTransferDTO transfer: transfers) {
@@ -56,19 +66,22 @@ public class TransferHistoryForm extends Composite {
 											transfer.getTimestamp()));
 			flexTable.setWidget(row, 0, lbl);
 			
-			lbl = new Label(transfer.getReceiverAccountNr());
+			lbl = new Label(transfer.getReceiverName()+" ("+ transfer.getReceiverAccountNr()+")");
 			flexTable.setWidget(row, 1, lbl);
-			
-			lbl = new Label(transfer.getRemark());
+
+			lbl = new Label(transfer.getReceiverBankName()+" ("+ transfer.getReceiverBankNr()+")");
 			flexTable.setWidget(row, 2, lbl);
+
+			lbl = new Label(transfer.getRemark());
+			flexTable.setWidget(row, 3, lbl);
 			
 			lbl = new Label(""+transfer.getAmount());
-			flexTable.setWidget(row, 3, lbl);
+			flexTable.setWidget(row, 4, lbl);
 
 			if (transfer.getAmount() < 0)
-				flexTable.getCellFormatter().addStyleName(row, 3, "negativeMoney");
+				flexTable.getCellFormatter().addStyleName(row, 4, "negativeMoney");
 			else //amount >= 0
-				flexTable.getCellFormatter().addStyleName(row, 3, "positiveMoney");
+				flexTable.getCellFormatter().addStyleName(row, 4, "positiveMoney");
 			row++;
 		}
 		
