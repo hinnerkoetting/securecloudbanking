@@ -1,0 +1,19 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style src="../../SCB.css"/>
+	<g:HTMLPanel>
+	<g:Label styleName="{style.title}" ui:field="title"/>
+		<table>
+			<tr>				
+				<td><g:Label ui:field="descName"/></td>
+				<td><g:TextBox ui:field="name"/></td>
+			</tr>
+			<tr>
+				<td><g:Label ui:field="descBlz"/></td>
+				<td><g:TextBox ui:field="blz"/></td>
+			</tr>
+		</table>
+		<g:Button ui:field="submit"/>
+	</g:HTMLPanel>
+</ui:UiBinder> 
