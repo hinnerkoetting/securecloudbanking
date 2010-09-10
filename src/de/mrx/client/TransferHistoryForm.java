@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -60,6 +61,8 @@ public class TransferHistoryForm extends Composite {
 		flexTable.setWidget(0, 4, lbl);
 
 		int row = 1;
+		
+		NumberFormat fmt = NumberFormat.getFormat("#0.00");
 		for (MoneyTransferDTO transfer: transfers) {
 			//add each transfer
 			lbl = new Label(DateTimeFormat.getMediumDateFormat().format(
@@ -75,7 +78,7 @@ public class TransferHistoryForm extends Composite {
 			lbl = new Label(transfer.getRemark());
 			flexTable.setWidget(row, 3, lbl);
 			
-			lbl = new Label(""+transfer.getAmount());
+			lbl = new Label(fmt.format(transfer.getAmount()));
 			flexTable.setWidget(row, 4, lbl);
 
 			if (transfer.getAmount() < 0)

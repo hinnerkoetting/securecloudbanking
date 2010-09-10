@@ -7,7 +7,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.BankService;
-import de.mrx.server.Bank;
 
 
 /**
@@ -26,10 +25,12 @@ public interface AdminService extends BankService {
 	
 	public String generateTestData();
 	
-	
-	
 	public String adminSendMoney(String senderAccountNr, String sendBLZ,
 			String receiveraccountNr, double amount, String remark);
 	
 	public List<AccountDTO> getExternalAccounts(String blz);
+	
+	public String deleteBank(String blz);
+	
+	public String deleteInternalAccount(String accountNr);
 }

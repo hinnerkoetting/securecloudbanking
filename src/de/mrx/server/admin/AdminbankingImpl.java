@@ -20,7 +20,6 @@ import de.mrx.client.admin.AdminService;
 import de.mrx.server.AllBanks;
 import de.mrx.server.Bank;
 import de.mrx.server.BankServiceImpl;
-import de.mrx.server.CustomerServiceImpl;
 import de.mrx.server.ExternalAccount;
 import de.mrx.server.GeneralAccount;
 import de.mrx.server.InternalSCBAccount;
@@ -273,17 +272,6 @@ AdminService {
 		return "Success!\nGenerated: \n -" + EXTERNAL_BANKS + " external banks.\n -"+ EXTERNAL_ACCS + " external accounts each \n -" + INTERNAL_ACCS + " internal accounts\n -" + TRANSACTIONS + " transactions";
 	}
 
-//	@Override
-//	public BankDTO getBankByBLZ(String blz) {
-//		PersistenceManager pm = PMF.get().getPersistenceManager();
-//		
-//		Extent<Bank> e=pm.getExtent(Bank.class);
-//		Query query=pm.newQuery(e, "blz==param");
-//		query.declareParameters("java.lang.String param");
-//		List<Bank> banks = (List<Bank>)query.execute(blz);
-//		
-//		return banks.get(0).getDTO();
-//	}
 
 	@Override
 	public String adminSendMoney(String senderAccountNr, String senderBLZ,
@@ -331,6 +319,39 @@ AdminService {
 				accountsDTO.add(account.getDTO());
 		}
 		return accountsDTO;
+	}
+
+	@Override
+	public String deleteBank(String blz) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		Bank bank = Bank.getByBLZ(pm, blz);
+		if (bank == null)
+			return "Error. Bank not found!";
+		
+		//delete all accounts of this bank
+		Extent<ExternalAccount> extentAccounts = pm.getExtent(ExternalAccount.class);
+		Query query = pm.newQuery(extentAccounts);
+		
+		List<ExternalAccount> accounts = (List<ExternalAccount>)query.execute();
+		for (ExternalAccount account: accounts) {
+			if (account.getBank().getBlz().equals(blz))
+				pm.deletePersistent(account);
+		}
+		
+		//now delete the actual bank
+		pm.deletePersistent(bank);
+		return "Success.";
+	}
+
+	@Override
+	public String deleteInternalAccount(String accountNr) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		InternalSCBAccount account = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);
+		if (account == null)
+			return "Error. Account not found!";
+		pm.deletePersistent(account);
+		return "Success.";
 	}
 
 

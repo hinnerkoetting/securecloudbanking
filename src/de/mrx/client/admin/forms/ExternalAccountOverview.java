@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
-import de.mrx.client.BankDTO;
 import de.mrx.client.TableStyler;
 import de.mrx.client.admin.Admin;
 /**
