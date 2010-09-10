@@ -66,6 +66,8 @@ public class AdminExternalBanks extends Composite {
 		
 		int row= 1;
 		for (final BankDTO bank: banks) {
+			if (bank.getName().equals("Secure Cloud Bank"))
+				continue;
 			table.setWidget(row, namePos, new Label(bank.getName()));
 			table.setWidget(row, blzPos, new Label(bank.getBlz()));
 			Button viewButton = new Button("View");

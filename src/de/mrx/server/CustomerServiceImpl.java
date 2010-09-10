@@ -108,9 +108,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 			ownBank = bankWrapper.getOwnBanks();
 			if (ownBank == null) {
-				ownBank = new Bank(SCB_BLZ, "Secure Cloud Bank");
+				ownBank = new Bank(Bank.SCB_BLZ, "Secure Cloud Bank");
 				ownBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-						Bank.class.getSimpleName(), SCB_BLZ));
+						Bank.class.getSimpleName(), Bank.SCB_BLZ));
 				bankWrapper.setOwnBanks(ownBank);
 
 			}

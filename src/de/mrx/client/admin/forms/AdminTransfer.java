@@ -95,7 +95,8 @@ public class AdminTransfer extends Composite {
 		recipientNr.setText(accNr);
 		recipientNr.setEnabled(false);
 		
-		recipientBLZ.setText("SCB");
+		//TODO this should be a reference to BLZ string
+		recipientBLZ.setText("1502222");
 		recipientBLZ.setEnabled(false);
 		
 				

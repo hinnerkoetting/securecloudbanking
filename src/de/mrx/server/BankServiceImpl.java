@@ -35,15 +35,14 @@ BankService {
 		senderAccount.addMoneyTransfer(transfer);
 		// recAccount.addMoneyTransfer(transfer);Sp�ter eine Kopie anlegen
 
-		senderAccount.setBalance(senderAccount.getBalance() - amount);
+		senderAccount.changeMoney(-amount);
 		MoneyTransfer receivertransfer = new MoneyTransfer(recAccount,
 				senderAccount, -amount,senderAccount.getOwner(),remark);
 		
 		recAccount.addMoneyTransfer(receivertransfer);
-		if (recAccount instanceof InternalSCBAccount){
-			InternalSCBAccount scbAccount=(InternalSCBAccount) recAccount;				
-			scbAccount.setBalance(scbAccount.getBalance() + amount);
-		}
+						
+		recAccount.changeMoney(amount);
+		
 		
 		
 		pm.makePersistent(senderAccount);

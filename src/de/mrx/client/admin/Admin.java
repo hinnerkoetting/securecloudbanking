@@ -117,8 +117,9 @@ public class Admin implements EntryPoint {
 	}
 	
 	public void showExternalAccounts(String blz) {
+		final ExternalAccountOverview accountOverview = new ExternalAccountOverview(this);
 		AdminServiceAsync bankingService = GWT.create(AdminService.class);
-		bankingService.getBankByBLZ(blz, new AsyncCallback<BankDTO>() {
+		bankingService.getExternalAccounts(blz, new AsyncCallback<List<AccountDTO>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -127,8 +128,10 @@ public class Admin implements EntryPoint {
 			}
 
 			@Override
-			public void onSuccess(BankDTO result) {
-				setContent(new ExternalAccountOverview(result));
+			public void onSuccess(List<AccountDTO> result) {
+				
+				accountOverview.setAccounts(result);
+				setContent(accountOverview);
 				
 			}
 		});

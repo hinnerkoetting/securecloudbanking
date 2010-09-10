@@ -163,10 +163,10 @@ AdminService {
 	@Override
 	public String generateTestData() {
 		resetData();
-		
+
 		//number of test data
 		final int EXTERNAL_BANKS = 5;
-		final int EXTERNAL_ACCS = 2;
+		final int EXTERNAL_ACCS = 4;
 		final int INTERNAL_ACCS = 10;
 		final int TRANSACTIONS = 20;
 		
@@ -177,13 +177,13 @@ AdminService {
 
 		//generate test banks
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		AllBanks bankWrapper = AllBanks.getBankWrapper(PMF.get()
-				.getPersistenceManager());
+		pm.currentTransaction().begin();
+		AllBanks bankWrapper = AllBanks.getBankWrapper(pm);
 		
 		//create own bank
-		Bank ownBank = new Bank(CustomerServiceImpl.SCB_BLZ, "Secure Cloud Bank");
+		Bank ownBank = new Bank(Bank.SCB_BLZ, "Secure Cloud Bank");
 		ownBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-				Bank.class.getSimpleName(), CustomerServiceImpl.SCB_BLZ));
+				Bank.class.getSimpleName(), Bank.SCB_BLZ));
 		bankWrapper.setOwnBanks(ownBank);
 		pm.makePersistent(ownBank);
 		
@@ -194,8 +194,9 @@ AdminService {
 			Bank bank = new Bank(rndBlz.toString(), bankname);
 			bank.setId(KeyFactory.createKey(bankWrapper.getId(),
 					Bank.class.getSimpleName(), bank.getBlz()));
-			pm.makePersistent(bank);
 			
+			bankWrapper.getOtherBanks().add(bank);
+			pm.makePersistent(bank);
 			//generate accounts for each bank
 			for (int j=0; j < EXTERNAL_ACCS; j++) {
 				Integer accNr = random.nextInt(99999999);
@@ -205,6 +206,8 @@ AdminService {
 				acc.setId(KeyFactory.createKey(bank.getId(), ExternalAccount.class
 						.getSimpleName(), accNr));
 				pm.makePersistent(acc);
+				
+
 			}
 			
 		}
@@ -220,10 +223,13 @@ AdminService {
 			
 			acc.setId(KeyFactory.createKey(ownBank.getId(), InternalSCBAccount.class
 					.getSimpleName(), accNr));
+			
+			
 			pm.makePersistent(acc);
+			
 		}
-		
-		
+		pm.currentTransaction().commit();
+		pm.currentTransaction().begin();
 		
 		//create test transactions
 		
@@ -247,56 +253,84 @@ AdminService {
 			int pos2 = random.nextInt(numInternal - 2);
 			InternalSCBAccount acc1 = internalAccounts.get(pos1);
 			InternalSCBAccount acc2 = internalAccounts.get(pos2);
-			MoneyTransfer transfer = new MoneyTransfer(acc1, acc2, (random.nextDouble()- 0.5) * 100,acc2.getOwner(),"testcomment" + i);
+			double amount = (random.nextDouble()- 0.5) * 100;
+			String remark = "testcomment" + i;
+			MoneyTransfer transfer = new MoneyTransfer(acc1, acc2, amount, acc2.getOwner(), remark);
 			acc1.addMoneyTransfer(transfer);
+			MoneyTransfer transferRevert = new MoneyTransfer(acc2, acc1, -amount, acc2.getOwner(), remark);
+			acc2.addMoneyTransfer(transferRevert);
+			
+			acc1.changeMoney(amount);
+			acc2.changeMoney(-amount);
+			pm.makePersistent(acc1);
+			pm.makePersistent(acc2);
+			
 
 		}
 		log.log(Level.INFO, ""+internalAccounts.size() + " "+externalAccounts.size());
-		
+		pm.currentTransaction().commit();
 //		MoneyTransfer transfer = new MoneyTransfer(
-		
 		return "Success!\nGenerated: \n -" + EXTERNAL_BANKS + " external banks.\n -"+ EXTERNAL_ACCS + " external accounts each \n -" + INTERNAL_ACCS + " internal accounts\n -" + TRANSACTIONS + " transactions";
 	}
 
-	@Override
-	public BankDTO getBankByBLZ(String blz) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		
-		Extent<Bank> e=pm.getExtent(Bank.class);
-		Query query=pm.newQuery(e, "blz==param");
-		query.declareParameters("java.lang.String param");
-		List<Bank> banks = (List<Bank>)query.execute(blz);
-		
-		return banks.get(0).getDTO();
-	}
+//	@Override
+//	public BankDTO getBankByBLZ(String blz) {
+//		PersistenceManager pm = PMF.get().getPersistenceManager();
+//		
+//		Extent<Bank> e=pm.getExtent(Bank.class);
+//		Query query=pm.newQuery(e, "blz==param");
+//		query.declareParameters("java.lang.String param");
+//		List<Bank> banks = (List<Bank>)query.execute(blz);
+//		
+//		return banks.get(0).getDTO();
+//	}
 
 	@Override
-	public String adminSendMoney(String senderAccountNr, String blz,
+	public String adminSendMoney(String senderAccountNr, String senderBLZ,
 			String receiveraccountNr, double amount, String remark) {
 		if (amount < 0)
 			return "Amount must be positive!";
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		//reciever bank is internal bank
-		
-		InternalSCBAccount recieverAcc = InternalSCBAccount.getOwnByAccountNr(pm, receiveraccountNr);
+		log.setLevel(Level.ALL);
+		GeneralAccount recieverAcc = InternalSCBAccount.getOwnByAccountNr(pm, receiveraccountNr);
+		GeneralAccount senderAcc = GeneralAccount.getAccount(pm, senderAccountNr, senderBLZ);
+	
+
 		if (recieverAcc == null) {
 			log.log(Level.INFO, "Reciever account could not be found!");
 			return ("Error. Could not find reciever account.");
 		}
-		
-//		Bank senderBank = Bank.getByBLZ(pm, blz);
-		if (blz.equals(CustomerServiceImpl.SCB_BLZ)) {
-			InternalSCBAccount senderAcc = InternalSCBAccount.getOwnByAccountNr(pm, senderAccountNr);
-			if (senderAcc == null) {
-				return "Error.\nSender does not exist!";
-			}
-			MoneyTransfer transfer = new MoneyTransfer(senderAcc,
-					recieverAcc, amount,recieverAcc.getOwner(),remark);
-			transferMoney(pm, senderAcc, recieverAcc, transfer, amount, remark);
-			return "Success.";
+		if (senderAcc == null) {
+			log.log(Level.INFO, "Sender account could not be found!");
+			return ("Error. Could not find sender account.");
 		}
+		log.log(Level.INFO,"Reciever: " +recieverAcc.toString());
+		log.log(Level.INFO,"Sender: "   +senderAcc.toString());
+		MoneyTransfer transfer = new MoneyTransfer(senderAcc,
+				recieverAcc, amount,recieverAcc.getOwner(),remark);
+		transferMoney(pm, senderAcc, recieverAcc, transfer, amount, remark);
+		return "Success.";
 		
-		return "error";
+		
+		
+	}
+
+	@Override
+	public List<AccountDTO> getExternalAccounts(String blz) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Extent<ExternalAccount> extent = pm.getExtent(ExternalAccount.class);
+		Query query = pm.newQuery(extent);
+		
+		List<ExternalAccount> externalAccounts = (List<ExternalAccount>)query.execute();
+
+		List<AccountDTO> accountsDTO = new ArrayList<AccountDTO>();
+		log.log(Level.INFO, externalAccounts.size() +"");
+		for (ExternalAccount account: externalAccounts) {
+			if (account.getBank().getBlz().equals(blz))
+				accountsDTO.add(account.getDTO());
+		}
+		return accountsDTO;
 	}
 
 

@@ -36,11 +36,12 @@ public class AccountOverview extends Composite {
 	Admin adminPage;
 	public AccountOverview(Admin admin) {
 		this.adminPage = admin;
+		initWidget(uiBinder.createAndBindUi(this));
 	}
 	
 	public void setAccounts(List<AccountDTO> accounts){
 
-		initWidget(uiBinder.createAndBindUi(this));
+		
 
 	
 		final int posAccount 		= 0;

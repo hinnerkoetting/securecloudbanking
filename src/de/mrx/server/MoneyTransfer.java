@@ -103,7 +103,7 @@ public class MoneyTransfer {
 		InternalSCBAccount s=(InternalSCBAccount)InternalSCBAccount.getOwnByAccountNr(pm,senderAccountNr);
 		Bank b=Bank.getByBLZ(pm,receiverBLZ);
 		GeneralAccount receiverAccount;
-		if (b.getBlz().equals(CustomerServiceImpl.SCB_BLZ)){
+		if (b.getBlz().equals(Bank.SCB_BLZ)){
 			receiverAccount=InternalSCBAccount.getOwnByAccountNr(pm,receiverAccountNr);
 		}
 		else{

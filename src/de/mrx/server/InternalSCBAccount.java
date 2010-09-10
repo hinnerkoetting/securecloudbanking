@@ -26,6 +26,8 @@ public class InternalSCBAccount extends GeneralAccount {
 	private static final long serialVersionUID = 1L;
 	
 	
+	@Persistent
+	private Double balance;//current money
 	
 	@Persistent
 	private String ownerEmail;
@@ -39,7 +41,19 @@ public class InternalSCBAccount extends GeneralAccount {
 	}
 
 	
-
+	public Double getBalance() {
+    	return balance;
+    }
+    
+    public void changeMoney(double amount) {
+    	balance += amount;
+    }
+    
+    public void setBalance(Double balance) {
+		this.balance = balance;
+	}
+    
+    
 	public static InternalSCBAccount getOwnByAccountNr(PersistenceManager pm, String accountNr){
 		
 		Extent<InternalSCBAccount> e=pm.getExtent(InternalSCBAccount.class);

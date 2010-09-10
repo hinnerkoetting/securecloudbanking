@@ -3,7 +3,6 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<ui:style src="../../SCB.css" />
 	<g:HTMLPanel>
-		Hello,
 		<g:FlexTable ui:field="table"/>
 	</g:HTMLPanel>
 </ui:UiBinder> 

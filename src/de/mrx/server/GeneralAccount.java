@@ -49,8 +49,7 @@ public abstract class GeneralAccount {
 	@Persistent
 	List<MoneyTransfer> transfers;
 
-	@Persistent
-	private double balance;//current money
+	
 	
 	public void setTransfers(List<MoneyTransfer> transfers) {
 		this.transfers = transfers;
@@ -133,16 +132,26 @@ public abstract class GeneralAccount {
 		this.owner = owner;
 	}
 	
-	
-    public double getBalance() {
-    	return balance;
-    }
     
-    public void setBalance(double balance) {
-		this.balance = balance;
-	}
+    /**
+     * retrieve stored account
+     * @param pm
+     * @param accountNr
+     * @param blz
+     * @return
+     */
+    public static GeneralAccount getAccount(PersistenceManager pm, String accountNr, String blz){
+    	
+    	if (blz.equals(Bank.SCB_BLZ)) { //internal account
+    		return InternalSCBAccount.getOwnByAccountNr(pm, accountNr);
+    	}
+    	else {//external account 
+    		return ExternalAccount.getExternalAccount(pm, accountNr, blz);
+    	}
+    	
+    }
 
-	
+    public abstract void changeMoney(double amount);
 
 	
 }
