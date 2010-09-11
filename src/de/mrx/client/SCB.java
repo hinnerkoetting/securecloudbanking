@@ -8,6 +8,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -163,8 +164,7 @@ public class SCB implements EntryPoint, Observer {
 			checkGoogleStatus();
 			doShowAbout(true);
 			GWT.log("Module loaded");
-			// jsni_startPointbar();
-			startAttack();
+			//GWT:	startAttack();
 
 		} catch (Exception e) {
 			GWT.log(e.getMessage());
