@@ -4,7 +4,7 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateLocales="default">
     <ui:style src="../SCB.css" />
    <g:HTMLPanel>
-   	<table >
+   	<table id="moneyTransferTable">
    		<tr>
     		<td> <ui:msg description="receiverAccountNr">Account Number</ui:msg></td>
     		<td> <g:TextBox ui:field='receiverAccountNr'/></td>
