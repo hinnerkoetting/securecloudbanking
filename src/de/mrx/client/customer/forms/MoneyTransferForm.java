@@ -100,6 +100,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 	FlexTable validateErrorTable;
 	public MoneyTransferForm(String accountNr){		
 		initWidget(uiBinder.createAndBindUi(this));
+		assert(accountNr!=null);	
 		this.currentAccountNr=accountNr;		
 		updateForm();
 		
@@ -115,6 +116,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 	 */
 	public MoneyTransferForm(String currentAccountNr, MoneyTransferDTO dto){
 		initWidget(uiBinder.createAndBindUi(this));
+		assert(currentAccountNr!=null);	
 		this.currentAccountNr=currentAccountNr;
 		confirmation=true;
 		requiredTanNr.setText(constants.confirmTanNr() +" "+ dto.getRequiredTan());
@@ -331,7 +333,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 				}
 
 				Double amountValue = Double.parseDouble(amount.getText());
-				
+				assert(currentAccountNr!=null);				
 
 				bankingService.sendMoneyAskForConfirmationData(currentAccountNr,
 						receiverBLZ.getText(), receiverAccountNr.getText(),

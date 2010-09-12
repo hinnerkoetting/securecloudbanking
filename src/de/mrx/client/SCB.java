@@ -83,7 +83,15 @@ public class SCB implements EntryPoint, Observer {
 
 
 
-	private String currentAccount;
+	/**
+	 * account number of user's saving account
+	 */
+	private String currentAccountNr;
+	
+	/**
+	 * account details of user's saving account
+	 */
+	private AccountDetailDTO currentAccountDetails;
 
 	private List<String> hints = new ArrayList<String>();
 
@@ -159,6 +167,7 @@ public class SCB implements EntryPoint, Observer {
 			leftPanelMenuForm = new LeftPanelMenuForm();
 			leftPanelMenuForm.addObserver(this);
 			checkGoogleStatus();
+			initAccountNr();
 			doShowAbout(true);
 			GWT.log("Module loaded");
 			//GWT:	startAttack();
@@ -180,9 +189,7 @@ public class SCB implements EntryPoint, Observer {
 		accountOverviewPanel.add(accountsListPanel);
 		accountOverviewPanel.add(accountsDetailsPanel);
 
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
+		getBankingService();
 		bankingService.getAccounts(new AsyncCallback<List<AccountDTO>>() {
 
 			public void onFailure(Throwable caught) {
@@ -269,18 +276,21 @@ public class SCB implements EntryPoint, Observer {
 	 */
 	private void checkGoogleStatus() {
 
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
+		getBankingService();
 		GWT.log(GWT.getHostPageBaseURL());
 		bankingService.login(GWT.getHostPageBaseURL(),
 				new AsyncCallback<SCBIdentityDTO>() {
 					public void onFailure(Throwable error) {
 						error.printStackTrace();
 						Log.error("Login state can not be retrieved! ", error);
-						Window.alert(constants.loginFailedText());
+						leftPanelMenuForm.setStateNotRegistered();
+//						Window.alert(constants.loginFailedText());
 					}
 
+					/**
+					 * after Loading of user information
+					 * @param result
+					 */
 					public void onSuccess(SCBIdentityDTO result) {
 						identityInfo = result;
 
@@ -290,23 +300,14 @@ public class SCB implements EntryPoint, Observer {
 							}
 							Log.info("User is logged in with email-adress "
 									+ result.getEmail());
-							if (identityInfo.isActivated()) {
-								Log.info("Valid Account " + identityInfo);
-								String userInfo = identityInfo.getEmail();
-								if (identityInfo.getNickName() != null) {
-									userInfo = identityInfo.getNickName()
-											+ " (" + userInfo + ")";
-								}
-								scbMenu.getMenuUserInfo().setText(userInfo);
-								scbMenu.getMenuItemRegister().setVisible(false);
-
-								showAccountOverview();
-
+							if (identityInfo.isActivated()) {								
+								doShowPageForActivatedUser();
 							} else {
 								Log.info("Account not yet activated in SCB: "
 										+ identityInfo);
 								scbMenu.getMenuUserInfo().setText(
 										identityInfo.getEmail());
+								leftPanelMenuForm.setStateRegisteredButNoSavingAccount();
 							}
 							loadLoggedInSetup();
 							String language = identityInfo.getLanguage();
@@ -317,6 +318,7 @@ public class SCB implements EntryPoint, Observer {
 							}
 						} else {
 							Log.info("User is not yet logged in with his Google account");
+							leftPanelMenuForm.setStateNotRegistered();
 							loadLogin();
 						}
 					}
@@ -351,9 +353,7 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	private void createAccount() {
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
+		getBankingService();
 		bankingService.openNewAccount(new AsyncCallback<Void>() {
 
 			public void onFailure(Throwable caught) {
@@ -371,12 +371,10 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	private void showAccountDetails(String accNr) {
-		if (bankingService == null) {
-			bankingService = GWT.create(CustomerService.class);
-		}
+		getBankingService();
 		accountsDetailsPanel.clear();
 
-		currentAccount = accNr;
+		currentAccountNr = accNr;
 
 		bankingService.getAccountDetails(accNr,
 				new AsyncCallback<AccountDetailDTO>() {
@@ -448,9 +446,7 @@ public class SCB implements EntryPoint, Observer {
 				showAccountOverview();				
 			}
 			if (eventType==LeftPanelMenuForm.EVENT_SHOW_SAVING_ACCOUNT){
-				AccountDetailDTO accDetails=(AccountDetailDTO) parameter;
-				currentAccount=accDetails.getAccountNr();
-				CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(accDetails);
+				CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(currentAccountDetails);
 				
 				customerTransfer.addObserver(SCB.this);
 				accountsDetailsPanel.clear();
@@ -483,25 +479,84 @@ public class SCB implements EntryPoint, Observer {
 
 	private void showFastMoneyTransferForm() {
 		FastMoneyTransferForm mTransfer = new FastMoneyTransferForm(
-				currentAccount);
+				currentAccountNr);
 		mTransfer.addObserver(SCB.this);
 		accountsDetailsPanel.clear();
 		accountsDetailsPanel.add(mTransfer);
 	}
 
 	private void showStandardMoneyTransferForm() {
-		mTransfer=new MoneyTransferForm(currentAccount);		
+		if (!checkAccountLoaded()){
+			return;
+		}
+		mTransfer=new MoneyTransferForm(currentAccountNr);		
 		accountsDetailsPanel.clear();
 		mTransfer.addObserver(SCB.this);
 		accountsDetailsPanel.add(mTransfer);
 	}
 
+	private boolean checkAccountLoaded() {
+		if (currentAccountNr==null){
+			Window.alert(constants.errorLoadingAccount());
+			return false;
+		}
+		return true;
+	}
+
 	private void showMoneyTransferConfirmationForm(MoneyTransferDTO moneyTranfer) {
-		confirmPage = new MoneyTransferForm(currentAccount, moneyTranfer);
+		confirmPage = new MoneyTransferForm(currentAccountNr, moneyTranfer);
 		accountsDetailsPanel.clear();
 		accountsDetailsPanel.add(confirmPage);
 	}
 
+	
+	/***
+	 * loads the account Nr of the saving account into the application
+	 */
+	private void initAccountNr(){
+		
+	
+	if (currentAccountNr==null){
+		getBankingService().getSavingAccount(new AsyncCallback<AccountDetailDTO>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("We are sorry. A problem occured");
+				GWT.log("Error loading user's account",caught);
+			}
+
+			@Override
+			public void onSuccess(AccountDetailDTO result) {
+				GWT.log("acc geladen: "+result.getAccountNr());
+				currentAccountDetails=result;
+				currentAccountNr=result.getAccountNr();
+			}
+			
+		});
+	}
+	}
+
+
+	private CustomerServiceAsync getBankingService() {
+		if (bankingService == null) {
+			bankingService = GWT.create(CustomerService.class);
+		}
+		return bankingService;
+	}
+
+	private void doShowPageForActivatedUser() {
+		Log.info("Valid Account " + identityInfo);
+		String userInfo = identityInfo.getEmail();
+		if (identityInfo.getNickName() != null) {
+			userInfo = identityInfo.getNickName()
+					+ " (" + userInfo + ")";
+		}
+		scbMenu.getMenuUserInfo().setText(userInfo);
+		scbMenu.getMenuItemRegister().setVisible(false);
+		leftPanelMenuForm.setStateOpenedSavingAccount();
+		showAccountOverview();
+	}
+	
 
 
 	/**
