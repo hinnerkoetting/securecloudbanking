@@ -108,3 +108,15 @@ color: red;
 			font-size: large;
 			text-align: center;
 }
+
+.hintError{
+			font-size: large;
+			text-align: center;
+			color: red
+}
+
+.hintInfo{
+			font-size: large;
+			text-align: center;
+			color: blue
+}
