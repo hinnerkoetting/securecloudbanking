@@ -86,7 +86,7 @@ public class SCB implements EntryPoint, Observer {
 
 	MenuBar generalMenu = new MenuBar(true);
 
-		private VerticalPanel accountsDetailsPanel = new VerticalPanel();
+		
 
 	FlexTable validateErrorTable = new FlexTable();
 
@@ -218,7 +218,8 @@ public class SCB implements EntryPoint, Observer {
 
 	private void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
 		contentPanel.clear();
-		accountsDetailsPanel.clear();
+		VerticalPanel accountsDetailsPanel = new VerticalPanel();
+		
 		contentPanel.add(accountsDetailsPanel);
 		if (result.size() == 0) {
 			Label noAccountHint = new Label(
@@ -333,7 +334,7 @@ public class SCB implements EntryPoint, Observer {
 
 	private void showAccountTransactions(String accNr) {
 		getBankingService();
-		accountsDetailsPanel.clear();
+		
 
 		currentAccountNr = accNr;
 
@@ -394,7 +395,7 @@ public class SCB implements EntryPoint, Observer {
 
 	@Override
 	public void update(Observable source, Object eventType, Object parameter) {
-		System.out.println("Updated");
+		GWT.log("GUI Update");
 		if (source instanceof MoneyTransferForm) {
 			showAccountTransactions((String) parameter);
 		} else if (source instanceof FastMoneyTransferForm) {
@@ -410,8 +411,8 @@ public class SCB implements EntryPoint, Observer {
 				CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(currentAccountDetails);
 				
 				customerTransfer.addObserver(SCB.this);
-				accountsDetailsPanel.clear();
-				accountsDetailsPanel.add(customerTransfer);
+				contentPanel.clear();
+				contentPanel.add(customerTransfer);
 
 			}
 			else if (eventType==LeftPanelMenuForm.EVENT_SEND_MONEY){
@@ -445,8 +446,8 @@ public class SCB implements EntryPoint, Observer {
 		FastMoneyTransferForm mTransfer = new FastMoneyTransferForm(
 				currentAccountNr);
 		mTransfer.addObserver(SCB.this);
-		accountsDetailsPanel.clear();
-		accountsDetailsPanel.add(mTransfer);
+		contentPanel.clear();
+		contentPanel.add(mTransfer);
 	}
 
 	private void showStandardMoneyTransferForm() {
@@ -454,9 +455,9 @@ public class SCB implements EntryPoint, Observer {
 			return;
 		}
 		mTransfer=new MoneyTransferForm(currentAccountNr);		
-		accountsDetailsPanel.clear();
+		contentPanel.clear();
 		mTransfer.addObserver(SCB.this);
-		accountsDetailsPanel.add(mTransfer);
+		contentPanel.add(mTransfer);
 	}
 
 	private boolean checkAccountLoaded() {
@@ -469,8 +470,8 @@ public class SCB implements EntryPoint, Observer {
 
 	private void showMoneyTransferConfirmationForm(MoneyTransferDTO moneyTranfer) {
 		confirmPage = new MoneyTransferForm(currentAccountNr, moneyTranfer);
-		accountsDetailsPanel.clear();
-		accountsDetailsPanel.add(confirmPage);
+		contentPanel.clear();
+		contentPanel.add(confirmPage);
 	}
 
 	
