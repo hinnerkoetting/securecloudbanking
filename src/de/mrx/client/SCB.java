@@ -474,6 +474,9 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	
+
+	
+	
 	/***
 	 * loads the account Nr of the saving account into the application
 	 */
