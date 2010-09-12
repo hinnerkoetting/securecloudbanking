@@ -41,6 +41,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 	interface MyUiBinder extends UiBinder<Widget, MoneyTransferForm> {
 	}
 	
+	public final Integer EVENT_RELOAD_ACCOUNT_DETAIL=1;
 	//	private SCBMessages messages = GWT.create(SCBMessages.class);
 	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 	
@@ -103,8 +104,9 @@ public class MoneyTransferForm extends Composite implements Observable{
 	
 	@UiField
 	FlexTable validateErrorTable;
-	public MoneyTransferForm(){
+	public MoneyTransferForm(String accountNr){		
 		initWidget(uiBinder.createAndBindUi(this));
+		this.currentAccountNr=accountNr;		
 		updateForm();
 		
 	}
@@ -180,10 +182,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 		return sendMoney;
 	}
 
-	public void initWithAccountNr(String currentAccountNr){
-		this.currentAccountNr=currentAccountNr;
-		updateForm();
-	}
+	
 
 	private boolean isFieldConfirmToExpresion(TextBox input, String expression,
 			String errorMessage) {
@@ -221,9 +220,9 @@ public class MoneyTransferForm extends Composite implements Observable{
 	}
 
 	@Override
-	public void notifyObservers(Object arg) {
+	public void notifyObservers(Integer eventType,Object parameter) {
 		for (Observer o: observers){
-			o.update(this,arg);
+			o.update(this,eventType,parameter);
 		}		
 	}
 
@@ -310,7 +309,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 
 						public void onSuccess(Void result) {
 							Window.alert(constants.sendMoneyHintSuccessful());
-							notifyObservers(currentAccountNr);
+							notifyObservers(EVENT_RELOAD_ACCOUNT_DETAIL,currentAccountNr);
 
 						}
 					});

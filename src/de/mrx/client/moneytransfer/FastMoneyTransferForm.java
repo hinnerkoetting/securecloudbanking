@@ -33,7 +33,7 @@ public class FastMoneyTransferForm  extends Composite implements Observable{
 	
 	  interface FastMoneySendBinder extends UiBinder<Widget, FastMoneyTransferForm> {}
 	  
-	  
+	  	public final static Integer EVENT_SEND_MT_DTO=1;
 		private SCBConstants constants = GWT.create(SCBConstants.class);
 //		private SCBMessages messages = GWT.create(SCBMessages.class);
 		
@@ -97,7 +97,7 @@ public class FastMoneyTransferForm  extends Composite implements Observable{
 						}
 
 						public void onSuccess(MoneyTransferDTO result) {
-							notifyObservers(result);
+							notifyObservers(EVENT_SEND_MT_DTO,result);
 							Log.debug("Show confirmation page");
 							
 
@@ -160,9 +160,9 @@ public class FastMoneyTransferForm  extends Composite implements Observable{
 		}
 
 		@Override
-		public void notifyObservers(Object arg) {
+		public void notifyObservers(Integer eventType,Object parameter) {
 			for (Observer o: observers){
-				o.update(this,arg);
+				o.update(this,EVENT_SEND_MT_DTO,parameter);
 			}		
 		}
 

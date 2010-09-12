@@ -22,6 +22,12 @@ public interface CustomerService extends BankService {
 	public List<AccountDTO> getAccounts();
 	
 	
+	/**
+	 * fetches detailled information about the users saving account
+	 * @return detailed Data for Saving Account
+	 */
+	public AccountDetailDTO getSavingAccount();
+	
 	
 	/**
 	 * open a new account for the logged in customer

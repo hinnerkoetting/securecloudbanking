@@ -85,7 +85,7 @@ public class SCBMenu extends Composite implements Observable{
 	Command cmdRegister = new Command() {
 		public void execute() {
 			GWT.log("Registration starts");
-			notifyObservers(EVENT_SHOW_REGISTRATION_MENU);
+			notifyObservers(EVENT_SHOW_REGISTRATION_MENU,null);
 			
 
 		}
@@ -111,9 +111,9 @@ public class SCBMenu extends Composite implements Observable{
 	}
 
 	@Override
-	public void notifyObservers(Object arg) {
+	public void notifyObservers(Integer eventType,Object parameter) {
 		for (Observer o: observers){
-			o.update(this,arg);
+			o.update(this,eventType, parameter);
 		}		
 	}
 

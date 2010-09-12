@@ -54,12 +54,12 @@ public class CustomerTransferHistoryForm extends Composite implements Observable
 	
 	@UiHandler ("btnSendFastMoney")
 	public void sendFastMoney(ClickEvent e){
-		notifyObservers(EVENT_SEND_FAST_MONEY);
+		notifyObservers(EVENT_SEND_FAST_MONEY,null);
 	}
 	
 	@UiHandler ("btnSendStandardMoney")
 	public void sendStandardMoney(ClickEvent e){
-		notifyObservers(EVENT_SEND_MONEY);
+		notifyObservers(EVENT_SEND_MONEY,null);
 	}
 	 
 	@Override
@@ -68,9 +68,9 @@ public class CustomerTransferHistoryForm extends Composite implements Observable
 	}
 
 	@Override
-	public void notifyObservers(Object arg) {
+	public void notifyObservers(Integer eventType, Object parameter) {
 		for (Observer o: observers){
-			o.update(this,arg);
+			o.update(this,eventType,parameter);
 		}		
 	}
 }

@@ -61,4 +61,6 @@ public interface CustomerServiceAsync extends BankServiceAsync {
 			String email, double amount, String remark,
 			AsyncCallback<MoneyTransferDTO> callback);
 
+	void getSavingAccount(AsyncCallback<AccountDetailDTO> callback);
+
 }
