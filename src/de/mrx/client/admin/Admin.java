@@ -275,6 +275,7 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		scbMenu = new SCBMenu();
 		scbMenu.addObserver(this);
 		topMenuPanel.add(scbMenu);
+		
 		adminMenu.add(new Adminmenu(this));
 		content.add(new AdminWelcome());
 //	
@@ -290,13 +291,13 @@ public class Admin extends Composite implements EntryPoint,Observer {
 
 	@Override
 	public void reportInfo(String info) {
-		// TODO Auto-generated method stub
+		 GWT.log("test");
 		
 	}
 
 	@Override
 	public void reportError(String error) {
-		// TODO Auto-generated method stub
+		 GWT.log("test");
 		
 	}
 
