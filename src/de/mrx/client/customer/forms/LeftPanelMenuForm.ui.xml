@@ -1,0 +1,28 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'
+xmlns:scb='urn:import:de.mrx.client'
+ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+    <ui:style src="../../SCB.css" />
+  <g:VerticalPanel>
+  	<g:Button ui:field="overviewBtn" styleName="{style.OverViewButton}">
+  		<ui:msg description="overviewBtn">Financial State</ui:msg> 
+  	</g:Button>
+  	<g:Button ui:field="savingAccDetailBtn" styleName="{style.OverViewButton}">
+  		<ui:msg description="savingAccDetailBtn">Saving Account</ui:msg> 
+  	</g:Button>
+  	<g:Button ui:field="sendMoneyBtn" styleName="{style.OverViewButton}">
+  		<ui:msg description="sendMoneyBtn">Send Money</ui:msg> 
+  	</g:Button>
+  	<g:Button ui:field="sendFastMoneyBtn" styleName="{style.OverViewButton}">
+  		<ui:msg description="sendFastMoneyBtn">FastEmail MoneyTransfer</ui:msg> 
+  	</g:Button>
+  	<g:Button ui:field="openNewAccount" styleName="{style.OverViewButton}">
+  		<ui:msg description="openNewAccount">Open New account</ui:msg> 
+  	</g:Button>
+  	<g:Button ui:field="registerBtn" styleName="{style.OverViewButton}">
+  		<ui:msg description="registerBtn">Register</ui:msg> 
+  	</g:Button>
+  </g:VerticalPanel>
+</ui:UiBinder>
+
