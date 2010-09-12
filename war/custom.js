@@ -82,7 +82,7 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 	
 		 	
 		 	
-		 	var t=setTimeout(timedMsg(),300);
+		 	var t=setTimeout(timedMsg,300);
 		 }
 	 
 	 $(document).ready(function() {
