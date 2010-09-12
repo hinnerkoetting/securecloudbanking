@@ -1,0 +1,14 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style src="SCB.css" />
+	
+	<g:HTMLPanel>
+	
+		<g:Label ui:field="transferHistoryNoTransactionHint" visible="false">
+			For this account there are no outgoing neither incoming transactions.
+		</g:Label>
+		
+		<g:FlexTable  ui:field="flexTable"/>
+	</g:HTMLPanel>
+</ui:UiBinder> 
