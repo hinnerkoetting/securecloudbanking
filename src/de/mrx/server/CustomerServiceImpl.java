@@ -422,6 +422,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			msg
 					.setText("Congratulations. You have activated your account at Secure Cloud Banking. Attached you find the Transaction numbers");
 			msg.setContent(outboundMultipart);
+			
 			Transport.send(msg);
 
 			log.info("Registration received: " + id);
