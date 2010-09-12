@@ -119,7 +119,7 @@ public class SCB implements EntryPoint, Observer {
 		contentPanel.clear();
 
 		HTML text = new HTML(constants.registrationIntroductionText());
-		text.setStyleName("centerAligned");
+		text.setStyleName("centerBlockText");
 		scbLogo = new Image("images/banking.jpg");
 		scbLogo.setStyleName("centerAligned");
 
@@ -457,6 +457,7 @@ public class SCB implements EntryPoint, Observer {
 
 	private void showMoneyTransferConfirmationForm(MoneyTransferDTO moneyTranfer) {
 		confirmPage = new MoneyTransferForm(currentAccountNr, moneyTranfer);
+		confirmPage.addObserver(this);
 		contentPanel.clear();
 		contentPanel.add(confirmPage);
 	}

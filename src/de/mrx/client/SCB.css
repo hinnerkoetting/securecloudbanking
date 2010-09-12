@@ -96,14 +96,18 @@ margin-left:0.2cm;
   text-align:right
 }
 
-.centerAligned{
-  text-align:center;    
-   display:block;  
-  color:blue;
-  font-size:large;
+.centerAligned{      
   margin-left: 3cm;
-    margin-right: auto;
+  margin-right: auto;
       
+}
+
+.centerBlockText{
+      
+  display:block;  
+  color:blue;
+  font-size:medium;
+  font-size:medium; 
 }
 
 .title {
