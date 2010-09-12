@@ -224,6 +224,18 @@ public class MoneyTransferForm extends Composite implements Observable{
 
 	
 	
+	public void reportError(String text) {
+		for (Observer o: observers){
+			o.reportError(text);
+		}		
+	}
+	
+	public void reportInfo(String text) {
+		for (Observer o: observers){
+			o.reportInfo(text);
+		}		
+	}
+	
 	
 	
 	public void setReceiverAccountNr(TextBox receiverAccountNr) {
@@ -304,7 +316,9 @@ public class MoneyTransferForm extends Composite implements Observable{
 						}
 
 						public void onSuccess(Void result) {
-							Window.alert(constants.sendMoneyHintSuccessful());
+							
+							reportInfo(constants.sendMoneyHintSuccessful());
+//							Window.alert(constants.sendMoneyHintSuccessful());
 							notifyObservers(EVENT_RELOAD_ACCOUNT_DETAIL,currentAccountNr);
 
 						}

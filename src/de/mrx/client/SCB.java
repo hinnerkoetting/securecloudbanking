@@ -8,6 +8,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -19,8 +21,10 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.customer.forms.CustomerTransferHistoryForm;
 import de.mrx.client.customer.forms.FastMoneyTransferForm;
@@ -41,11 +45,30 @@ public class SCB implements EntryPoint, Observer {
 
 	public static final String PAGEID_HEADER = "cloudbanking";
 	public static final String PAGEID_CONTENT = "content";
-	public static final String PAGEID_FEHLER = "fehler";
-	public static final String PAGEID_SIGN = "signInOut";
+//	public static final String PAGEID_FEHLER = "fehler";
+//	public static final String PAGEID_SIGN = "signInOut";
 
 	public final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
 	String currentLanguage = "de";
+	
+	interface MyUiBinder extends UiBinder<Widget, SCB> {
+	} 
+	
+	
+	
+	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+	
+	@UiField
+	VerticalPanel navigationPanel;
+	
+	@UiField
+	VerticalPanel contentPanel;
+	
+	@UiField
+	HorizontalPanel hintPanel;
+	
+	@UiField
+	HorizontalPanel menuPanel;
 
 	RegistrationForm regForm;
 
@@ -77,9 +100,15 @@ public class SCB implements EntryPoint, Observer {
 
 	private SCBIdentityDTO identityInfo = null;
 	private VerticalPanel loginPanel = new VerticalPanel();
-
-	private Anchor signInLink = new Anchor(constants.signIn());
-	private Anchor signOutLink = new Anchor(constants.signOut());
+	
+	@UiField
+	Anchor signIn;
+	
+	@UiField
+	Anchor signOut;
+	
+//	private Anchor signInLink = new Anchor(constants.signIn());
+//	private Anchor signOutLink = new Anchor(constants.signOut());
 
 
 
@@ -102,33 +131,31 @@ public class SCB implements EntryPoint, Observer {
 	
 
 	private void doShowAbout(boolean picture) {
-		RootPanel r = RootPanel.get(PAGEID_CONTENT);
-		if (r == null)
-			return;
-		r.clear();
-		informationPanel = new VerticalPanel();
+		contentPanel.clear();
+		
 		HTML text = new HTML(constants.registrationIntroductionText());
 		text.setStyleName("centerAligned");
 		scbLogo = new Image("images/banking.jpg");
 		scbLogo.setStyleName("centerAligned");
 
-		informationPanel.add(text);
+		contentPanel.add(text);
 		if (picture) {
-			informationPanel.add(scbLogo);
+			contentPanel.add(scbLogo);
 		}
 
-		RootPanel.get(PAGEID_CONTENT).add(informationPanel);
+
 	}
 
 	private void doOpenRegisterMenu() {
-		RootPanel.get(PAGEID_CONTENT).clear();
-		doShowAbout(false);
+		
 		if (regForm == null) {
-			regForm = new RegistrationForm(signInLink);
+			regForm = new RegistrationForm(signIn);
 			regForm.setUser(identityInfo);
 		}
 
-		RootPanel.get(PAGEID_CONTENT).add(regForm);
+		navigationPanel.clear();
+		
+		contentPanel.add(regForm);
 	}
 
 	/**
@@ -140,6 +167,7 @@ public class SCB implements EntryPoint, Observer {
 		scbMenu = new SCBMenu();
 		scbMenu.addObserver(this);
 		// tempMainpanel.add(menu);
+		
 		v.add(scbMenu);
 		return v;
 	}
@@ -148,29 +176,35 @@ public class SCB implements EntryPoint, Observer {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-
+		
 		try {
-			GWT.log("On Module Load");
-			RootPanel r = RootPanel.get(PAGEID_HEADER);
-			if (r == null) {
-				GWT.log("Root not found: '" + PAGEID_HEADER + "'");
-				return;
-			}
+			RootLayoutPanel.get().add(uiBinder.createAndBindUi(this));
+//			GWT.log("On Module Load");
+//			RootPanel r = RootPanel.get(PAGEID_HEADER);
+//			if (r == null) {
+//				GWT.log("Root not found: '" + PAGEID_HEADER + "'");
+//				return;
+//			}
 
 			// RootPanel.get(PAGEID_FEHLER).add(divLogger);
 			Log.setUncaughtExceptionHandler();
 
-			mainPanel = createMainPanel();
+//			mainPanel = createMainPanel();
+			scbMenu = new SCBMenu();
+			scbMenu.addObserver(this);
+			menuPanel.add(scbMenu);
 
-			r.add(mainPanel);
+//			r.add(mainPanel);
 
 			leftPanelMenuForm = new LeftPanelMenuForm();
+			navigationPanel.add(leftPanelMenuForm);
+			
 			leftPanelMenuForm.addObserver(this);
 			checkGoogleStatus();
 			initAccountNr();
+			
 			doShowAbout(true);
-			GWT.log("Module loaded");
-			//GWT:	startAttack();
+			
 
 		} catch (Exception e) {
 			GWT.log(e.getMessage());
@@ -178,62 +212,21 @@ public class SCB implements EntryPoint, Observer {
 		}
 	}
 
-	private void showAccountOverview() {
-		RootPanel.get(PAGEID_CONTENT).clear();
-		accountOverviewPanel.clear();
-		accountsDetailsPanel.clear();
-		accountsListPanel.clear();
-		Log.debug("Show Account Overview");
+	private void showAccountOverviewForSingleAccount(){
+		List accWrapper=new ArrayList<AccountDTO>();
+		if (currentAccountNr==null){
+			GWT.log("account data not yet loaded. Can not show detail");
+			return;
+		}
+		accWrapper.add(currentAccountDetails);
+		showAccountOverviewInDetailPanel(accWrapper);
 		
-		accountOverviewPanel.add(leftPanelMenuForm);
-		accountOverviewPanel.add(accountsListPanel);
-		accountOverviewPanel.add(accountsDetailsPanel);
-
-		getBankingService();
-		bankingService.getAccounts(new AsyncCallback<List<AccountDTO>>() {
-
-			public void onFailure(Throwable caught) {
-				Log.error("Loading Account data failed", caught);
-				return;
-
-			}
-
-			public void onSuccess(List<AccountDTO> result) {
-				if (result == null) {
-					Log.warn("No accounts");
-
-				} else {
-					Log.info("Number of Accounts: " + result.size());
-										showAccountOverviewInDetailPanel(result);
-					
-					
-					if (result.size() == 0) {
-						Button neuerAccountBtn = new Button(constants
-								.overViewBtnOpenSavingAccount());
-						neuerAccountBtn.setStyleName("OverViewButton");
-						neuerAccountBtn.addClickHandler(new ClickHandler() {
-
-							public void onClick(ClickEvent event) {
-								createAccount();
-							}
-
-						});
-						Log.debug("Include 'open saving account button");
-						accountsListPanel.add(neuerAccountBtn);
-
-					}
-				}
-
-				RootPanel.get(PAGEID_CONTENT).add(accountOverviewPanel);
-				Log.debug("Overview Page loaded");
-
-			}
-		});
-
 	}
 
 	private void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
+		contentPanel.clear();
 		accountsDetailsPanel.clear();
+		contentPanel.add(accountsDetailsPanel);
 		if (result.size() == 0) {
 			Label noAccountHint = new Label(
 					constants.accountOverviewHintNoAccount());
@@ -328,27 +321,19 @@ public class SCB implements EntryPoint, Observer {
 
 	private void loadLogin() {
 		// Assemble login panel.
-		signInLink.setHref(identityInfo.getLoginUrl());
-		signInLink.setStyleName("rightAligned");
-
-		// loginPanel.add(onlyGoogleAllowedLabel);
-		// loginPanel.add(signInLink);
-		RootPanel.get(PAGEID_SIGN).remove(signInLink);
-		RootPanel.get(PAGEID_SIGN).remove(signOutLink);
-		RootPanel.get(PAGEID_SIGN).add(signInLink);
-
-		// RootPanel.get(PAGEID_HEADER).add(signInLink);
+		signIn.setHref(identityInfo.getLoginUrl());
+		signIn.setText(constants.signIn());
+		signIn.setVisible(true);
+		signOut.setVisible(false);
 	}
 
 	private void loadLoggedInSetup() {
 		// Assemble logout panel.
 
-		signOutLink.setHref(identityInfo.getLogoutUrl());
-		// loginPanel.add(logoutLabel);
-		loginPanel.add(signOutLink);
-		RootPanel.get(PAGEID_SIGN).remove(signInLink);
-		RootPanel.get(PAGEID_SIGN).remove(signOutLink);
-		RootPanel.get(PAGEID_SIGN).add(signOutLink);
+		signOut.setHref(identityInfo.getLogoutUrl());
+		signOut.setText(constants.signOut());
+		signIn.setVisible(false);
+		signOut.setVisible(true);
 
 	}
 
@@ -370,7 +355,7 @@ public class SCB implements EntryPoint, Observer {
 
 	}
 
-	private void showAccountDetails(String accNr) {
+	private void showAccountTransactions(String accNr) {
 		getBankingService();
 		accountsDetailsPanel.clear();
 
@@ -388,8 +373,8 @@ public class SCB implements EntryPoint, Observer {
 						CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(
 								result);
 						customerTransfer.addObserver(SCB.this);
-
-						accountsDetailsPanel.add(customerTransfer);
+						contentPanel.clear();
+						contentPanel.add(customerTransfer);
 
 					}
 				});
@@ -405,7 +390,7 @@ public class SCB implements EntryPoint, Observer {
 		}
 
 		public void onClick(ClickEvent event) {
-			showAccountDetails(accNr);
+			showAccountTransactions(accNr);
 		}
 
 	}
@@ -420,7 +405,7 @@ public class SCB implements EntryPoint, Observer {
 		String debugFlag = Window.Location.getParameter("gwt.codesvr");
 
 		if (debugFlag != null) {
-			reloadURL = GWT.getHostPageBaseURL() + queryPart + "&locale="
+			reloadURL = GWT.getHostPageBaseURL() +"?gwt.codesvr="+ debugFlag + "&locale="
 					+ language;
 		} else {
 			reloadURL = GWT.getHostPageBaseURL() + "?locale=" + language;
@@ -435,7 +420,7 @@ public class SCB implements EntryPoint, Observer {
 	public void update(Observable source, Object eventType, Object parameter) {
 		System.out.println("Updated");
 		if (source instanceof MoneyTransferForm) {
-			showAccountDetails((String) parameter);
+			showAccountTransactions((String) parameter);
 		} else if (source instanceof FastMoneyTransferForm) {
 			if (parameter instanceof MoneyTransferDTO) {
 				showMoneyTransferConfirmationForm((MoneyTransferDTO) parameter);
@@ -443,7 +428,7 @@ public class SCB implements EntryPoint, Observer {
 			}
 		}else if(source instanceof LeftPanelMenuForm){
 			if (eventType==LeftPanelMenuForm.EVENT_SHOW_OVERVIEW){
-				showAccountOverview();				
+				showAccountOverviewForSingleAccount();			
 			}
 			if (eventType==LeftPanelMenuForm.EVENT_SHOW_SAVING_ACCOUNT){
 				CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(currentAccountDetails);
@@ -554,10 +539,23 @@ public class SCB implements EntryPoint, Observer {
 		scbMenu.getMenuUserInfo().setText(userInfo);
 		scbMenu.getMenuItemRegister().setVisible(false);
 		leftPanelMenuForm.setStateOpenedSavingAccount();
-		showAccountOverview();
+		showAccountOverviewForSingleAccount();
+		
 	}
 	
-
+	public void reportError(String errorText){		
+		hintPanel.clear();		
+		Label l=new Label(errorText);
+		l.setStyleName("hintError");
+		hintPanel.add(l);
+	}
+	
+	public  void reportInfo(String infoText){
+		hintPanel.clear();		
+		Label l=new Label(infoText);
+		l.setStyleName("hintInfo");
+		hintPanel.add(l);
+	}
 
 	/**
 	 * this is the injection for a Javascript-Attacker with GWT

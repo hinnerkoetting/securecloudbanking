@@ -96,10 +96,15 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	public AccountDetailDTO getSavingAccount(){
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
-		
+		if (user==null) {
+			return null;
+		}
 
 		pm = PMF.get().getPersistenceManager();
 		InternalSCBAccount savingAccount= InternalSCBAccount.getOwnByEmail(pm,user.getEmail());
+		if (savingAccount==null) {
+			return null;
+		}
 		return savingAccount.getDetailedDTO(pm);
 	}
 
