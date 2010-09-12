@@ -10,9 +10,7 @@ import java.util.Properties;
 import java.util.Random;
 
 import javax.activation.DataHandler;
-import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.jdo.annotations.PersistenceAware;
 import javax.mail.Message;
 import javax.mail.MessagingException;

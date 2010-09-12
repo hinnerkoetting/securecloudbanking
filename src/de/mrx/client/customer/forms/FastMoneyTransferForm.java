@@ -1,4 +1,4 @@
-package de.mrx.client.moneytransfer;
+package de.mrx.client.customer.forms;
 
 import java.util.ArrayList;
 import java.util.List;

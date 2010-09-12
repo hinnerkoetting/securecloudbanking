@@ -8,7 +8,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -21,25 +20,18 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-import de.mrx.client.forms.LeftPanelMenuForm;
-import de.mrx.client.moneytransfer.FastMoneyTransferForm;
-import de.mrx.client.moneytransfer.MoneyTransferForm;
+import de.mrx.client.customer.forms.CustomerTransferHistoryForm;
+import de.mrx.client.customer.forms.FastMoneyTransferForm;
+import de.mrx.client.customer.forms.LeftPanelMenuForm;
+import de.mrx.client.customer.forms.MoneyTransferForm;
 import de.mrx.client.register.RegistrationForm;
-
-import com.google.gwt.query.client.GQuery;
-import com.google.gwt.query.client.Function;
-import com.google.gwt.query.client.Selector;
-import com.google.gwt.query.client.Selectors;
-import static com.google.gwt.query.client.GQuery.*;
-import static com.google.gwt.query.client.css.CSS.*;
 
 /**
  * Complete GUI for Secure Cloud Banking. Includes Registration process, general
  * information, and online banking Entry point classes define
- * <code>onModuleLoad()</code>. TODO: This class is too big! Split!
+ * <code>onModuleLoad()</code>. 
  * 
  */
 public class SCB implements EntryPoint, Observer {
@@ -53,7 +45,7 @@ public class SCB implements EntryPoint, Observer {
 	public static final String PAGEID_SIGN = "signInOut";
 
 	public final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
-	String currentLanguage = "en";
+	String currentLanguage = "de";
 
 	RegistrationForm regForm;
 
@@ -89,7 +81,7 @@ public class SCB implements EntryPoint, Observer {
 	private Anchor signInLink = new Anchor(constants.signIn());
 	private Anchor signOutLink = new Anchor(constants.signOut());
 
-	private MenuBar menu;
+
 
 	private String currentAccount;
 
@@ -405,29 +397,7 @@ public class SCB implements EntryPoint, Observer {
 				});
 	}
 
-	private boolean isFieldConfirmToExpresion(TextBox input, String expression,
-			String errorMessage) {
-		if (input.getText().trim().toUpperCase().matches(expression)) {
-			input.setStyleName("");
-			return true;
-		} else {
-			input.setStyleName(STYLE_VALUE_NOT_OKAY);
-			Log.info("Text: '" + input.getText() + "'\tExpression: "
-					+ expression);
-			hints.add(errorMessage);
-			return false;
-		}
-
-	}
-
-	private void createHintTable() {
-		for (int i = 0; i < hints.size(); i++) {
-			String currentMessage = hints.get(i);
-			Label hintLabel = new Label(currentMessage);
-			hintLabel.setStyleName(STYLE_VALUE_NOT_OKAY);
-			validateErrorTable.setWidget(i, 1, hintLabel);
-		}
-	}
+	
 
 	class AccountClickHandler implements ClickHandler {
 		String accNr;
