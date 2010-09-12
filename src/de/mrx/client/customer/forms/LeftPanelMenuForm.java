@@ -101,23 +101,24 @@ public class LeftPanelMenuForm extends Composite implements Observable{
 	
 	@UiHandler("savingAccDetailBtn")	
 	public void showSavingAccount(ClickEvent e){
-		customerService.getSavingAccount(new AsyncCallback<AccountDetailDTO>() {
-			
-			@Override
-			public void onSuccess(AccountDetailDTO result) {
-				notifyObservers(EVENT_SHOW_SAVING_ACCOUNT,result);
-
-				
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log("showOverviewErro",caught);
-				Window.alert("Fehler: "+caught.getMessage());
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		notifyObservers(EVENT_SHOW_SAVING_ACCOUNT,null);
+//		customerService.getSavingAccount(new AsyncCallback<AccountDetailDTO>() {
+//			
+//			@Override
+//			public void onSuccess(AccountDetailDTO result) {
+//				notifyObservers(EVENT_SHOW_SAVING_ACCOUNT,result);
+//
+//				
+//			}
+//			
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				GWT.log("showOverviewErro",caught);
+//				Window.alert("Fehler: "+caught.getMessage());
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		});
 		
 	}
 	

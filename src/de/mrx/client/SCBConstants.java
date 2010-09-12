@@ -17,6 +17,8 @@ public interface SCBConstants extends Constants{
 	 @DefaultStringValue("Sign Out")
 	 String signOut();
 	 
+	 @DefaultStringValue("Can not load your account data")
+	 String errorLoadingAccount();
 	 
 	 @DefaultStringValue("Our business will soon offer service. Please try again the other day!")
 	 String outOfServiceNotice();
