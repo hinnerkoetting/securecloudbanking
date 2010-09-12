@@ -158,19 +158,7 @@ public class SCB implements EntryPoint, Observer {
 		contentPanel.add(regForm);
 	}
 
-	/**
-	 * REMOVEME: temporal workaround until refactoring
-	 */
-	public VerticalPanel createMainPanel() {
 
-		VerticalPanel v = new VerticalPanel();
-		scbMenu = new SCBMenu();
-		scbMenu.addObserver(this);
-		// tempMainpanel.add(menu);
-		
-		v.add(scbMenu);
-		return v;
-	}
 
 	/**
 	 * This is the entry point method.
