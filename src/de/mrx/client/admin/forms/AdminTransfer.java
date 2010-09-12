@@ -21,8 +21,10 @@ import com.google.gwt.user.client.ui.Widget;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.TableStyler;
 import de.mrx.client.admin.Admin;
+import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
+import de.mrx.shared.SCBData;
 
 public class AdminTransfer extends Composite {
 
@@ -108,15 +110,17 @@ public class AdminTransfer extends Composite {
 	
 	Admin adminpage;
 	
-	private static String SCB_PLZ = "1502222";
+	
+	
+	AdminConstants constants = GWT.create(AdminConstants.class);
 	
 	public AdminTransfer(Admin admin, String accNr, String accOwner) {
 		this.adminpage = admin;
 		initWidget(uiBinder.createAndBindUi(this));
-		title.setText("Transfer Money");		
-		descName.setText("Name");
-		descNr.setText("Account Number");
-		descBLZ.setText("BLZ");
+		title.setText(constants.transferMoney());		
+		descName.setText(constants.name());
+		descNr.setText(constants.accountNr());
+		descBLZ.setText(constants.blz());
 		descRecipient.setText("Recipient");
 		descSender.setText("Sender");
 			
@@ -128,16 +132,16 @@ public class AdminTransfer extends Composite {
 		recipientNr.setEnabled(false);
 		
 		//TODO this should be a reference to BLZ string
-		recipientBLZ.setText(SCB_PLZ);
+		recipientBLZ.setText(SCBData.SCB_PLZ);
 		recipientBLZ.setEnabled(false);
 		
-		descOwner.setText("Owner");
-		descAccountNr.setText("Account No.");			
-		descRemark.setText("Remark");		
-		descAmount.setText("Amount");
-		submit.setText("Submit");
-		search.setText("Search");
-		searchTitle.setText("Search for sender");
+		descOwner.setText(constants.owner());
+		descAccountNr.setText(constants.accountNr());			
+		descRemark.setText(constants.remark());		
+		descAmount.setText(constants.amount());
+		submit.setText(constants.submit());
+		search.setText(constants.search());
+		searchTitle.setText(constants.searchForSender());
 		
 	}
 
@@ -204,9 +208,9 @@ public class AdminTransfer extends Composite {
 		final int posAccount 		= 1;
 		final int posInsert			= 2;
 		//add header
-		searchTable.setWidget(0, posOwner, new Label("Owner"));
-		searchTable.setWidget(0, posAccount, new Label("Account No."));
-		searchTable.setWidget(0, posInsert, new Label("Insert"));
+		searchTable.setWidget(0, posOwner, new Label(constants.owner()));
+		searchTable.setWidget(0, posAccount, new Label(constants.accountNr()));
+		searchTable.setWidget(0, posInsert, new Label(constants.insert()));
 		
 		//add all accounts to table
 		int row = 1;		
@@ -214,14 +218,14 @@ public class AdminTransfer extends Composite {
 		for (AccountDTO account: accounts) {	
 			searchTable.setWidget(row, posAccount, new Label(account.getAccountNr()));			
 			searchTable.setWidget(row, posOwner, new Label(account.getOwner()));
-			Button insertButton = new Button("Insert");
+			Button insertButton = new Button(constants.insert());
 			final String accNr = account.getAccountNr();
 			final String accOwner = account.getOwner();
 			insertButton.addClickHandler(new ClickHandler() {
 				
 				@Override
 				public void onClick(ClickEvent event) {
-					senderBLZ.setText(SCB_PLZ);
+					senderBLZ.setText(SCBData.SCB_PLZ);
 					senderName.setText(accOwner);
 					senderNr.setText(accNr);
 				}

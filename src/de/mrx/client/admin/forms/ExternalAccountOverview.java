@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.Widget;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.TableStyler;
 import de.mrx.client.admin.Admin;
+import de.mrx.client.admin.AdminConstants;
 /**
  * 
  * shows all accounts of an external bank
@@ -32,6 +33,8 @@ public class ExternalAccountOverview extends Composite {
 	
 	Admin adminPage;
 	
+	AdminConstants constants = GWT.create(AdminConstants.class);
+	
 	public ExternalAccountOverview( Admin admin) {
 		initWidget(uiBinder.createAndBindUi(this));
 //		table.setWidget(0,0, new Label(bank.getBlz()));
@@ -48,8 +51,8 @@ public class ExternalAccountOverview extends Composite {
 
 		
 		//add header
-		table.setWidget(0, posAccount, new Label("Account No."));
-		table.setWidget(0, posOwner, new Label("Owner"));
+		table.setWidget(0, posAccount, new Label(constants.accountNr()));
+		table.setWidget(0, posOwner, new Label(constants.owner()));
 
 		
 		//add all accounts to table

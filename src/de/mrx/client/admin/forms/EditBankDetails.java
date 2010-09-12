@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.BankDTO;
 import de.mrx.client.admin.Admin;
+import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
@@ -49,14 +50,16 @@ public class EditBankDetails extends Composite {
 	
 	Admin adminpage; 
 	
+	AdminConstants constants = GWT.create(AdminConstants.class);
+	
 	public EditBankDetails(Admin admin,String oldBLZ, String oldName) {
 		adminpage = admin;
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		title.setText("Edit bank details");
-		descName.setText("Name");
-		descBlz.setText("Blz");
-		submit.setText("Submit");
+		title.setText(constants.editBankDetails());
+		descName.setText(constants.name());
+		descBlz.setText(constants.blz());
+		submit.setText(constants.blz());
 		this.oldBLZ = oldBLZ;
 		this.oldName = oldName;
 		name.setText(oldName);

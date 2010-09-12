@@ -7,6 +7,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
+import de.mrx.client.admin.AdminConstants;
+
 public class AdminWelcome extends Composite {
 
 	private static AdminWelcomeUiBinder uiBinder = GWT
@@ -18,9 +20,11 @@ public class AdminWelcome extends Composite {
 	@UiField
 	Label welcome;
 
+	AdminConstants constants = GWT.create(AdminConstants.class);
+	
 	public AdminWelcome() {
 		initWidget(uiBinder.createAndBindUi(this));
-		welcome.setText("Welcome to the admin interface!");
+		welcome.setText(constants.adminWelcome());
 	}
 
 

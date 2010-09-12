@@ -20,8 +20,10 @@ import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.MoneyTransferDTO;
+import de.mrx.client.SCBConstants;
 import de.mrx.client.TableStyler;
 import de.mrx.client.admin.Admin;
+import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
@@ -33,16 +35,12 @@ public class AccountOverview extends Composite {
 	interface AccountOverviewUiBinder extends UiBinder<Widget, AccountOverview> {
 	}
 
-	private static String ACCOUNT_OWNER = "Owner";
-	private static String ACCOUNT_NR = "Account No.";
 
 	@UiField
 	FlexTable overviewTable;
 	
 	@UiField
 	Label title;
-	
-	
 	
 	@UiField
 	Label descOwner;
@@ -61,15 +59,18 @@ public class AccountOverview extends Composite {
 	
 	Admin adminPage;
 	
+	AdminConstants constants = GWT.create(AdminConstants.class);
+	
 	public AccountOverview(Admin admin) {
+		
 		this.adminPage = admin;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		title.setText("SCB accounts");
-		descOwner.setText(ACCOUNT_OWNER);
-		descAccountNr.setText(ACCOUNT_NR);
-		search.setText("Search");		
+		title.setText(constants.accountOverview());
+		descOwner.setText(constants.owner());
+		descAccountNr.setText(constants.accountNr());
+		search.setText(constants.search());		
 	}
 	
 	public void setAccounts(List<AccountDTO> accounts){
@@ -84,12 +85,12 @@ public class AccountOverview extends Composite {
 		final int posDelete 		= 5;
 		
 		//add header
-		overviewTable.setWidget(0, posAccount, new Label(ACCOUNT_NR));
-		overviewTable.setWidget(0, posBalance, new Label("Balance"));
-		overviewTable.setWidget(0, posOwner, new Label(ACCOUNT_OWNER));
-		overviewTable.setWidget(0, posTransaction, new Label("Transactions"));
-		overviewTable.setWidget(0, posTransfer, new Label("Transfer Money"));
-		overviewTable.setWidget(0, posDelete, new Label("Delete Account"));
+		overviewTable.setWidget(0, posAccount, new Label(constants.owner()));
+		overviewTable.setWidget(0, posBalance, new Label(constants.balance()));
+		overviewTable.setWidget(0, posOwner, new Label(constants.accountNr()));
+		overviewTable.setWidget(0, posTransaction, new Label(constants.transactions()));
+		overviewTable.setWidget(0, posTransfer, new Label(constants.transferMoney()));
+		overviewTable.setWidget(0, posDelete, new Label(constants.deleteAccount()));
 		
 		
 		//add all accounts to table
@@ -107,7 +108,7 @@ public class AccountOverview extends Composite {
 			/**
 			 * show transactions of this account
 			 */
-			Button showTransactions = new Button("Display");			
+			Button showTransactions = new Button(constants.display());			
 			
 			showTransactions.addClickHandler(new ClickHandler() {	
 				public void onClick(ClickEvent event) {
@@ -137,7 +138,7 @@ public class AccountOverview extends Composite {
 			/**
 			 * add money to this account
 			 */
-			Button transferMoney = new Button("Transfer");
+			Button transferMoney = new Button(constants.transfer());
 			
 			transferMoney.addClickHandler(new ClickHandler() {
 				
@@ -149,12 +150,12 @@ public class AccountOverview extends Composite {
 			});
 			overviewTable.setWidget(row, posTransfer, transferMoney);
 			
-			Button deleteButton = new Button("Delete");
+			Button deleteButton = new Button(constants.delete());
 			deleteButton.addClickHandler(new ClickHandler() {
 				
 				@Override
 				public void onClick(ClickEvent event) {
-					if (Window.confirm("Are you sure? This will delete this account!")) {
+					if (Window.confirm(constants.deleteAccountConfirm())) {
 						AdminServiceAsync adminService = GWT.create(AdminService.class);
 						adminService.deleteInternalAccount(accNr, new AsyncCallback<String>() {
 
