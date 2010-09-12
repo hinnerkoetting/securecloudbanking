@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.admin.Admin;
+import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
@@ -34,13 +35,16 @@ public class Adminmenu extends Composite {
 	
 	Admin adminpage;
 	
+	AdminConstants constants = GWT.create(AdminConstants.class);
+	
 	public Adminmenu(Admin admin) {
 		adminpage = admin;
 		initWidget(uiBinder.createAndBindUi(this));
-		accounts.setText("Accounts");
-		externalBanks.setText("External banks");
 		
-		generateData.setText("Generate data");
+		accounts.setText(constants.accounts());
+		externalBanks.setText(constants.externalBanks());
+		
+		generateData.setText(constants.generateData());
 	}
 
 	@UiHandler("accounts")
@@ -56,7 +60,7 @@ public class Adminmenu extends Composite {
 	
 	@UiHandler("generateData")
 	void onClickGenerateData(ClickEvent e) {
-		if (Window.confirm("Are you sure?\nThis will delete all current data!")) {
+		if (Window.confirm(constants.generateDataConfirm())) {
 			AdminServiceAsync bankingService = GWT.create(AdminService.class);
 			bankingService.generateTestData(new AsyncCallback<String>() {
 				

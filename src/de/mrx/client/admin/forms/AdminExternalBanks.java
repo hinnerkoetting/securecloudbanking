@@ -21,8 +21,10 @@ import com.google.gwt.user.client.ui.Widget;
 import de.mrx.client.BankDTO;
 import de.mrx.client.TableStyler;
 import de.mrx.client.admin.Admin;
+import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
+import de.mrx.shared.SCBData;
 
 
 public class AdminExternalBanks extends Composite {
@@ -45,12 +47,14 @@ public class AdminExternalBanks extends Composite {
 	
 	Admin adminpage;
 	
+	AdminConstants constants = GWT.create(AdminConstants.class);
+	
 	public AdminExternalBanks(Admin admin) {
 		this.adminpage = admin;
 		
 		initWidget(uiBinder.createAndBindUi(this));
-		title.setText("External Banks");
-		addBank.setText("Add Bank");
+		title.setText(constants.externalBanks());
+		addBank.setText(constants.addBank());
 	}
 	
 	public void setBanks(List<BankDTO> banks) {
@@ -63,16 +67,16 @@ public class AdminExternalBanks extends Composite {
 		
 		//add header
 		
-		table.setWidget(0, namePos, new Label("Name"));
-		table.setWidget(0, blzPos, new Label("BLZ"));
-		table.setWidget(0, viewPos, new Label("View accounts"));
-		table.setWidget(0, editPos, new Label("Edit details"));
-		table.setWidget(0, deletePos, new Label("Delete"));
+		table.setWidget(0, namePos, new Label(constants.name()));
+		table.setWidget(0, blzPos, new Label(constants.blz()));
+		table.setWidget(0, viewPos, new Label(constants.viewAccounts()));
+		table.setWidget(0, editPos, new Label(constants.editDetails()));
+		table.setWidget(0, deletePos, new Label(constants.delete()));
 		TableStyler.setTableStyle(table);
 		
 		int row= 1;
 		for (final BankDTO bank: banks) {
-			if (bank.getName().equals("Secure Cloud Bank"))
+			if (bank.getName().equals(SCBData.SCB_NAME))
 				continue;
 			//name
 			table.setWidget(row, namePos, new Label(bank.getName()));
@@ -81,7 +85,7 @@ public class AdminExternalBanks extends Composite {
 			table.setWidget(row, blzPos, new Label(bank.getBlz()));
 			
 			//view
-			Button viewButton = new Button("View");
+			Button viewButton = new Button(constants.display());
 			
 			viewButton.addClickHandler(new ClickHandler() {				
 				@Override
@@ -92,7 +96,7 @@ public class AdminExternalBanks extends Composite {
 			table.setWidget(row, viewPos, viewButton);
 			
 			//edit
-			Button editButton = new Button("Edit");
+			Button editButton = new Button(constants.edit());
 			editButton.addClickHandler(new ClickHandler() {
 				
 				@Override
@@ -105,12 +109,12 @@ public class AdminExternalBanks extends Composite {
 			
 			
 			//delete
-			Button deleteButton = new Button("Delete");
+			Button deleteButton = new Button(constants.delete());
 			deleteButton.addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
-					if (Window.confirm("Are you sure? This will delete this bank and all its accounts!")) {
+					if (Window.confirm(constants.deleteBankConfirm())) {
 						AdminServiceAsync adminService = GWT.create(AdminService.class);
 						adminService.deleteBank(bank.getBlz(), new AsyncCallback<String>() {
 							

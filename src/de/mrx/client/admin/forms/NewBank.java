@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.BankDTO;
 import de.mrx.client.admin.Admin;
+import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
@@ -44,13 +45,16 @@ public class NewBank extends Composite {
 	Button submit;
 	
 	Admin adminPage;
+	
+	AdminConstants constants = GWT.create(AdminConstants.class);
+	
 	public NewBank(Admin admin) {
 		this.adminPage = admin;
 		initWidget(uiBinder.createAndBindUi(this));
-		title.setText("Add new Bank");
-		descName.setText("Name");
-		descBlz.setText("Blz");
-		submit.setText("Submit");
+		title.setText(constants.addNewBank());
+		descName.setText(constants.name());
+		descBlz.setText(constants.blz());
+		submit.setText(constants.submit());
 	}
 	
 	@UiHandler("submit")
