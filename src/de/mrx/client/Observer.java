@@ -5,5 +5,5 @@ package de.mrx.client;
  * @see java.util.Observer
  */
 public interface Observer {
-	public void update(Observable o, Object arg); 
+	public void update(Observable source, Object event,Object parameter); 
 }

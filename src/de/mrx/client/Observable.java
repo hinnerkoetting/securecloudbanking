@@ -6,5 +6,5 @@ package de.mrx.client;
  */
 public interface Observable {
 	public void addObserver(Observer o) ;
-	void notifyObservers(Object arg); 
+	void notifyObservers(Integer eventType, Object parameter); 
 }

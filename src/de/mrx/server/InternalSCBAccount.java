@@ -67,6 +67,27 @@ public class InternalSCBAccount extends GeneralAccount {
 	}
 	
 	
+	/**
+	 * determines the saving account of the user.
+	 * Because at the moment every customer only gets one account, no further filtering is necessary
+	 * @param pm
+	 * @param ownerEmail
+	 * @return
+	 */
+public  InternalSCBAccount getOwnSavingAccount(PersistenceManager pm, String ownerEmail){
+		
+		Extent<InternalSCBAccount> e=pm.getExtent(InternalSCBAccount.class);
+		Query query=pm.newQuery(e,"owner == ownerParam");
+		query.setFilter("owner == ownerNrParam");
+		query.declareParameters("java.lang.String ownerNrParam");
+		query.setUnique(true);
+		InternalSCBAccount result= (InternalSCBAccount) query.execute(ownerEmail);
+		
+		return result;
+	}
+
+	
+	
 public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String email){
 		
 		Extent<InternalSCBAccount> e=pm.getExtent(InternalSCBAccount.class);

@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import de.mrx.client.forms.LeftPanelMenuForm;
 import de.mrx.client.moneytransfer.FastMoneyTransferForm;
 import de.mrx.client.moneytransfer.MoneyTransferForm;
 import de.mrx.client.register.RegistrationForm;
@@ -97,6 +98,8 @@ public class SCB implements EntryPoint, Observer {
 	private Image scbLogo;
 	private SCBMenu scbMenu;
 	private MoneyTransferForm confirmPage;
+	private LeftPanelMenuForm leftPanelMenuForm;
+	
 
 	private void doShowAbout(boolean picture) {
 		RootPanel r = RootPanel.get(PAGEID_CONTENT);
@@ -161,6 +164,8 @@ public class SCB implements EntryPoint, Observer {
 
 			r.add(mainPanel);
 
+			leftPanelMenuForm = new LeftPanelMenuForm();
+			leftPanelMenuForm.addObserver(this);
 			checkGoogleStatus();
 			doShowAbout(true);
 			GWT.log("Module loaded");
@@ -178,6 +183,8 @@ public class SCB implements EntryPoint, Observer {
 		accountsDetailsPanel.clear();
 		accountsListPanel.clear();
 		Log.debug("Show Account Overview");
+		
+		accountOverviewPanel.add(leftPanelMenuForm);
 		accountOverviewPanel.add(accountsListPanel);
 		accountOverviewPanel.add(accountsDetailsPanel);
 
@@ -198,31 +205,9 @@ public class SCB implements EntryPoint, Observer {
 
 				} else {
 					Log.info("Number of Accounts: " + result.size());
-					Button overviewBtn = new Button(constants
-							.overViewBtnFinancialState());
-					overviewBtn.setStyleName("OverViewButton");
-					overviewBtn.addClickHandler(new ClickHandler() {
-
-						public void onClick(ClickEvent event) {
-							showAccountOverview();
-						}
-					});
-					accountsListPanel.add(overviewBtn);
-					showAccountOverviewInDetailPanel(result);
-					// accountsListPanel.add(new Label("Your accounts "));
-					for (AccountDTO acc : result) {
-						Log.info(acc.toString());
-
-						Button btn = new Button(acc.getAccountDescription()
-								+ " (" + acc.getAccountNr() + ")");
-
-						btn.setStyleName("OverViewButton");
-
-						btn.addClickHandler(new AccountClickHandler(acc
-								.getAccountNr()));
-						accountsListPanel.add(btn);
-					}
-
+										showAccountOverviewInDetailPanel(result);
+					
+					
 					if (result.size() == 0) {
 						Button neuerAccountBtn = new Button(constants
 								.overViewBtnOpenSavingAccount());
@@ -248,7 +233,7 @@ public class SCB implements EntryPoint, Observer {
 
 	}
 
-	protected void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
+	private void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
 		accountsDetailsPanel.clear();
 		if (result.size() == 0) {
 			Label noAccountHint = new Label(
@@ -479,24 +464,47 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
+	public void update(Observable source, Object eventType, Object parameter) {
 		System.out.println("Updated");
-		if (o instanceof MoneyTransferForm) {
-			showAccountDetails((String) arg);
-		} else if (o instanceof FastMoneyTransferForm) {
-			if (arg instanceof MoneyTransferDTO) {
-				showMoneyTransferConfirmationForm((MoneyTransferDTO) arg);
+		if (source instanceof MoneyTransferForm) {
+			showAccountDetails((String) parameter);
+		} else if (source instanceof FastMoneyTransferForm) {
+			if (parameter instanceof MoneyTransferDTO) {
+				showMoneyTransferConfirmationForm((MoneyTransferDTO) parameter);
 
 			}
-		} else if (o instanceof CustomerTransferHistoryForm) {
-			if (arg == CustomerTransferHistoryForm.EVENT_SEND_MONEY) {
+		}else if(source instanceof LeftPanelMenuForm){
+			if (eventType==LeftPanelMenuForm.EVENT_SHOW_OVERVIEW){
+				showAccountOverview();				
+			}
+			if (eventType==LeftPanelMenuForm.EVENT_SHOW_SAVING_ACCOUNT){
+				AccountDetailDTO accDetails=(AccountDetailDTO) parameter;
+				currentAccount=accDetails.getAccountNr();
+				CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(accDetails);
+				
+				customerTransfer.addObserver(SCB.this);
+				accountsDetailsPanel.clear();
+				accountsDetailsPanel.add(customerTransfer);
+
+			}
+			if (eventType==LeftPanelMenuForm.EVENT_SEND_MONEY){
 				showStandardMoneyTransferForm();
-			} else if (arg == CustomerTransferHistoryForm.EVENT_SEND_FAST_MONEY) {
+			}
+			if (eventType==LeftPanelMenuForm.EVENT_SEND_MONEY_FAST){
+				showFastMoneyTransferForm();
+			}
+			
+		}
+		
+		else if (source instanceof CustomerTransferHistoryForm) {
+			if (eventType == CustomerTransferHistoryForm.EVENT_SEND_MONEY) {
+				showStandardMoneyTransferForm();
+			} else if (eventType == CustomerTransferHistoryForm.EVENT_SEND_FAST_MONEY) {
 				showFastMoneyTransferForm();
 			}
 
-		} else if (o instanceof SCBMenu) {
-			if (arg == SCBMenu.EVENT_SHOW_REGISTRATION_MENU) {
+		} else if (source instanceof SCBMenu) {
+			if (eventType == SCBMenu.EVENT_SHOW_REGISTRATION_MENU) {
 				doOpenRegisterMenu();
 			}
 		}
@@ -512,8 +520,7 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	private void showStandardMoneyTransferForm() {
-		mTransfer=new MoneyTransferForm();
-		mTransfer.initWithAccountNr(currentAccount);
+		mTransfer=new MoneyTransferForm(currentAccount);		
 		accountsDetailsPanel.clear();
 		mTransfer.addObserver(SCB.this);
 		accountsDetailsPanel.add(mTransfer);

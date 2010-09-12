@@ -10,7 +10,9 @@ import java.util.Properties;
 import java.util.Random;
 
 import javax.activation.DataHandler;
+import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.PersistenceAware;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -90,6 +92,17 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			log.info(dto.toString());
 		}
 		return accountDTOs;
+	}
+	
+	@Override
+	public AccountDetailDTO getSavingAccount(){
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		
+
+		pm = PMF.get().getPersistenceManager();
+		InternalSCBAccount savingAccount= InternalSCBAccount.getOwnByEmail(pm,user.getEmail());
+		return savingAccount.getDetailedDTO(pm);
 	}
 
 	/**
@@ -596,4 +609,6 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			pm.close();
 		}
 	}
+
+	
 }
