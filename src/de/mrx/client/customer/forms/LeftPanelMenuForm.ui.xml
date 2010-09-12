@@ -20,6 +20,9 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   	<g:Button ui:field="openNewAccount" styleName="{style.OverViewButton}">
   		<ui:msg description="openNewAccount">Open New account</ui:msg> 
   	</g:Button>
+  	<g:Button ui:field="registerBtn" styleName="{style.OverViewButton}">
+  		<ui:msg description="registerBtn">Register</ui:msg> 
+  	</g:Button>
   </g:VerticalPanel>
 </ui:UiBinder>
 

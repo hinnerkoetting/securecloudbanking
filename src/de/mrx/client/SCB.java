@@ -13,7 +13,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
@@ -22,7 +21,6 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -88,18 +86,12 @@ public class SCB implements EntryPoint, Observer {
 
 	MenuBar generalMenu = new MenuBar(true);
 
-	private VerticalPanel mainPanel = new VerticalPanel();
-
-	private HorizontalPanel accountOverviewPanel = new HorizontalPanel();
-	private VerticalPanel accountsListPanel = new VerticalPanel();
-	private VerticalPanel accountsDetailsPanel = new VerticalPanel();
+		private VerticalPanel accountsDetailsPanel = new VerticalPanel();
 
 	FlexTable validateErrorTable = new FlexTable();
 
-	private VerticalPanel informationPanel;
-
+	
 	private SCBIdentityDTO identityInfo = null;
-	private VerticalPanel loginPanel = new VerticalPanel();
 	
 	@UiField
 	Anchor signIn;
@@ -122,7 +114,7 @@ public class SCB implements EntryPoint, Observer {
 	 */
 	private AccountDetailDTO currentAccountDetails;
 
-	private List<String> hints = new ArrayList<String>();
+	//private List<String> hints = new ArrayList<String>();
 
 	private Image scbLogo;
 	private SCBMenu scbMenu;
@@ -154,6 +146,7 @@ public class SCB implements EntryPoint, Observer {
 		}
 
 		navigationPanel.clear();
+		contentPanel.clear();
 		
 		contentPanel.add(regForm);
 	}
@@ -213,7 +206,7 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	private void showAccountOverviewForSingleAccount(){
-		List accWrapper=new ArrayList<AccountDTO>();
+		List<AccountDTO> accWrapper=new ArrayList<AccountDTO>();
 		if (currentAccountNr==null){
 			GWT.log("account data not yet loaded. Can not show detail");
 			return;
@@ -277,7 +270,6 @@ public class SCB implements EntryPoint, Observer {
 						error.printStackTrace();
 						Log.error("Login state can not be retrieved! ", error);
 						leftPanelMenuForm.setStateNotRegistered();
-//						Window.alert(constants.loginFailedText());
 					}
 
 					/**
@@ -337,23 +329,7 @@ public class SCB implements EntryPoint, Observer {
 
 	}
 
-	private void createAccount() {
-		getBankingService();
-		bankingService.openNewAccount(new AsyncCallback<Void>() {
-
-			public void onFailure(Throwable caught) {
-				Log.error("Open new account failed", caught);
-			}
-
-			public void onSuccess(Void result) {
-				Log.info("Account created");
-				Window.alert(constants.accountOpened());
-				Window.Location.reload();
-
-			}
-		});
-
-	}
+	
 
 	private void showAccountTransactions(String accNr) {
 		getBankingService();
@@ -399,7 +375,7 @@ public class SCB implements EntryPoint, Observer {
 	 * change the language during runtime keeps the debug flag
 	 */
 	public static void changeToLocalisedVersion(String language) {
-		String queryPart = Window.Location.getQueryString();
+		//String queryPart = Window.Location.getQueryString();
 
 		String reloadURL;
 		String debugFlag = Window.Location.getParameter("gwt.codesvr");
@@ -430,7 +406,7 @@ public class SCB implements EntryPoint, Observer {
 			if (eventType==LeftPanelMenuForm.EVENT_SHOW_OVERVIEW){
 				showAccountOverviewForSingleAccount();			
 			}
-			if (eventType==LeftPanelMenuForm.EVENT_SHOW_SAVING_ACCOUNT){
+			else if (eventType==LeftPanelMenuForm.EVENT_SHOW_SAVING_ACCOUNT){
 				CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(currentAccountDetails);
 				
 				customerTransfer.addObserver(SCB.this);
@@ -438,11 +414,14 @@ public class SCB implements EntryPoint, Observer {
 				accountsDetailsPanel.add(customerTransfer);
 
 			}
-			if (eventType==LeftPanelMenuForm.EVENT_SEND_MONEY){
+			else if (eventType==LeftPanelMenuForm.EVENT_SEND_MONEY){
 				showStandardMoneyTransferForm();
 			}
-			if (eventType==LeftPanelMenuForm.EVENT_SEND_MONEY_FAST){
+			else if (eventType==LeftPanelMenuForm.EVENT_SEND_MONEY_FAST){
 				showFastMoneyTransferForm();
+			}
+			else if (eventType==LeftPanelMenuForm.EVENT_SHOW_REGISTRATION){
+				doOpenRegisterMenu();	
 			}
 			
 		}
@@ -506,15 +485,17 @@ public class SCB implements EntryPoint, Observer {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("We are sorry. A problem occured");
+				Window.alert("We are sorry. A problem occured: "+caught.getMessage());
 				GWT.log("Error loading user's account",caught);
 			}
 
 			@Override
 			public void onSuccess(AccountDetailDTO result) {
-				GWT.log("acc geladen: "+result.getAccountNr());
-				currentAccountDetails=result;
-				currentAccountNr=result.getAccountNr();
+				if (result!=null){
+					GWT.log("acc geladen: "+result.getAccountNr());
+					currentAccountDetails=result;
+					currentAccountNr=result.getAccountNr();
+				}
 			}
 			
 		});

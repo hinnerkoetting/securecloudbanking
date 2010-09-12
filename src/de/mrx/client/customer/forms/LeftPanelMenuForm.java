@@ -8,13 +8,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.CustomerService;
 import de.mrx.client.CustomerServiceAsync;
 import de.mrx.client.Observable;
@@ -28,6 +25,7 @@ public class LeftPanelMenuForm extends Composite implements Observable{
 	public final static Integer EVENT_SHOW_SAVING_ACCOUNT=2;
 	public final static Integer EVENT_SEND_MONEY=3;
 	public final static Integer EVENT_SEND_MONEY_FAST=4;
+	public final static Integer EVENT_SHOW_REGISTRATION=5;
 	
 
 	private static MyUiBinder menuUiBinder = GWT.create(MyUiBinder.class);
@@ -50,7 +48,8 @@ public class LeftPanelMenuForm extends Composite implements Observable{
 	@UiField
 	Button openNewAccount;
 	
-	
+	@UiField
+	Button registerBtn;
  	
 	
 	public LeftPanelMenuForm(){
@@ -62,7 +61,8 @@ public class LeftPanelMenuForm extends Composite implements Observable{
 		savingAccDetailBtn.setVisible(true);
 		sendMoneyBtn.setVisible(true);
 		sendFastMoneyBtn.setVisible(true);
-		openNewAccount.setVisible(false);		
+		openNewAccount.setVisible(false);
+		registerBtn.setVisible(false);
 	}
 	
 	public void setStateRegisteredButNoSavingAccount(){
@@ -70,7 +70,8 @@ public class LeftPanelMenuForm extends Composite implements Observable{
 		savingAccDetailBtn.setVisible(false);
 		sendMoneyBtn.setVisible(false);
 		sendFastMoneyBtn.setVisible(false);
-		openNewAccount.setVisible(true);		
+		openNewAccount.setVisible(true);
+		registerBtn.setVisible(false);
 	}
 	
 	public void setStateNotRegistered(){
@@ -78,8 +79,11 @@ public class LeftPanelMenuForm extends Composite implements Observable{
 		savingAccDetailBtn.setVisible(false);
 		sendMoneyBtn.setVisible(false);
 		sendFastMoneyBtn.setVisible(false);
-		openNewAccount.setVisible(false);		
+		openNewAccount.setVisible(false);	
+		registerBtn.setVisible(true);
 	}
+	
+	
 
 	@Override
 	public void addObserver(Observer o) {
@@ -97,6 +101,11 @@ public class LeftPanelMenuForm extends Composite implements Observable{
 	public void showOverview(ClickEvent e){
 		notifyObservers(EVENT_SHOW_OVERVIEW,null);
 		
+	}
+	
+	@UiHandler("registerBtn")	
+	public void showRegistrationForm(ClickEvent e){
+		notifyObservers(EVENT_SHOW_REGISTRATION,null);		
 	}
 	
 	@UiHandler("savingAccDetailBtn")	

@@ -20,7 +20,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.MoneyTransferDTO;
-import de.mrx.client.SCBConstants;
 import de.mrx.client.TableStyler;
 import de.mrx.client.admin.Admin;
 import de.mrx.client.admin.AdminConstants;

@@ -1,6 +1,5 @@
 package de.mrx.client.admin;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.Constants;
 
 public interface AdminConstants extends Constants{
