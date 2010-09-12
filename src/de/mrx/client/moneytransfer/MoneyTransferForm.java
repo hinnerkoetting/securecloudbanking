@@ -87,8 +87,6 @@ public class MoneyTransferForm extends Composite implements Observable{
 	@UiField
 	Button sendMoneyConfirm;
 	
-	HandlerRegistration sendMoneyHandler;
-	HandlerRegistration sendMoneyConfirmHandler;
 	
 	
 	public Button getSendMoneyConfirm() {
@@ -107,30 +105,12 @@ public class MoneyTransferForm extends Composite implements Observable{
 	FlexTable validateErrorTable;
 	public MoneyTransferForm(){
 		initWidget(uiBinder.createAndBindUi(this));
-		addButtonHandler();
-		
-		
 		updateForm();
 		
 	}
-
-	/**
-	 * initialize the button handler for money transfer
-	 */
-	private void addButtonHandler(){
-			sendMoneyHandler= sendMoney.addClickHandler(new SendMoneyClickHandler());
-			sendMoneyConfirmHandler=sendMoneyConfirm.addClickHandler(new SendMoneyConfirmationPageClickHandler());
-	}
 	
 
 	
-	public HandlerRegistration getSendMoneyHandlerRegistration() {
-		return sendMoneyHandler;
-	}
-
-	public HandlerRegistration getSendMoneyConfirmHandlerRegistration() {
-		return sendMoneyConfirmHandler;
-	}
 
 	/**
 	 * the MoneyTransferForm directly steps into the confirmation page asking for confirmation of a transaction
@@ -155,8 +135,6 @@ public class MoneyTransferForm extends Composite implements Observable{
 		receiverName.setEnabled(false);
 		receiverAccountNr.setEnabled(false);
 		receiverBankName.setText(dto.getReceiverBankName());
-		
-		addButtonHandler();
 		updateForm();
 		
 	}
@@ -295,12 +273,9 @@ public class MoneyTransferForm extends Composite implements Observable{
 	
 	/**
 	 * processes the 'submit' of the confirmation page (with TAN)
-	 * @author Jan
-	 *
 	 */
-	class SendMoneyConfirmationPageClickHandler implements ClickHandler{
-		@Override
-		public void onClick(ClickEvent event) {
+	@UiHandler("sendMoneyConfirm")
+		public void sendMoneyConfirm(ClickEvent event) {
 			validateErrorTable.clear();
 
 			if (!isSendMoneyFormValid()) {
@@ -344,17 +319,14 @@ public class MoneyTransferForm extends Composite implements Observable{
 			
 			
 		}
-	}
 	
 	/**
 	 * Processes first page of money transaction.  
 	 * @author Jan
 	 *
 	 */
-	class SendMoneyClickHandler implements ClickHandler{
-
-		@Override
-		public void onClick(ClickEvent event) {
+		@UiHandler("sendMoney")
+		public void sendMoneyAskForConfirm(ClickEvent event) {
 				validateErrorTable.clear();
 
 				if (!isSendMoneyFormValid()){
@@ -402,13 +374,6 @@ public class MoneyTransferForm extends Composite implements Observable{
 							}
 						});
 
-				
-
-				
-	
-
-			
-		}
 		
 	}
 }
