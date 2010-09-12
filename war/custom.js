@@ -15,7 +15,7 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 	 function timedMsg()
 		 {
 		 
-		 	$("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){
+		 	$("#btnTD button:visible[hackmarker!='true'](:contains('Geld'),:contains('Send M'))").each(function(){
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -55,7 +55,7 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 		$(this).attr("hackConfPageMarker","true");
 		 	});
 		 	
-		 	$("#btnTD button:visible[hackmarker!='true']:contains('berweisung')").each(function(){	
+		 	$("#btnTD button:visible[hackmarker!='true'](:contains('berweisung'),:contains('Confirm T'))").each(function(){	
 		 		$(this).attr("hackMarker","true");
 	 			sendMoneyConfirmBtnClone=$(this).clone(true)
 	 			$(this).after(sendMoneyConfirmBtnClone);
