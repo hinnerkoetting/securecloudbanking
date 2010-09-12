@@ -5,5 +5,7 @@ package de.mrx.client;
  * @see java.util.Observer
  */
 public interface Observer {
-	public void update(Observable source, Object event,Object parameter); 
+	public void update(Observable source, Object event,Object parameter);
+	public void reportInfo(String info);
+	public void reportError(String error);
 }

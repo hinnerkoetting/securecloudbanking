@@ -150,8 +150,9 @@ public class RegistrationForm extends Composite {
 
 			}
 
-			public void onSuccess(Void result) {				
-				RootPanel.get(SCB.PAGEID_CONTENT).clear();
+			public void onSuccess(Void result) {
+				
+				
 				String queryPart=Window.Location.getQueryString();
 				
 				
