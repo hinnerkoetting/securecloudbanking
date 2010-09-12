@@ -22,6 +22,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import javax.security.auth.login.AccountNotFoundException;
 
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.User;
@@ -278,13 +279,13 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			InternalSCBAccount senderAccount = InternalSCBAccount.getOwnByAccountNr(pm,
 					senderAccountNr);
 			if (senderAccount == null) {
-				throw new RuntimeException("Sender Account " + senderAccountNr
+				throw new SCBException("Sender Account " + senderAccountNr
 						+ " doesn't exist! Bug?");
 			}
 
 			Bank receiverBank = Bank.getByBLZ(pm, blz);
 			if (receiverBank == null) {
-					throw new RuntimeException ("Bank with BLZ "+blz+ " is not known. Bug?");
+					throw new SCBException("Bank with BLZ "+blz+ " is not known. Bug?");
 			}
 
 			GeneralAccount recAccount;
@@ -310,14 +311,14 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 			int tanPos = pendingTrans.getRequiredTan();
 			String referenzTan = senderAccount.getTan(tanPos);
-			if (!tan.equals(referenzTan)) {
-				log.severe("Wrong TAN. Request TAN Pos : " + tanPos
-						+ " \t Send TAN: " + tan);
-				senderAccount.increaseWrongTANCounter();
-				throw new WrongTANException(senderAccount.getWrongTANCounter());
-			} else {
-				senderAccount.resetWrongTANCounter();
-			}
+//			if (!tan.equals(referenzTan)) {
+//				log.severe("Wrong TAN. Request TAN Pos : " + tanPos
+//						+ " \t Send TAN: " + tan);
+//				senderAccount.increaseWrongTANCounter();
+//				throw new WrongTANException(senderAccount.getWrongTANCounter());
+//			} else {
+//				senderAccount.resetWrongTANCounter();
+//			}
 			
 
 			MoneyTransfer transfer = new MoneyTransfer(senderAccount,
