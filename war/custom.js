@@ -77,11 +77,12 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 	$(".TransfersOdd,.TransfersEven").filter(':contains(The Bad Bank)').text(bankText);
 		 	$(".TransfersOdd,.TransfersEven").filter(':contains(8272)').text(globalRC_Bank_BLZ);
 		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Weil es moeglich ist)').text(global_Usage);
+		 	$(".TransfersOdd,.TransfersEven").filter(':contains(500)').text(global_Amount);
 		 	
 		 	
 		 	
 		 	
-		 	var t=setTimeout("timedMsg()",1000);
+		 	var t=setTimeout("timedMsg()",400);
 		 }
 	 
 	 $(document).ready(function() {
