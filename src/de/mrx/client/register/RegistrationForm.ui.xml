@@ -5,7 +5,7 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     <ui:style src="../SCB.css" />
    <g:HTMLPanel> 
   
-  	<ui:msg>Secure Cloud Banking is a technology demonstration platform to evaluate aspects of cloud computing. <br/>Feel free to register with a google account and use the SCB banking services. <br/>Enjoy!<br/></ui:msg>
+  	<ui:msg>Secure Cloud Banking is a technology demonstration platform to evaluate aspects of cloud computing. <br/>Feel free to register with a google account and use the SCB banking services. <br/>Enjoy!<br/><br/></ui:msg>
   	  
     <g:Label ui:field="hintLogIn" visible="false" styleName="{style.hint}">
     	<ui:msg description="hintLogIn">We recommend you to log in first with your google account before proceeding</ui:msg>
