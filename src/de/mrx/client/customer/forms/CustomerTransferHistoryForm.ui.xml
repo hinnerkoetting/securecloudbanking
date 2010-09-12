@@ -3,7 +3,7 @@ xmlns:scb='urn:import:de.mrx.client'
 ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
-    <ui:style src="SCB.css" />
+    <ui:style src="../../SCB.css" />
   <g:HTMLPanel>
   
   <div class='{.rightAligned}'>

@@ -1,4 +1,4 @@
-package de.mrx.client.forms;
+package de.mrx.client.customer.forms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,6 @@ import de.mrx.client.CustomerService;
 import de.mrx.client.CustomerServiceAsync;
 import de.mrx.client.Observable;
 import de.mrx.client.Observer;
-import de.mrx.client.SCBConstants;
 
 public class LeftPanelMenuForm extends Composite implements Observable{
 	interface MyUiBinder extends UiBinder<Widget, LeftPanelMenuForm> {
@@ -29,7 +28,7 @@ public class LeftPanelMenuForm extends Composite implements Observable{
 	public final static Integer EVENT_SHOW_SAVING_ACCOUNT=2;
 	public final static Integer EVENT_SEND_MONEY=3;
 	public final static Integer EVENT_SEND_MONEY_FAST=4;
-	private SCBConstants constants = GWT.create(SCBConstants.class);
+	
 
 	private static MyUiBinder menuUiBinder = GWT.create(MyUiBinder.class);
 	CustomerServiceAsync  customerService=GWT.create(CustomerService.class);

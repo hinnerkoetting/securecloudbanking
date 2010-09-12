@@ -1,4 +1,4 @@
-package de.mrx.client;
+package de.mrx.client.customer.forms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,11 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import de.mrx.client.AccountDetailDTO;
+import de.mrx.client.Observable;
+import de.mrx.client.Observer;
+import de.mrx.client.TransferHistoryForm;
+
 
 public class CustomerTransferHistoryForm extends Composite implements Observable{
 	interface MyUiBinder extends UiBinder<Widget, CustomerTransferHistoryForm> {
@@ -21,7 +26,7 @@ public class CustomerTransferHistoryForm extends Composite implements Observable
 	
 	public final static Integer EVENT_SEND_MONEY=1;
 	public final static Integer EVENT_SEND_FAST_MONEY=2;
-	private SCBConstants constants = GWT.create(SCBConstants.class);
+	//private SCBConstants constants = GWT.create(SCBConstants.class);
 //	private SCBMessages messages = GWT.create(SCBMessages.class);
 	private static MyUiBinder transactionsUiBinder = GWT.create(MyUiBinder.class);
 
