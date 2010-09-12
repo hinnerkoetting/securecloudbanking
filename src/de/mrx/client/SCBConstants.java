@@ -232,4 +232,17 @@ public interface SCBConstants extends Constants{
 	
 	@DefaultStringValue("Language")
 	String languageMenu();
+	
+	@DefaultStringValue("Account Data could not be loaded")
+	String accountDataNotLoaded();
+	
+	@DefaultStringValue("Login not possible. Please try again in 30 seconds")
+	String couldNotLogin();
+	
+	@DefaultStringValue("We are sorry. An error occured. Please try again in some minutes")	
+	String generalError();
+
+	@DefaultStringValue("Application is still initializing. Please try again in 30 seconds.")
+	String initializing();
+	
 }

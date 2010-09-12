@@ -102,6 +102,8 @@ public class RegisterServiceImpl extends RemoteServiceServlet implements
 
 		}
 		catch (SCBException e){
+			
+			e.printStackTrace();
 			log.warning("Problem Registering: "+e.getMessage());
 			throw e;
 		}

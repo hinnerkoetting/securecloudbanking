@@ -42,6 +42,7 @@ public class CustomerTransferHistoryForm extends Composite implements Observable
 	AccountDetailDTO account;
 	
 	public CustomerTransferHistoryForm(AccountDetailDTO acc ){
+		assert(acc!=null);
 		initWidget(transactionsUiBinder.createAndBindUi(this));
 		account=acc;
 		transfers=new TransferHistoryForm(acc.getTransfers());

@@ -92,6 +92,7 @@ public class RegistrationForm extends Composite {
 	
 	@UiField
 	CheckBox agb;
+	private SCBIdentityDTO id;
 
 	public RegistrationForm(Anchor signInLink) {
 		// sets listBox
@@ -112,7 +113,7 @@ public class RegistrationForm extends Composite {
 			return;
 		}
 		
-		SCBIdentityDTO id = new SCBIdentityDTO(lastName.getText(), email.getText());
+		id = new SCBIdentityDTO(lastName.getText(), email.getText());
 		id.setStreet(street.getText());
 		id.setCity(city.getText());
 		id.setPlz(plz.getText());		
@@ -150,26 +151,7 @@ public class RegistrationForm extends Composite {
 			}
 
 			public void onSuccess(Void result) {
-				
-				
-				String queryPart=Window.Location.getQueryString();
-				
-				
-				String reloadURL;
-				String debugFlag=Window.Location.getParameter("gwt.codesvr");
-				
-				if (debugFlag!=null){
-					reloadURL=GWT.getHostPageBaseURL()+queryPart+"&locale="+language;	
-				}
-				else{
-					reloadURL=GWT.getHostPageBaseURL()+"?locale="+language;
-				}
-				
-				GWT.log(reloadURL);
-
-				
-				Window.open(reloadURL,"_self",null);
-				
+				SCB.changeToLocalisedVersion(id.getLanguage());				
 			}
 		};
 

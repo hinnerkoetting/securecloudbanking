@@ -14,7 +14,7 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     
   </g:north>
 
-  <g:west size='20'>
+  <g:west size='12'>
     <g:VerticalPanel ui:field="navigationPanel"/>    
   </g:west>
 

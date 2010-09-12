@@ -3,7 +3,16 @@ xmlns:scb='urn:import:de.mrx.client'
 ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
-    <ui:style src="../../SCB.css" />
+    <ui:style src="../../SCB.css" > 
+     
+    	.btnWithDistance { 
+    		margin:0.5cm; 
+    	}
+    	
+    	.accountBalance { 
+    		margin:0.5cm; 
+    	}
+  	</ui:style>
   <g:HTMLPanel>
   
   <div class='{.rightAligned}'>
@@ -11,7 +20,7 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   	<g:Label >
   		<ui:msg description="moneyTransferFormBalance">Balance</ui:msg>
   	</g:Label>  	
-  	<g:Label ui:field="balance">
+  	<g:Label ui:field="balance" styleName="{style.accountBalance}">
   	</g:Label>
   </g:HorizontalPanel>
   <br/>
@@ -20,10 +29,10 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
    <g:VerticalPanel ui:field="transferWrapper"/>
    
   <g:HorizontalPanel>
-  	<g:Button ui:field="btnSendFastMoney">
+  	<g:Button ui:field="btnSendFastMoney" styleName="{style.btnWithDistance}">
   		<ui:msg description="moneyTransferFormBalance"> FastEmail Transfer</ui:msg>
   	</g:Button>
-  	<g:Button ui:field="btnSendStandardMoney">
+  	<g:Button ui:field="btnSendStandardMoney" styleName="{style.btnWithDistance}">
   		<ui:msg description="moneyTransferFormBalance">Transfer Money</ui:msg>
   	</g:Button>
   </g:HorizontalPanel>

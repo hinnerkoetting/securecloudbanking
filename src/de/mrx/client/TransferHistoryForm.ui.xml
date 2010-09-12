@@ -6,7 +6,9 @@
 	<g:HTMLPanel>
 	
 		<g:Label ui:field="transferHistoryNoTransactionHint" visible="false">
-			For this account there are no outgoing neither incoming transactions.
+			<ui:msg description="noTransaction">
+				For this account there are no outgoing neither incoming transactions.
+			</ui:msg>
 		</g:Label>
 		
 		<g:FlexTable  ui:field="flexTable"/>

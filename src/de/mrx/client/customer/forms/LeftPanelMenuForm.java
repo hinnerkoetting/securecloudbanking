@@ -66,6 +66,7 @@ public class LeftPanelMenuForm extends Composite implements Observable {
 		sendFastMoneyBtn.setVisible(true);
 		openNewAccount.setVisible(false);
 		registerBtn.setVisible(false);
+		setVisible(true);
 	}
 
 	public void setStateRegisteredButNoSavingAccount() {
@@ -75,6 +76,7 @@ public class LeftPanelMenuForm extends Composite implements Observable {
 		sendFastMoneyBtn.setVisible(false);
 		openNewAccount.setVisible(true);
 		registerBtn.setVisible(false);
+		setVisible(true);
 	}
 
 	public void setStateNotRegistered() {
@@ -84,6 +86,7 @@ public class LeftPanelMenuForm extends Composite implements Observable {
 		sendFastMoneyBtn.setVisible(false);
 		openNewAccount.setVisible(false);
 		registerBtn.setVisible(true);
+		setVisible(true);
 	}
 
 	@Override
