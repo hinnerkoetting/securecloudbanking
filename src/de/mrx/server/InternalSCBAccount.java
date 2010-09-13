@@ -89,7 +89,7 @@ public  InternalSCBAccount getOwnSavingAccount(PersistenceManager pm, String own
 	
 	
 public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String email){
-		
+		email = email.toLowerCase();
 		Extent<InternalSCBAccount> e=pm.getExtent(InternalSCBAccount.class);
 		Query query=pm.newQuery(e,"ownerEmail == emailParam");		
 		query.declareParameters("java.lang.String emailParam");
