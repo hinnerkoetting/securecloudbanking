@@ -33,7 +33,7 @@ public class Bank {
 	@Unique
 	private String blz;
 
-	@PrimaryKey	
+	@PrimaryKey
 	private Key id;
 
 	public void setId(Key id) {
