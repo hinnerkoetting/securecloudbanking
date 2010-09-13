@@ -40,6 +40,7 @@ import de.mrx.client.CustomerService;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.AccountNotExistException;
+import de.mrx.shared.SCBData;
 import de.mrx.shared.SCBException;
 
 /**
@@ -124,9 +125,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 			ownBank = bankWrapper.getOwnBanks();
 			if (ownBank == null) {
-				ownBank = new Bank(Bank.SCB_BLZ, "Secure Cloud Bank");
+				ownBank = new Bank(SCBData.SCB_PLZ, SCBData.SCB_NAME);
 				ownBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-						Bank.class.getSimpleName(), Bank.SCB_BLZ));
+						Bank.class.getSimpleName(), SCBData.SCB_PLZ));
 				bankWrapper.setOwnBanks(ownBank);
 
 			}
