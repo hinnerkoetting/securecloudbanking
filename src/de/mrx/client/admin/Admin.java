@@ -34,6 +34,7 @@ import de.mrx.client.Observer;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.SCBMenu;
 import de.mrx.client.TransferHistoryForm;
+import de.mrx.client.admin.forms.AccountDetails;
 import de.mrx.client.admin.forms.AccountOverview;
 import de.mrx.client.admin.forms.AdminExternalBanks;
 import de.mrx.client.admin.forms.AdminTransfer;
@@ -140,19 +141,13 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		setContent(new AdminExternalBanks(null));
 	}
 	
-	/**
-	 * 
-	 */
-	public void showTransferMoney(String accNr, String accOwner) {
-		setContent(new AdminTransfer(this, accNr, accOwner));
-	}
 	
 	/**
 	 * show information about all accounts
 	 */
 	public void showAccounts() {
 		final AccountOverview accountOverview = new AccountOverview(this);
-		
+		accountOverview.addObserver(this);
 		AdminServiceAsync bankingService = GWT.create(AdminService.class);
 		bankingService.getAllInternalAccounts(new AsyncCallback<List<AccountDTO>>() {
 
@@ -270,6 +265,7 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		scbMenu = new SCBMenu();
 		scbMenu.addObserver(this);
 		topMenuPanel.add(scbMenu);
+
 		setContent(new Label("Administration privileges required."));
 		checkGoogleStatus();
 		
@@ -284,7 +280,21 @@ public class Admin extends Composite implements EntryPoint,Observer {
 			else if (event == SCBMenu.EVENT_CHANGE_LANGUAGE) {
 				changeToLocalisedVersion((String)parameter);
 			}
+			else 
+				Log.info("missing event");
 		}
+		else if (source instanceof AccountOverview) {
+			if ((Integer)event == AccountDetails.ACCOUNT_DELETED) {
+				showAccounts();
+			}
+			else if ((Integer)event == AdminTransfer.TRANSACTION_SUCCEEDED) {
+				showAccounts();
+			}
+			else 
+				Log.info("missing event");
+		}
+		else 
+			Log.info("missing event");
 		
 	}
 
