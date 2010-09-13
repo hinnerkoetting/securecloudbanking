@@ -34,6 +34,7 @@ public class Bank {
 	private String blz;
 
 	@PrimaryKey
+	@Persistent
 	private Key id;
 
 	public void setId(Key id) {
