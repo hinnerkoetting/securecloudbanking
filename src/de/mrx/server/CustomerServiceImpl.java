@@ -44,23 +44,22 @@ import de.mrx.shared.SCBException;
 
 /**
  * implementation class for the bankingservice
+ * 
  * @see de.mrx.client.CustomerService
- *
+ * 
  */
 @SuppressWarnings("serial")
 @PersistenceAware
 public class CustomerServiceImpl extends BankServiceImpl implements
 		CustomerService {
 
-	
-	
 	PersistenceManager pm = PMF.get().getPersistenceManager();
 
 	/**
-	 * SCB-Bank 
+	 * SCB-Bank
 	 */
 	Bank ownBank;
-	
+
 	/**
 	 * reference to the bank container
 	 */
@@ -71,18 +70,18 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	}
 
 	/**
-	 * receive all accounts of the currently logged in user 
+	 * receive all accounts of the currently logged in user
 	 */
 	public List<AccountDTO> getAccounts() {
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
-		
 
 		pm = PMF.get().getPersistenceManager();
 		String query = " SELECT FROM " + InternalSCBAccount.class.getName()
 				+ " WHERE owner =='" + user.getEmail() + "'";
 		log.info("geTAccounts Query: " + query);
-		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>) pm.newQuery(query).execute();
+		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>) pm
+				.newQuery(query).execute();
 		List<AccountDTO> accountDTOs = new ArrayList<AccountDTO>();
 		for (InternalSCBAccount acc : accounts) {
 			AccountDTO dto = acc.getDTO();
@@ -91,18 +90,19 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		}
 		return accountDTOs;
 	}
-	
+
 	@Override
-	public AccountDetailDTO getSavingAccount(){
+	public AccountDetailDTO getSavingAccount() {
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
-		if (user==null) {
+		if (user == null) {
 			return null;
 		}
 
 		pm = PMF.get().getPersistenceManager();
-		InternalSCBAccount savingAccount= InternalSCBAccount.getOwnByEmail(pm,user.getEmail());
-		if (savingAccount==null) {
+		InternalSCBAccount savingAccount = InternalSCBAccount.getOwnByEmail(pm,
+				user.getEmail());
+		if (savingAccount == null) {
 			return null;
 		}
 		return savingAccount.getDetailedDTO(pm);
@@ -140,13 +140,15 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 			pm.close();
 		}
-		
+
 	}
 
 	/**
-	 * fetches the balance of a given account. 
-	 * Can be only used by the owner of the account or an admin?
-	 * @param accountNr account that should be access
+	 * fetches the balance of a given account. Can be only used by the owner of
+	 * the account or an admin?
+	 * 
+	 * @param accountNr
+	 *            account that should be access
 	 * @return balance of the account
 	 */
 	public double getBalance(String accountNr) {
@@ -161,7 +163,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		// log.info( acc.toString());
 		// }
 		// log.info("geTAccounts Query: "+query);
-		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>) pm.newQuery(query).execute();
+		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>) pm
+				.newQuery(query).execute();
 		if (accounts.size() != 1) {
 			throw new RuntimeException("Anzahl Accounts mit Nr '" + accountNr
 					+ "' ist " + accounts.size());
@@ -169,15 +172,11 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		return accounts.get(0).getBalance();
 	}
 
-
-
-	
-
-	
-
 	/**
 	 * open a new account for the logged in customer
-	 * @throws SCBException if account can not be created
+	 * 
+	 * @throws SCBException
+	 *             if account can not be created
 	 */
 	public void openNewAccount() throws SCBException {
 		try {
@@ -195,14 +194,14 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			DecimalFormat format = new DecimalFormat("##");
 			format.setMinimumIntegerDigits(6);
 
-			InternalSCBAccount acc = new InternalSCBAccount(identityInfo.getEmail(), format
-					.format(kontoNr), 5, ownBank);
+			InternalSCBAccount acc = new InternalSCBAccount(
+					identityInfo.getEmail(), format.format(kontoNr), 5, ownBank);
 			acc.setBank(ownBank);
-			acc.setId(KeyFactory.createKey(ownBank.getId(), InternalSCBAccount.class
-					.getSimpleName(), kontoNr));
+			acc.setId(KeyFactory.createKey(ownBank.getId(),
+					InternalSCBAccount.class.getSimpleName(), kontoNr));
 			acc.setAccountType(AccountDTO.SAVING_ACCOUNT);
 			acc.setAccountDescription(AccountDTO.SAVING_ACCOUNT_DES);
-			
+
 			acc.setOwnerEmail(identityInfo.getEmail());
 
 			pm.currentTransaction().begin();
@@ -228,20 +227,21 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	}
 
 	/*
-	 * sends money. For this service, the sender must be a customer of SCB
-	 * the receiver must now already be known, he is created before confirmation
+	 * sends money. For this service, the sender must be a customer of SCB the
+	 * receiver must now already be known, he is created before confirmation
 	 */
 	public void sendMoney(String senderAccountNr, String blz,
 			String receiveraccountNr, double amount, String remark,
 			String receiverName, String bankName, String tan)
 			throws SCBException {
 		try {
+			log.info("Send Money Confirmation (senderAcc:"+senderAccountNr+"\t BLZ"+blz+"\tReceiver Acc: "+receiveraccountNr+" ReceiverName :"+receiverName+" Amount: "+amount);
 
 			pm = PMF.get().getPersistenceManager();
 			bankWrapper = AllBanks.getBankWrapper(pm);
 			ownBank = bankWrapper.getOwnBanks();
-			InternalSCBAccount senderAccount = InternalSCBAccount.getOwnByAccountNr(pm,
-					senderAccountNr);
+			InternalSCBAccount senderAccount = InternalSCBAccount
+					.getOwnByAccountNr(pm, senderAccountNr);
 			if (senderAccount == null) {
 				throw new SCBException("Sender Account " + senderAccountNr
 						+ " doesn't exist! Bug?");
@@ -249,51 +249,55 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			Bank receiverBank = Bank.getByBLZ(pm, blz);
 			if (receiverBank == null) {
-					throw new SCBException("Bank with BLZ "+blz+ " is not known. Bug?");
+				throw new SCBException("Bank with BLZ " + blz
+						+ " is not known. Bug?");
 			}
 
 			GeneralAccount recAccount;
 			if (receiverBank.equals(ownBank)) {
-				recAccount = InternalSCBAccount.getOwnByAccountNr(pm, receiveraccountNr);
+				recAccount = InternalSCBAccount.getOwnByAccountNr(pm,
+						receiveraccountNr);
 				if (recAccount == null) {
 					throw new AccountNotExistException(receiveraccountNr);
 				}
 
-			} else {//external Bank
+			} else {// external Bank
 				recAccount = ExternalAccount.getAccountByBLZAndAccountNr(pm,
 						receiverBank, receiveraccountNr);
 
 				if (recAccount == null) {
-					throw new RuntimeException ("this account must exist by now");				}
+					throw new RuntimeException("this account must exist by now");
+				}
 			}
 			MoneyTransferPending pendingTrans = senderAccount
 					.getPendingTransaction();
 			if (pendingTrans == null) {
-				log
-						.severe("Hacking attempt!. No pending transaction before commit");
+				log.severe("Hacking attempt!. No pending transaction before commit");
 				throw new SCBException("Invalid transaction");
 			}
 			int tanPos = pendingTrans.getRequiredTan();
 			String referenzTan = senderAccount.getTan(tanPos);
-//			if (!tan.equals(referenzTan)) {
-//				log.severe("Wrong TAN. Request TAN Pos : " + tanPos
-//						+ " \t Send TAN: " + tan);
-//				senderAccount.increaseWrongTANCounter();
-//				throw new WrongTANException(senderAccount.getWrongTANCounter());
-//			} else {
-//				senderAccount.resetWrongTANCounter();
-//			}
-			
+			// if (!tan.equals(referenzTan)) {
+			// log.severe("Wrong TAN. Request TAN Pos : " + tanPos
+			// + " \t Send TAN: " + tan);
+			// senderAccount.increaseWrongTANCounter();
+			// throw new WrongTANException(senderAccount.getWrongTANCounter());
+			// } else {
+			// senderAccount.resetWrongTANCounter();
+			// }
 
 			MoneyTransfer transfer = new MoneyTransfer(pm, senderAccount,
-					recAccount, amount,recAccount.getOwner(),remark);
-			
+					recAccount, amount, recAccount.getOwner(), remark);
+
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
 			// MoneyTransfer.class.getSimpleName(), 1));
 			log.info("Save Moneytransfer");
-			transferMoney(pm, senderAccount, recAccount, transfer, amount, remark);
-			
-
+			transferMoney(pm, senderAccount, recAccount, transfer, amount,
+					remark);
+		} catch (SCBException e) {// all exceptions should be reported
+			e.printStackTrace();
+			log.severe(e.getMessage());
+			throw e;
 		} finally {
 			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
@@ -303,15 +307,19 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	}
 
 	/**
-	 * get all account details 
-	 * @param accountNr account that should be fetched
+	 * get all account details
+	 * 
+	 * @param accountNr
+	 *            account that should be fetched
 	 * @return detailled information
-	 * @throws SCBException if data can not be fetched
+	 * @throws SCBException
+	 *             if data can not be fetched
 	 */
 	public AccountDetailDTO getAccountDetails(String accountNr)
 			throws SCBException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		InternalSCBAccount acc = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);
+		InternalSCBAccount acc = InternalSCBAccount.getOwnByAccountNr(pm,
+				accountNr);
 		if (acc == null) {
 			throw new SCBException("Account data for Account '" + accountNr
 					+ "' can not be loaded at the moment!");
@@ -382,13 +390,12 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			Message msg = new MimeMessage(session);
 			msg.setFrom(new InternetAddress(
 					"support@securecloudbanking.appspotmail.com"));
-			msg.addRecipient(Message.RecipientType.TO, new InternetAddress(id
-					.getEmail(), id.getName()));
+			msg.addRecipient(Message.RecipientType.TO,
+					new InternetAddress(id.getEmail(), id.getName()));
 			msg.setSubject("SCB Account " + account.getAccountNr() + " opened");
-			msg
-					.setText("Congratulations. You have activated your account at Secure Cloud Banking. Attached you find the Transaction numbers");
+			msg.setText("Congratulations. You have activated your account at Secure Cloud Banking. Attached you find the Transaction numbers");
 			msg.setContent(outboundMultipart);
-			
+
 			Transport.send(msg);
 
 			log.info("Registration received: " + id);
@@ -400,7 +407,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	}
 
 	/**
-	 * send all details for a money transaction. The money is not yet transferred, but in a second step must be confirmed with a TAN
+	 * send all details for a money transaction. The money is not yet
+	 * transferred, but in a second step must be confirmed with a TAN
+	 * 
 	 * @param senderAccountNr
 	 * @param blz
 	 * @param accountNr
@@ -421,8 +430,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			pm = PMF.get().getPersistenceManager();
 			bankWrapper = AllBanks.getBankWrapper(pm);
 			ownBank = bankWrapper.getOwnBanks();
-			InternalSCBAccount senderAccount = InternalSCBAccount.getOwnByAccountNr(pm,
-					senderAccountNr);
+			InternalSCBAccount senderAccount = InternalSCBAccount
+					.getOwnByAccountNr(pm, senderAccountNr);
 			if (senderAccount == null) {
 				throw new SCBException("Sender Account " + senderAccountNr
 						+ " existiert nicht!");
@@ -447,7 +456,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			GeneralAccount recAccount;
 			if (receiverBank.equals(ownBank)) {
-				recAccount = InternalSCBAccount.getOwnByAccountNr(pm, receiveraccountNr);
+				recAccount = InternalSCBAccount.getOwnByAccountNr(pm,
+						receiveraccountNr);
 				if (recAccount == null) {
 					throw new RuntimeException(
 							"Dieser Account existiert nicht bei der Bank "
@@ -467,9 +477,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 					recAccount = new ExternalAccount(receiverName,
 							receiveraccountNr, receiverBank);
 					recAccount.setId(KeyFactory.createKey(receiverBank.getId(),
-							ExternalAccount.class.getSimpleName(), receiverBank
-									.getBlz()
-									+ "_" + receiveraccountNr));
+							ExternalAccount.class.getSimpleName(),
+							receiverBank.getBlz() + "_" + receiveraccountNr));
 					receiverBank.addAccount(recAccount);
 					pm.makePersistent(recAccount);
 
@@ -504,10 +513,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		} catch (Exception e) {
 			log.severe(e.getMessage());
 			e.printStackTrace();
-			throw new SCBException(
-					"Transaction can not be executed", e);
-		}
-		finally {
+			throw new SCBException("Transaction can not be executed", e);
+		} finally {
 			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
 			}
@@ -516,33 +523,36 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	}
 
 	/**
-	 * send all details for a money transaction. The recipient must be customer of SCB and is determined with his email. The money is not yet transferred, but in a second step must be confirmed with a TAN
+	 * send all details for a money transaction. The recipient must be customer
+	 * of SCB and is determined with his email. The money is not yet
+	 * transferred, but in a second step must be confirmed with a TAN
 	 */
 	public MoneyTransferDTO sendMoneyAskForConfirmationDataWithEmail(
-			String senderAccountNr, String email, double amount, String remark) throws SCBException {
+			String senderAccountNr, String email, double amount, String remark)
+			throws SCBException {
 		try {
 
 			pm = PMF.get().getPersistenceManager();
 			bankWrapper = AllBanks.getBankWrapper(pm);
 			ownBank = bankWrapper.getOwnBanks();
-			InternalSCBAccount senderAccount = InternalSCBAccount.getOwnByAccountNr(pm,
-					senderAccountNr);
+			InternalSCBAccount senderAccount = InternalSCBAccount
+					.getOwnByAccountNr(pm, senderAccountNr);
 			if (senderAccount == null) {
 				throw new SCBException("Sender Account " + senderAccountNr
 						+ " existiert nicht!");
 			}
-			
-			InternalSCBAccount receiverAcc= InternalSCBAccount.getOwnByEmail(pm,email);
-			if (receiverAcc==null){
+
+			InternalSCBAccount receiverAcc = InternalSCBAccount.getOwnByEmail(
+					pm, email);
+			if (receiverAcc == null) {
 				throw new AccountNotExistException();
 			}
-			
-			
+
 			MoneyTransferPending transfer = new MoneyTransferPending();
 			transfer.setRemark(remark);
 			transfer.setReceiverName(receiverAcc.getOwnerEmail());
 			transfer.setSenderAccountNr(senderAccountNr);
-			transfer.setReceiverBLZ(receiverAcc.getBank(pm).getBlz());			
+			transfer.setReceiverBLZ(receiverAcc.getBank(pm).getBlz());
 			transfer.setReceiverAccountNr(receiverAcc.getAccountNr());
 			transfer.setAmount(amount);
 			transfer.setReceiverBankName(receiverAcc.getBank(pm).getName());
@@ -553,26 +563,21 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			log.info("Save Moneytransfer");
 			pm.currentTransaction().begin();
 
-
 			senderAccount.setPendingTransaction(transfer);
 
 			pm.makePersistent(senderAccount);
 			pm.currentTransaction().commit();
 			return transfer.getDTO();
 
-			
-			
 		} catch (Exception e) {
 			log.severe(e.getMessage());
 			e.printStackTrace();
-			if (e instanceof SCBException ){
-				throw (SCBException)e;
+			if (e instanceof SCBException) {
+				throw (SCBException) e;
+			} else {
+				throw new SCBException("Can not executed transaction.", e);
 			}
-			else{	throw new SCBException(
-					"Can not executed transaction.", e);
-			}
-		}
-		finally {
+		} finally {
 			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
 			}
@@ -580,5 +585,4 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		}
 	}
 
-	
 }
