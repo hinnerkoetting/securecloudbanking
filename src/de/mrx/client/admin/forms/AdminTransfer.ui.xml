@@ -1,0 +1,77 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style src="../../SCB.css">
+		.header {
+			background-color:blue;
+			color: white;
+   			font-style:italic;
+		}
+		.table {
+			border-spacing:5px;
+		}
+		.searchDiv {
+			background-color:#DDDDDD;
+			position:relative;			
+			margin-top:50px; 
+		}
+	</ui:style>
+	<g:HTMLPanel>
+
+		<g:Label  styleName="{style.title}" ui:field="title"/>		
+		<table class="{style.table}">
+			<tr class="{style.header}">				
+				
+				<td></td>
+				
+				<td><g:Label ui:field="descName"/></td>
+				<td><g:Label ui:field="descNr"/></td>
+				<td><g:Label ui:field="descBLZ"/></td>
+			</tr>
+			<tr >
+				<td><g:Label ui:field="descRecipient"/></td>
+				<td><g:TextBox ui:field="recipientName"/></td>				
+				<td><g:TextBox ui:field="recipientNr"/></td>
+				<td><g:TextBox ui:field="recipientBLZ"/></td>				
+			</tr>
+			<tr>
+				<td><g:Label ui:field="descSender"/></td>
+				<td><g:TextBox ui:field="senderName"/></td>
+				<td><g:TextBox ui:field="senderNr"/></td>
+				<td><g:TextBox ui:field="senderBLZ"/></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><g:Label ui:field="descAmount"/> </td>
+				<td><g:TextBox ui:field="amount"/></td>
+				<td></td><td></td>
+			</tr>
+			<tr>
+				<td><g:Label ui:field="descRemark"/></td>
+				<td><g:TextBox ui:field="remark"/></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><g:Button ui:field="submit"/></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
+
+		<div class="{style.searchDiv}">
+			<g:Label styleName="{style.title}" ui:field="searchTitle"/>
+			<table>
+				<tr>
+					<td><g:Label ui:field="descOwner"/></td>
+					<td><g:TextBox ui:field ="searchOwner"/></td>
+					<td><g:Label ui:field="descAccountNr"/></td>
+					<td><g:TextBox ui:field ="searchAccountNr"/></td>
+					<td><g:Button ui:field ="search"/></td>
+				</tr>
+			</table>
+			<g:FlexTable ui:field="searchTable"/>
+	
+		</div>
+		
+	</g:HTMLPanel>
+</ui:UiBinder> 

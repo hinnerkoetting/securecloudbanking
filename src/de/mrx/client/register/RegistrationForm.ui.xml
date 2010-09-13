@@ -1,0 +1,61 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'
+ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+    <ui:style src="../SCB.css" />
+   <g:HTMLPanel> 
+  <p class='{style.centerBlockText}'>
+  	<ui:msg description="introductionText" >Secure Cloud Banking is a technology demonstration platform to evaluate aspects of cloud computing. <br/>Feel free to register with a google account and use the SCB banking services. <br/>Enjoy!<br/><br/></ui:msg>
+ 	</p>
+    <g:Label ui:field="hintLogIn" visible="false" styleName="{style.hint}">
+    	<ui:msg description="hintLogIn">We recommend you to log in first with your google account before proceeding</ui:msg>
+    </g:Label>
+    
+    
+    <g:VerticalPanel ui:field="signInLinkWrapper" visible="false"/>
+    
+    <table >
+    <tr>
+    	<td> <ui:msg description="regLblLastName">Last Name</ui:msg></td>
+    	<td> <g:TextBox ui:field='lastName'/></td>
+    	<td> <ui:msg description="regLblFirstName">First Name</ui:msg></td>
+    	<td> <g:TextBox ui:field='firstName'/></td>
+    </tr>
+    <tr >
+    	
+    	<td> <ui:msg description="street">Street</ui:msg></td>
+    	<td> <g:TextBox ui:field='street'/></td>
+    	<td> <ui:msg description="houseNr">House Nr</ui:msg></td>
+    	<td> <g:TextBox ui:field='houseNr'/></td>
+    	
+    </tr>
+    	<td> <ui:msg description="plz">Postal Code</ui:msg></td>
+    	<td> <g:TextBox ui:field='plz'/></td>
+    	<td> <ui:msg description="city">City</ui:msg></td>
+    	<td> <g:TextBox ui:field='city'/></td>
+    
+    <tr>
+    <tr>
+        	<td> <ui:msg description="regLblEmail">Email (only Googlemail)</ui:msg></td>
+    		<td> <g:TextBox ui:field='email'/></td>
+        	<td> <ui:msg description="languageLbl">Language</ui:msg></td>
+   			<td> <g:ListBox ui:field='language' visibleItemCount='1'/></td>
+    </tr>
+    <tr/>
+    </tr>
+
+    <tr>
+    	<td><g:CheckBox ui:field='agb'><ui:msg description="agbhint">I accept the Terms Of Services</ui:msg></g:CheckBox></td>
+    	<td><g:Anchor ui:field='agblink' target="_blank"><ui:msg description="agbhint">ToS</ui:msg></g:Anchor></td>
+    	
+    	
+    	<td> <g:Button ui:field='registerBtn'><ui:msg description="registerBtn">Register</ui:msg></g:Button> </td>
+    </tr>
+    </table> 
+    
+    <g:FlexTable ui:field="validateErrorTable"/>
+    
+  </g:HTMLPanel>
+</ui:UiBinder>
+		
+		
