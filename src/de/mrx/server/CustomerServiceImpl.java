@@ -114,8 +114,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	 */
 	private void loadInitialData() {
 		try {
-			bankWrapper = AllBanks.getBankWrapper(PMF.get()
-					.getPersistenceManager());
+			bankWrapper = AllBanks.getBankWrapper(pm);
 			pm.currentTransaction().begin();
 			if (bankWrapper == null) {
 
