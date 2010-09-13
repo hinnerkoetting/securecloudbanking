@@ -54,8 +54,6 @@ import de.mrx.shared.SCBException;
 public class CustomerServiceImpl extends BankServiceImpl implements
 		CustomerService {
 
-	PersistenceManager pm = PMF.get().getPersistenceManager();
-
 	/**
 	 * SCB-Bank
 	 */
@@ -77,7 +75,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 
-		pm = PMF.get().getPersistenceManager();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		String query = " SELECT FROM " + InternalSCBAccount.class.getName()
 				+ " WHERE owner =='" + user.getEmail() + "'";
 		log.info("geTAccounts Query: " + query);
@@ -100,7 +98,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			return null;
 		}
 
-		pm = PMF.get().getPersistenceManager();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		InternalSCBAccount savingAccount = InternalSCBAccount.getOwnByEmail(pm,
 				user.getEmail());
 		if (savingAccount == null) {
@@ -113,9 +111,10 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	 * initialisation. After DB-Resets stores basic data in the JDO-database.
 	 */
 	private void loadInitialData() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			bankWrapper = AllBanks.getBankWrapper(PMF.get()
-					.getPersistenceManager());
+
+			bankWrapper = AllBanks.getBankWrapper(pm);
 			pm.currentTransaction().begin();
 			if (bankWrapper == null) {
 
@@ -180,8 +179,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	 *             if account can not be created
 	 */
 	public void openNewAccount() throws SCBException {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
+
 			UserService userService = UserServiceFactory.getUserService();
 			User user = userService.getCurrentUser();
 			if (user == null) {
@@ -235,10 +235,12 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			String receiveraccountNr, double amount, String remark,
 			String receiverName, String bankName, String tan)
 			throws SCBException {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			log.info("Send Money Confirmation (senderAcc:"+senderAccountNr+"\t BLZ"+blz+"\tReceiver Acc: "+receiveraccountNr+" ReceiverName :"+receiverName+" Amount: "+amount);
+			log.info("Send Money Confirmation (senderAcc:" + senderAccountNr
+					+ "\t BLZ" + blz + "\tReceiver Acc: " + receiveraccountNr
+					+ " ReceiverName :" + receiverName + " Amount: " + amount);
 
-			pm = PMF.get().getPersistenceManager();
 			bankWrapper = AllBanks.getBankWrapper(pm);
 			ownBank = bankWrapper.getOwnBanks();
 			InternalSCBAccount senderAccount = InternalSCBAccount
@@ -425,10 +427,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			String senderAccountNr, String blz, String receiveraccountNr,
 			double amount, String remark, String receiverName, String bankName)
 			throws SCBException {
-
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 
-			pm = PMF.get().getPersistenceManager();
 			bankWrapper = AllBanks.getBankWrapper(pm);
 			ownBank = bankWrapper.getOwnBanks();
 			InternalSCBAccount senderAccount = InternalSCBAccount
@@ -531,9 +532,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	public MoneyTransferDTO sendMoneyAskForConfirmationDataWithEmail(
 			String senderAccountNr, String email, double amount, String remark)
 			throws SCBException {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 
-			pm = PMF.get().getPersistenceManager();
 			bankWrapper = AllBanks.getBankWrapper(pm);
 			ownBank = bankWrapper.getOwnBanks();
 			InternalSCBAccount senderAccount = InternalSCBAccount
