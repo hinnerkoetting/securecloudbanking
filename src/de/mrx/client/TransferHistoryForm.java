@@ -36,7 +36,6 @@ public class TransferHistoryForm extends Composite {
 	HorizontalPanel selectPages;
 	
 	private static int TRANSACTIONS_PER_PAGE = 8;
-	private int currentPage = 1;
 	
 	List<MoneyTransferDTO> transfers;
 	
@@ -59,8 +58,13 @@ public class TransferHistoryForm extends Composite {
 			transferHistoryNoTransactionHint.setVisible(true);
 		}
 		
+		int numberPages;
 		//set pages
-		int numberPages = transfers.size() /  TRANSACTIONS_PER_PAGE + 1;
+		if (transfers.size() == 0)
+			numberPages = 0;
+		else 
+			numberPages = transfers.size() /  TRANSACTIONS_PER_PAGE + 1;
+		
 		for (int i = 1; i <= numberPages; i++) {
 			Anchor pageLink = new Anchor(""+i);
 			final int j = i;
@@ -95,14 +99,13 @@ public class TransferHistoryForm extends Composite {
 		flexTable.setWidget(0, 4, lbl);
 
 		
-		switchToPage(currentPage);
+		switchToPage(1);
 		
 
 
 	}
 	
 	private void switchToPage(int page) {
-		currentPage = page;
 		//table row
 		int row = 1;
 		
@@ -111,7 +114,8 @@ public class TransferHistoryForm extends Composite {
 		for (int i = 0; i < TRANSACTIONS_PER_PAGE; i++) {
 			int index = (page-1) * TRANSACTIONS_PER_PAGE + i;
 			if (index >= transfers.size()) {
-				flexTable.removeRow(row);
+				if (flexTable.getRowCount() > row)
+					flexTable.removeRow(row);
 				//row++ is not needed because the last row was just removed
 				continue;
 			}

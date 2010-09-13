@@ -182,10 +182,10 @@ AdminService {
 		resetData();
 
 		//number of test data
-		final int EXTERNAL_BANKS = 5;
-		final int EXTERNAL_ACCS = 4;
-		final int INTERNAL_ACCS = 10;
-		final int TRANSACTIONS = 20;
+		final int EXTERNAL_BANKS = 3;
+		final int EXTERNAL_ACCS = 2;
+		final int INTERNAL_ACCS = 5;
+		final int TRANSACTIONS = 50;
 		
 		
 		log.setLevel(Level.ALL);
@@ -273,9 +273,9 @@ AdminService {
 			InternalSCBAccount acc2 = internalAccounts.get(pos2);
 			double amount = (random.nextDouble()- 0.5) * 100;
 			String remark = "testcomment" + i;
-			MoneyTransfer transfer = new MoneyTransfer(acc1, acc2, amount, acc2.getOwner(), remark);
+			MoneyTransfer transfer = new MoneyTransfer(pm, acc1, acc2, amount, acc2.getOwner(), remark);
 			acc1.addMoneyTransfer(transfer);
-			MoneyTransfer transferRevert = new MoneyTransfer(acc2, acc1, -amount, acc2.getOwner(), remark);
+			MoneyTransfer transferRevert = new MoneyTransfer(pm, acc2, acc1, -amount, acc2.getOwner(), remark);
 			acc2.addMoneyTransfer(transferRevert);
 			
 			acc1.changeMoney(amount);
@@ -314,7 +314,7 @@ AdminService {
 		}
 		log.log(Level.INFO,"Reciever: " +recieverAcc.toString());
 		log.log(Level.INFO,"Sender: "   +senderAcc.toString());
-		MoneyTransfer transfer = new MoneyTransfer(senderAcc,
+		MoneyTransfer transfer = new MoneyTransfer(pm, senderAcc,
 				recieverAcc, amount,recieverAcc.getOwner(),remark);
 		transferMoney(pm, senderAcc, recieverAcc, transfer, amount, remark);
 		return "Success.";
@@ -335,7 +335,7 @@ AdminService {
 		List<AccountDTO> accountsDTO = new ArrayList<AccountDTO>();
 		log.log(Level.INFO, externalAccounts.size() +"");
 		for (ExternalAccount account: externalAccounts) {
-			if (account.getBank().getBlz().equals(blz))
+			if (account.getBank(pm).getBlz().equals(blz))
 				accountsDTO.add(account.getDTO());
 		}
 		return accountsDTO;
@@ -356,7 +356,7 @@ AdminService {
 		@SuppressWarnings("unchecked")
 		List<ExternalAccount> accounts = (List<ExternalAccount>)query.execute();
 		for (ExternalAccount account: accounts) {
-			if (account.getBank().getBlz().equals(blz))
+			if (account.getBank(pm).getBlz().equals(blz))
 				pm.deletePersistent(account);
 		}
 		

@@ -36,7 +36,7 @@ BankService {
 		// recAccount.addMoneyTransfer(transfer);Sp�ter eine Kopie anlegen
 
 		senderAccount.changeMoney(-amount);
-		MoneyTransfer receivertransfer = new MoneyTransfer(recAccount,
+		MoneyTransfer receivertransfer = new MoneyTransfer(pm, recAccount,
 				senderAccount, -amount,senderAccount.getOwner(),remark);
 		
 		recAccount.addMoneyTransfer(receivertransfer);
