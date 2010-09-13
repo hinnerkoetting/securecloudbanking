@@ -107,10 +107,10 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		String debugFlag = Window.Location.getParameter("gwt.codesvr");
 
 		if (debugFlag != null) {
-			reloadURL = GWT.getHostPageBaseURL() +"?gwt.codesvr="+ debugFlag + "&locale="
+			reloadURL = GWT.getHostPageBaseURL() +"Admin.html?gwt.codesvr="+ debugFlag + "&locale="
 					+ language;
 		} else {
-			reloadURL = GWT.getHostPageBaseURL() + "?locale=" + language;
+			reloadURL = GWT.getHostPageBaseURL() + "Admin.html?locale=" + language;
 		}
 
 		GWT.log(reloadURL);
