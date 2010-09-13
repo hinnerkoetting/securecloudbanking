@@ -57,7 +57,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 	List<Observer>  observers=new ArrayList<Observer>();
 
 	@UiField
-	TextBox receiverAccountNr;
+	TextBox receiverAccountNr; 
 
 	@UiField
 	TextBox receiverBankName;
