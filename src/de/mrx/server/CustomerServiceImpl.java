@@ -133,7 +133,14 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			pm.currentTransaction().commit();
 
-		} finally {
+		}
+		catch (RuntimeException e){
+			//log and throw
+			log.severe(e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}
+		finally {
 			if (pm.currentTransaction().isActive()) {
 				pm.currentTransaction().rollback();
 
