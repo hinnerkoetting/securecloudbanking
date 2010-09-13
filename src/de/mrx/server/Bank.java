@@ -33,8 +33,7 @@ public class Bank {
 	@Unique
 	private String blz;
 
-	@Persistent
-	@PrimaryKey
+	@PrimaryKey	
 	private Key id;
 
 	public void setId(Key id) {
@@ -101,14 +100,14 @@ public class Bank {
 		this.name = name;
 	}
 
-//	public Bank() {
-//
-//	}
+	public Bank() {
 
-//	public Bank(BankDTO dto) {
-//		setBlz(dto.getBlz());
-//		setName(dto.getName());
-//	}
+	}
+
+	public Bank(BankDTO dto) {
+		setBlz(dto.getBlz());
+		setName(dto.getName());
+	}
 
 	public String getBlz() {
 		return blz;
