@@ -57,7 +57,7 @@ public class ExternalAccount extends GeneralAccount {
 		List<ExternalAccount> result = (List<ExternalAccount>)query.execute(accountNr);
 		//look for account with correct blz
 		for (ExternalAccount account: result) {
-			if (account.getBank().getBlz().equals(blz))
+			if (account.getBank(pm).getBlz().equals(blz))
 				return account;
 		}
 		//not found

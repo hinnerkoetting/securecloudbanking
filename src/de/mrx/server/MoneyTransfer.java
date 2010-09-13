@@ -72,7 +72,7 @@ public class MoneyTransfer {
 		
 	}
 	
-	public MoneyTransfer( GeneralAccount sender, GeneralAccount receiver, double amount, String receiverName, String remark) {
+	public MoneyTransfer(PersistenceManager pm, GeneralAccount sender, GeneralAccount receiver, double amount, String receiverName, String remark) {
 		super();
 		if (sender==null){
 			throw new RuntimeException("Sender may not be null");
@@ -82,9 +82,9 @@ public class MoneyTransfer {
 		}
 		this.amount = amount;
 		senderAccountNr=sender.getAccountNr();
-		senderBLZ=sender.getBank().getBlz();
+		senderBLZ=sender.getBank(pm).getBlz();
 		receiverAccountNr=receiver.getAccountNr();
-		receiverBLZ=receiver.getBank().getBlz();
+		receiverBLZ=receiver.getBank(pm).getBlz();
 		this.receiverName=receiverName;
 		this.remark=remark;
 		timestamp=new Date();
@@ -110,7 +110,7 @@ public class MoneyTransfer {
 			receiverAccount=(ExternalAccount)ExternalAccount.getAccountByBLZAndAccountNr(pm,b,receiverAccountNr);	
 		}		
 		if (receiverAccount!=null){
-		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank().getBlz(),s.getAccountNr(),receiverAccount.getBank().getBlz(),receiverAccount.getAccountNr(),getAmount());
+		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank(pm).getBlz(),s.getAccountNr(),receiverAccount.getBank(pm).getBlz(),receiverAccount.getAccountNr(),getAmount());
 		dto.setTimestamp(getTimestamp());
 		dto.setRemark(getRemark());
 		dto.setReceiverName(getReceiverName());
@@ -122,7 +122,7 @@ public class MoneyTransfer {
 			MoneyTransferDTO dto=new MoneyTransferDTO();
 			dto.setAmount(getAmount());
 			dto.setSenderAccountNr(s.getAccountNr());
-			dto.setSenderBankNr(s.getBank().getBlz());
+			dto.setSenderBankNr(s.getBank(pm).getBlz());
 			dto.setReceiverAccountNr("Unbekannt");
 			dto.setReceiverBankNr("Unbekannt");
 			dto.setRemark(getRemark());

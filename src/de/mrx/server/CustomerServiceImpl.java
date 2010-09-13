@@ -22,7 +22,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
-import javax.security.auth.login.AccountNotFoundException;
 
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.User;
@@ -42,7 +41,6 @@ import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
-import de.mrx.shared.WrongTANException;
 
 /**
  * implementation class for the bankingservice
@@ -321,7 +319,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 //			}
 			
 
-			MoneyTransfer transfer = new MoneyTransfer(senderAccount,
+			MoneyTransfer transfer = new MoneyTransfer(pm, senderAccount,
 					recAccount, amount,recAccount.getOwner(),remark);
 			
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
@@ -578,10 +576,10 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			transfer.setRemark(remark);
 			transfer.setReceiverName(receiverAcc.getOwnerEmail());
 			transfer.setSenderAccountNr(senderAccountNr);
-			transfer.setReceiverBLZ(receiverAcc.getBank().getBlz());			
+			transfer.setReceiverBLZ(receiverAcc.getBank(pm).getBlz());			
 			transfer.setReceiverAccountNr(receiverAcc.getAccountNr());
 			transfer.setAmount(amount);
-			transfer.setReceiverBankName(receiverAcc.getBank().getName());
+			transfer.setReceiverBankName(receiverAcc.getBank(pm).getName());
 
 			Random r = new Random();
 			int transNr = r.nextInt(100);

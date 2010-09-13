@@ -26,7 +26,7 @@ public abstract class GeneralAccount {
 	@Persistent
 	private String accountNr;
 	
-//	@Persistent
+	@Persistent
 	private Key bankID;
 
 	
@@ -83,8 +83,9 @@ public abstract class GeneralAccount {
 		return accountNr;
 	}
 
-	public Bank getBank() {
-		Bank bank=PMF.get().getPersistenceManager().getObjectById(Bank.class,getBankID());
+	public Bank getBank(PersistenceManager pm) {
+
+		Bank bank=pm.getObjectById(Bank.class,getBankID());
 		return bank;
 	}
 	public AccountDTO getDTO() {
