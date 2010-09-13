@@ -4,7 +4,8 @@
 	ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">	
-	<ui:style src="SCB.css" />
+	<ui:style src="SCB.css">
+	</ui:style>
 	
 	<g:HTMLPanel>
 	
@@ -13,7 +14,7 @@
 				For this account there are no outgoing neither incoming transactions.
 			</ui:msg>
 		</g:Label>
-		
 		<g:FlexTable  ui:field="flexTable"/>
+		<g:HorizontalPanel ui:field="selectPages"/>
 	</g:HTMLPanel>
 </ui:UiBinder> 
