@@ -1,5 +1,6 @@
 package de.mrx.client.admin.forms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -19,14 +20,15 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
+import de.mrx.client.Observable;
+import de.mrx.client.Observer;
 import de.mrx.client.TableStyler;
-import de.mrx.client.admin.Admin;
 import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 import de.mrx.shared.SCBData;
 
-public class AdminTransfer extends Composite {
+public class AdminTransfer extends Composite implements Observable {
 
 	private static AdminTransferUiBinder uiBinder = GWT
 			.create(AdminTransferUiBinder.class);
@@ -108,15 +110,18 @@ public class AdminTransfer extends Composite {
 	
 	DialogBox a;
 	
-	Admin adminpage;
+	List<Observer> observer;
 	
+	
+	public static final int TRANSACTION_SUCCEEDED = 50;
 	
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
 	
-	public AdminTransfer(Admin admin, String accNr, String accOwner) {
-		this.adminpage = admin;
+	public AdminTransfer(String accNr, String accOwner) {
+		observer = new ArrayList<Observer>();
 		initWidget(uiBinder.createAndBindUi(this));
+		
 		title.setText(constants.transferMoney());		
 		descName.setText(constants.name());
 		descNr.setText(constants.accountNr());
@@ -168,8 +173,8 @@ public class AdminTransfer extends Composite {
 
 						@Override
 						public void onSuccess(String result) {
-							Window.alert(result);
-							adminpage.showAccounts();
+							GWT.log(result);
+							notifyObservers(TRANSACTION_SUCCEEDED, null);
 						}
 					});
 		
@@ -236,5 +241,19 @@ public class AdminTransfer extends Composite {
 		TableStyler.setTableStyle(searchTable);
 
 
+	}
+
+	@Override
+	public void addObserver(Observer o) {
+		observer.add(o);
+		
+	}
+
+	@Override
+	public void notifyObservers(Integer eventType, Object parameter) {
+		for (Observer o: observer) {
+			o.update(this, eventType, parameter);
+		}
+		
 	}
 }
