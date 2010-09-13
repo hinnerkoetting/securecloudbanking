@@ -284,7 +284,14 @@ public class Admin extends Composite implements EntryPoint,Observer {
 
 	@Override
 	public void update(Observable source, Object event, Object parameter) {
-		 GWT.log("test");
+		if (source instanceof SCBMenu) {
+			if (event == SCBMenu.EVENT_SHOW_REGISTRATION_MENU) {
+//				doOpenRegisterMenu();
+			}
+			else if (event == SCBMenu.EVENT_CHANGE_LANGUAGE) {
+				changeToLocalisedVersion((String)parameter);
+			}
+		}
 		
 	}
 
