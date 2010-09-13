@@ -12,7 +12,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -33,7 +32,7 @@ public class TransferHistoryForm extends Composite {
 	Label transferHistoryNoTransactionHint;
 	
 	@UiField
-	HorizontalPanel selectPages;
+	FlexTable selectPages;
 	
 	private static int TRANSACTIONS_PER_PAGE = 8;
 	
@@ -46,7 +45,6 @@ public class TransferHistoryForm extends Composite {
 	public TransferHistoryForm(List<MoneyTransferDTO> transfers) {
 		this.transfers = transfers;
 		
-		//TODO change this
 		SCBConstants constants = GWT.create(SCBConstants.class);
 		
 		
@@ -74,7 +72,7 @@ public class TransferHistoryForm extends Composite {
 					
 				}
 			});
-			selectPages.add(pageLink);
+			selectPages.setWidget(0, i, pageLink);
 			
 		}
 		

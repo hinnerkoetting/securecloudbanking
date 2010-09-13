@@ -28,8 +28,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
-import de.mrx.client.CustomerService;
-import de.mrx.client.CustomerServiceAsync;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.Observable;
 import de.mrx.client.Observer;
@@ -80,7 +78,7 @@ public class Admin extends Composite implements EntryPoint,Observer {
 	
 	@UiField 
 	SimplePanel content;
-	
+
     /**
      * show all transactions
      * 
@@ -101,7 +99,7 @@ public class Admin extends Composite implements EntryPoint,Observer {
 	 * change the language during runtime keeps the debug flag
 	 */
 	public static void changeToLocalisedVersion(String language) {
-		String queryPart = Window.Location.getQueryString();
+		
 
 		String reloadURL;
 		String debugFlag = Window.Location.getParameter("gwt.codesvr");
@@ -208,78 +206,72 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		content.setWidget(widget);
 	}
 	
+	private void loadAdminPage() {
+		adminMenu.add(new Adminmenu(this));
+		setContent(new AdminWelcome());
+	}
 	
 	private void checkGoogleStatus() {
-		CustomerServiceAsync bankingService = GWT.create(CustomerService.class);
-		bankingService.login(GWT.getHostPageBaseURL(),
+		AdminServiceAsync adminService = GWT.create(AdminService.class);
+
+		adminService.login(GWT.getHostPageBaseURL(),
 				new AsyncCallback<SCBIdentityDTO>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
 						 GWT.log(caught.toString());
-						
 					}
 
 					@Override
 					public void onSuccess(SCBIdentityDTO result) {
+						
 						SCBIdentityDTO identityInfo = result;
 						if (identityInfo.isLoggedIn()) {
-							
 							Log.info("User is logged in with email-adress "
 									+ result.getEmail());
-							if (identityInfo.isActivated()) {								
-								doShowPageForActivatedUser();
-							} else {
-								Log.info("Account not yet activated in SCB: "
-										+ identityInfo);
-								scbMenu.getMenuUserInfo().setText(
-										identityInfo.getEmail());
-								
-							}
-//							loadLoggedInSetup();
+							scbMenu.getMenuUserInfo().setText(
+									identityInfo.getEmail());
 							String language = identityInfo.getLanguage();
-							GWT.log("Language: " + language);
+							
 							if (language != null
 									&& !currentLanguage.equals(language)) {
+								GWT.log("Language: " + language);
 								changeToLocalisedVersion(language);
 							}
+							if (identityInfo.isAdmin()) {								
+								loadAdminPage();
+							}
+							signOut.setHref(identityInfo.getLogoutUrl()+Window.Location.getQueryString());
+							signOut.setText(constants.signOut());
+							signIn.setVisible(false);
+							signOut.setVisible(true);
+							
+							
+							
 						} else {
 							Log.info("User is not yet logged in with his Google account");
 					
-							loadLogin();
+							// Assemble login panel.
+							signIn.setHref(identityInfo.getLoginUrl());
+							signIn.setText(constants.signIn());
+							signIn.setVisible(true);
+							signOut.setVisible(false);
 						}
-						
-					}
-
-					private void loadLogin() {
-						// Assemble login panel.
-//						signIn.setHref(identityInfo.getLoginUrl());
-//						signIn.setText(constants.signIn());
-						signIn.setVisible(true);
-						signOut.setVisible(false);
-					}
-
-					private void doShowPageForActivatedUser() {
-						// TODO Auto-generated method stub
 						
 					}
 		
 		});
+
 	}
 	
 	@Override
 	public void onModuleLoad() {
 		RootLayoutPanel.get().add(uiBinder.createAndBindUi(this));
-
-		
 		scbMenu = new SCBMenu();
 		scbMenu.addObserver(this);
 		topMenuPanel.add(scbMenu);
-		
-		adminMenu.add(new Adminmenu(this));
-		content.add(new AdminWelcome());
-//	
-//		checkGoogleStatus();
+		setContent(new Label("Administration privileges required."));
+		checkGoogleStatus();
 		
 	}
 

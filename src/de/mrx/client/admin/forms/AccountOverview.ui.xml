@@ -29,9 +29,9 @@
 		
 			</div>
 			<div>
-				<g:FlexTable styleName="{style.tableDiv}" ui:field="overviewTable">
+				<g:FlexTable styleName="{style.tableDiv}" ui:field="overviewTable"/>
+				<g:FlexTable ui:field="selectPages"/>
 				
-				</g:FlexTable>
 			</div>
 			
 		</div>

@@ -15,7 +15,6 @@ import com.google.appengine.api.datastore.KeyFactory;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.BankDTO;
-import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.admin.AdminService;
 import de.mrx.server.AllBanks;
 import de.mrx.server.Bank;
@@ -100,11 +99,6 @@ AdminService {
 	}
 
 
-	@Override
-	public SCBIdentityDTO login(String requestUri) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/**
 	 * 
