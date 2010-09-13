@@ -171,43 +171,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 
 
-	/**
-	 * login to only banking
-	 * @param requestUri page to be redirected after login and logout
-	 * @return information about the customer
-	 */
-	public SCBIdentityDTO login(String requestUri) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
-		SCBIdentityDTO identityInfo;
+	
 
-		if (user != null) {
-
-			log.fine("Login: " + user);
-
-			identityInfo = getIdentity(pm, user);
-
-			identityInfo.setLoggedIn(true);
-			identityInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
-
-		} else {
-			identityInfo = new SCBIdentityDTO();
-			identityInfo.setLoggedIn(false);
-			identityInfo.setLoginUrl(userService.createLoginURL(requestUri));
-		}
-		return identityInfo;
-	}
-
-	private SCBIdentityDTO getIdentity(PersistenceManager pm, User user) {
-		SCBIdentity id = SCBIdentity.getIdentity(pm, user);
-		if (id == null) {
-			id = new SCBIdentity(user.getEmail());
-			id.setNickName(user.getNickname());
-		}
-		return id.getDTO();
-
-	}
+	
 
 	/**
 	 * open a new account for the logged in customer

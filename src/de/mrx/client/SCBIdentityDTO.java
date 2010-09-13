@@ -26,6 +26,8 @@ public class SCBIdentityDTO implements Serializable {
 	
 	private String language;
 	
+	private boolean admin;
+	
 	public String getLanguage() {
 		return language;
 	}
@@ -34,6 +36,10 @@ public class SCBIdentityDTO implements Serializable {
 		this.language = language;
 	}
 
+	public boolean isAdmin() {
+		return admin;
+	}
+	
 	private boolean loggedIn = false;
 	private String loginUrl;
 	private String logoutUrl;
@@ -62,6 +68,9 @@ public class SCBIdentityDTO implements Serializable {
 	  private String plz;
 	  private String street;
 	
+	  public void setAdmin(boolean isAdmin) {
+		 this.admin = isAdmin;
+	  }
 	
 	public SCBIdentityDTO(){
 		

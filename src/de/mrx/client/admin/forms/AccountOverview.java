@@ -11,6 +11,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -56,9 +57,23 @@ public class AccountOverview extends Composite {
 	@UiField
 	Button search;
 	
+	@UiField
+	FlexTable selectPages;
+	
 	Admin adminPage;
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
+	
+	private final int ACCOUNTS_PER_PAGE = 8;
+	private final int posOwner 			= 0;
+	private final int posAccount 		= 1;
+	private final int posBalance 		= 2;		
+	private final int posTransaction 	= 3;
+	private final int posTransfer 		= 4;
+	private final int posDelete 		= 5;
+	
+	
+	private List<AccountDTO> accounts;
 	
 	public AccountOverview(Admin admin) {
 		
@@ -73,15 +88,32 @@ public class AccountOverview extends Composite {
 	}
 	
 	public void setAccounts(List<AccountDTO> accounts){
+		this.accounts = accounts;
+	
 		overviewTable.clear();
 		
 
-		final int posOwner 			= 0;
-		final int posAccount 		= 1;
-		final int posBalance 		= 2;		
-		final int posTransaction 	= 3;
-		final int posTransfer 		= 4;
-		final int posDelete 		= 5;
+		int numberPages = accounts.size() /  ACCOUNTS_PER_PAGE;
+		if (accounts.size() %  ACCOUNTS_PER_PAGE != 0)
+			numberPages++;
+		
+		for (int i = 1; i <= numberPages; i++) {
+			Anchor pageLink = new Anchor(""+i);
+			final int j = i;
+			pageLink.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					switchToPage(j);
+					
+				}
+			});
+			selectPages.setWidget(0, i, pageLink);
+			
+		}
+		
+		
+		
 		
 		//add header
 		overviewTable.setWidget(0, posOwner, new Label(constants.owner()));
@@ -92,11 +124,48 @@ public class AccountOverview extends Composite {
 		overviewTable.setWidget(0, posDelete, new Label(constants.deleteAccount()));
 		
 		
-		//add all accounts to table
+		switchToPage(1);
+
+
+	}
+	
+	@UiHandler("search")
+	public void onClickSearch(ClickEvent event) {
+		final AccountOverview overview = this;
+		AdminServiceAsync adminService = GWT.create(AdminService.class);
+		
+		adminService.searchInternalAccounts(searchOwner.getText(), searchAccountNr.getText(), new AsyncCallback<List<AccountDTO>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log(caught.toString());
+				
+			}
+
+			@Override
+			public void onSuccess(List<AccountDTO> result) {
+				overview.setAccounts(result);
+				
+			}
+		});
+	}
+	
+	private void switchToPage(int page) {
 		int row = 1;
 		NumberFormat fmt = NumberFormat.getFormat("#0.00");
+		for (int i = 0; i < ACCOUNTS_PER_PAGE; i++) {
+			int index = (page-1) * ACCOUNTS_PER_PAGE + i;
+			if (index >= accounts.size()) {
+				if (overviewTable.getRowCount() > row)
+					overviewTable.removeRow(row);
+				//row++ is not needed because the last row was just removed
+				continue;
+			}
+			//add all accounts to table
+			AccountDTO account = accounts.get(index);
+			
 
-		for (AccountDTO account: accounts) {
+			
 			overviewTable.setWidget(row, posOwner, new Label(account.getOwner()));
 			overviewTable.setWidget(row, posAccount, new Label(account.getAccountNr()));
 			String balance = fmt.format(account.getBalance());
@@ -181,28 +250,6 @@ public class AccountOverview extends Composite {
 			row++;
 		}
 		TableStyler.setTableStyle(overviewTable);
-
-
-	}
-	
-	@UiHandler("search")
-	public void onClickSearch(ClickEvent event) {
-		final AccountOverview overview = this;
-		AdminServiceAsync adminService = GWT.create(AdminService.class);
 		
-		adminService.searchInternalAccounts(searchOwner.getText(), searchAccountNr.getText(), new AsyncCallback<List<AccountDTO>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log(caught.toString());
-				
-			}
-
-			@Override
-			public void onSuccess(List<AccountDTO> result) {
-				overview.setAccounts(result);
-				
-			}
-		});
 	}
 }

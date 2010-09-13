@@ -15,6 +15,6 @@
 			</ui:msg>
 		</g:Label>
 		<g:FlexTable  ui:field="flexTable"/>
-		<g:HorizontalPanel ui:field="selectPages"/>
+		<g:FlexTable ui:field="selectPages"/>
 	</g:HTMLPanel>
 </ui:UiBinder> 

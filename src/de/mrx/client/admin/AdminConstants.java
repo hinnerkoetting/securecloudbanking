@@ -104,4 +104,10 @@ public interface AdminConstants extends Constants{
 	
 	@DefaultStringValue("Add new bank")
 	 String addNewBank();
+	
+	@DefaultStringValue("Sign In")
+	 String signIn();
+	
+	@DefaultStringValue("Sign Out")
+	 String signOut();
 }

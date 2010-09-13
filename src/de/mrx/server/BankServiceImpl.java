@@ -6,10 +6,14 @@ import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import de.mrx.client.BankService;
 import de.mrx.client.MoneyTransferDTO;
+import de.mrx.client.SCBIdentityDTO;
 
 public abstract class BankServiceImpl extends RemoteServiceServlet implements
 BankService {
@@ -69,4 +73,53 @@ BankService {
 		}
 		return mtDTOs;
 	}
+	
+	
+	protected SCBIdentityDTO getIdentity(PersistenceManager pm, User user) {
+		SCBIdentity id = SCBIdentity.getIdentity(pm, user);
+		if (id == null) {
+			id = new SCBIdentity(user.getEmail());
+			id.setNickName(user.getNickname());
+		}
+		return id.getDTO();
+
+	}
+	
+	
+	/**
+	 * login to only banking
+	 * @param requestUri page to be redirected after login and logout
+	 * @return information about the customer
+	 */
+	public SCBIdentityDTO login(String requestUri) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		
+		
+		SCBIdentityDTO identityInfo;
+
+		if (user != null) {
+
+			log.fine("Login: " + user);
+
+			identityInfo = getIdentity(pm, user);
+			
+			identityInfo.setLoggedIn(true);
+			identityInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
+			if (userService.isUserAdmin())
+				identityInfo.setAdmin(true);
+			else 
+				identityInfo.setAdmin(false);
+
+		} else {
+			identityInfo = new SCBIdentityDTO();
+			identityInfo.setLoggedIn(false);
+			identityInfo.setLoginUrl(userService.createLoginURL(requestUri));
+		}
+		
+		
+		return identityInfo;
+	}
+	
 }
