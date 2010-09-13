@@ -2,7 +2,13 @@
 ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
-    <ui:style src="SCB.css" />
+    <ui:style src="SCB.css" >
+    .bankInfo{
+ 		 text-align:right;
+ 		 margin-right:1cm;
+	}
+    
+    </ui:style>
     
     <g:DockLayoutPanel unit='EM'>
   <g:north size='10'>
@@ -23,7 +29,13 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
   </g:center>
   
   <g:south size='10'>
-    <g:HorizontalPanel ui:field="hintPanel"/>
+  	<g:HorizontalPanel width='100%'>
+    	<g:HorizontalPanel ui:field="hintPanel"/>
+    	<g:HTML styleName='{style.bankInfo}'>
+    		<p>	Secure Cloud Bank</p>
+    		<p>	BLZ 1502222</p>
+    	</g:HTML>
+    </g:HorizontalPanel>
   </g:south>
 </g:DockLayoutPanel>
     
