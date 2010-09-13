@@ -34,7 +34,7 @@ public class TransferHistoryForm extends Composite {
 	@UiField
 	FlexTable selectPages;
 	
-	private static int TRANSACTIONS_PER_PAGE = 8;
+	private static int TRANSACTIONS_PER_PAGE = 6;
 	
 	List<MoneyTransferDTO> transfers;
 	
