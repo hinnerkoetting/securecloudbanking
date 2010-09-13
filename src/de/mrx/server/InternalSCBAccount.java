@@ -37,7 +37,7 @@ public class InternalSCBAccount extends GeneralAccount {
 	}
 
 	public void setOwnerEmail(String ownerEmail) {
-		this.ownerEmail = ownerEmail;
+		this.ownerEmail = ownerEmail.toLowerCase();
 	}
 
 	
@@ -75,7 +75,7 @@ public class InternalSCBAccount extends GeneralAccount {
 	 * @return
 	 */
 public  InternalSCBAccount getOwnSavingAccount(PersistenceManager pm, String ownerEmail){
-		
+		ownerEmail = ownerEmail.toLowerCase();
 		Extent<InternalSCBAccount> e=pm.getExtent(InternalSCBAccount.class);
 		Query query=pm.newQuery(e,"owner == ownerParam");
 		query.setFilter("owner == ownerNrParam");
