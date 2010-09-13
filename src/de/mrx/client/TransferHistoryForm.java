@@ -58,12 +58,10 @@ public class TransferHistoryForm extends Composite {
 			transferHistoryNoTransactionHint.setVisible(true);
 		}
 		
-		int numberPages;
-		//set pages
-		if (transfers.size() == 0)
-			numberPages = 0;
-		else 
-			numberPages = transfers.size() /  TRANSACTIONS_PER_PAGE + 1;
+		//setup pages
+		int numberPages = transfers.size() /  TRANSACTIONS_PER_PAGE;
+		if (transfers.size() %  TRANSACTIONS_PER_PAGE != 0)
+			numberPages++;
 		
 		for (int i = 1; i <= numberPages; i++) {
 			Anchor pageLink = new Anchor(""+i);

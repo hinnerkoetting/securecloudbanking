@@ -84,9 +84,9 @@ public class AccountOverview extends Composite {
 		final int posDelete 		= 5;
 		
 		//add header
-		overviewTable.setWidget(0, posAccount, new Label(constants.owner()));
-		overviewTable.setWidget(0, posBalance, new Label(constants.balance()));
-		overviewTable.setWidget(0, posOwner, new Label(constants.accountNr()));
+		overviewTable.setWidget(0, posOwner, new Label(constants.owner()));
+		overviewTable.setWidget(0, posAccount, new Label(constants.accountNr()));
+		overviewTable.setWidget(0, posBalance, new Label(constants.balance()));		
 		overviewTable.setWidget(0, posTransaction, new Label(constants.transactions()));
 		overviewTable.setWidget(0, posTransfer, new Label(constants.transferMoney()));
 		overviewTable.setWidget(0, posDelete, new Label(constants.deleteAccount()));
@@ -96,11 +96,12 @@ public class AccountOverview extends Composite {
 		int row = 1;
 		NumberFormat fmt = NumberFormat.getFormat("#0.00");
 
-		for (AccountDTO account: accounts) {	
+		for (AccountDTO account: accounts) {
+			overviewTable.setWidget(row, posOwner, new Label(account.getOwner()));
 			overviewTable.setWidget(row, posAccount, new Label(account.getAccountNr()));
 			String balance = fmt.format(account.getBalance());
 			overviewTable.setWidget(row, posBalance, new Label(balance));
-			overviewTable.setWidget(row, posOwner, new Label(account.getOwner()));
+			
 			
 			final String accNr = account.getAccountNr();
 			final String accOwner = account.getOwner();
