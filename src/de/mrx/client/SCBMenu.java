@@ -18,6 +18,7 @@ public class SCBMenu extends Composite implements Observable{
 	}
 	
 	public final static Integer EVENT_SHOW_REGISTRATION_MENU=10; 
+	public final static Integer EVENT_CHANGE_LANGUAGE=11;
 	
 	private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 	private SCBConstants constants = GWT.create(SCBConstants.class);
@@ -94,13 +95,12 @@ public class SCBMenu extends Composite implements Observable{
 	
 	Command cmdChangeToEnglish = new Command() {
 		public void execute() {
-			SCB.changeToLocalisedVersion("en");
-
+			notifyObservers(EVENT_CHANGE_LANGUAGE,new String("en"));
 		}
 	};
 	Command cmdChangeToGerman = new Command() {
 		public void execute() {
-			SCB.changeToLocalisedVersion("de");
+			notifyObservers(EVENT_CHANGE_LANGUAGE,new String("de"));
 
 		}
 	};

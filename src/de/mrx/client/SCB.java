@@ -413,7 +413,7 @@ public class SCB implements EntryPoint, Observer {
 				showFastMoneyTransferForm();
 			} else if (eventType == LeftPanelMenuForm.EVENT_SHOW_REGISTRATION) {
 				doOpenRegisterMenu();
-			}
+			}		
 		}
 
 		else if (source instanceof CustomerTransferHistoryForm) {
@@ -425,6 +425,9 @@ public class SCB implements EntryPoint, Observer {
 		} else if (source instanceof SCBMenu) {
 			if (eventType == SCBMenu.EVENT_SHOW_REGISTRATION_MENU) {
 				doOpenRegisterMenu();
+			}
+			else if (eventType == SCBMenu.EVENT_CHANGE_LANGUAGE) {
+				changeToLocalisedVersion((String)parameter);
 			}
 		}
 	}
