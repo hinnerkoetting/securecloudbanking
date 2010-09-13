@@ -53,26 +53,8 @@ public class Bank {
 		return result;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Bank other = (Bank) obj;
-		if (blz == null) {
-			if (other.blz != null)
-				return false;
-		} else if (!blz.equals(other.blz))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+	public boolean equals(Bank otherBank) {
+		return (this.getBlz() == otherBank.getBlz() && this.getName() == otherBank.getName());
 	}
 
 	@Override

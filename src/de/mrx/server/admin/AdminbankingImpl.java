@@ -25,6 +25,7 @@ import de.mrx.server.InternalSCBAccount;
 import de.mrx.server.MoneyTransfer;
 import de.mrx.server.MoneyTransferPending;
 import de.mrx.server.PMF;
+import de.mrx.shared.SCBData;
 import de.mrx.shared.SCBException;
 
 public class AdminbankingImpl extends BankServiceImpl implements
@@ -192,9 +193,9 @@ AdminService {
 		AllBanks bankWrapper = AllBanks.getBankWrapper(pm);
 		
 		//create own bank
-		Bank ownBank = new Bank(Bank.SCB_BLZ, "Secure Cloud Bank");
+		Bank ownBank = new Bank(SCBData.SCB_PLZ, SCBData.SCB_NAME);
 		ownBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-				Bank.class.getSimpleName(), Bank.SCB_BLZ));
+				Bank.class.getSimpleName(), SCBData.SCB_PLZ));
 		bankWrapper.setOwnBanks(ownBank);
 		pm.makePersistent(ownBank);
 		
