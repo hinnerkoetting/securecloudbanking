@@ -15,7 +15,6 @@
 
   <!-- Other module inherits                                      -->
 
-<set-property name='user.agent' value='gecko' />
   <!-- Specify the app entry point class.                         -->
   <entry-point class='de.mrx.client.admin.Admin'/>
   <extend-property name="locale" values="de"/>
