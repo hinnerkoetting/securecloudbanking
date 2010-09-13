@@ -217,6 +217,7 @@ AdminService {
 
 				acc.setId(KeyFactory.createKey(bank.getId(), ExternalAccount.class
 						.getSimpleName(), accNr));
+				bank.addAccount(acc);
 				pm.makePersistent(acc);
 				
 
@@ -236,7 +237,7 @@ AdminService {
 			acc.setId(KeyFactory.createKey(ownBank.getId(), InternalSCBAccount.class
 					.getSimpleName(), accNr));
 			
-			
+			ownBank.addAccount(acc);
 			pm.makePersistent(acc);
 			
 		}
