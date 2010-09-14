@@ -1,5 +1,8 @@
 package de.mrx.client.admin.forms;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -13,21 +16,19 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.BankDTO;
-import de.mrx.client.admin.Admin;
+import de.mrx.client.Observable;
+import de.mrx.client.Observer;
 import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
-public class EditBankDetails extends Composite {
+public class EditBank extends Composite implements Observable {
 
-	private static EditBankDetailsUiBinder uiBinder = GWT
-			.create(EditBankDetailsUiBinder.class);
+	private static EditBankUiBinder uiBinder = GWT
+			.create(EditBankUiBinder.class);
 
-	interface EditBankDetailsUiBinder extends UiBinder<Widget, EditBankDetails> {
+	interface EditBankUiBinder extends UiBinder<Widget, EditBank> {
 	}
-
-	@UiField
-	Label title;
 
 	@UiField
 	Label descName;
@@ -48,18 +49,20 @@ public class EditBankDetails extends Composite {
 	String oldBLZ;
 	String oldName;
 	
-	Admin adminpage; 
+	public static final int EDIT_BANK_SUCCEED = 23455;
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
 	
-	public EditBankDetails(Admin admin,String oldBLZ, String oldName) {
-		adminpage = admin;
+	List<Observer> observer;
+	
+	public EditBank(String oldBLZ, String oldName) {
+		observer = new ArrayList<Observer>();
+
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		title.setText(constants.editBankDetails());
 		descName.setText(constants.name());
 		descBlz.setText(constants.blz());
-		submit.setText(constants.blz());
+		submit.setText(constants.submit());
 		this.oldBLZ = oldBLZ;
 		this.oldName = oldName;
 		name.setText(oldName);
@@ -77,7 +80,7 @@ public class EditBankDetails extends Composite {
 			@Override
 			public void onSuccess(String result) {
 				GWT.log(result);
-				adminpage.showExternalBanks();
+				notifyObservers(EDIT_BANK_SUCCEED, null);
 			}
 			
 			@Override
@@ -86,6 +89,20 @@ public class EditBankDetails extends Composite {
 			}
 		});
 			
+	}
+
+	@Override
+	public void addObserver(Observer o) {
+		observer.add(o);
+		
+	}
+
+	@Override
+	public void notifyObservers(Integer eventType, Object parameter) {
+		for (Observer o: observer) {
+			o.update(this, eventType, parameter);
+		}
+		
 	}
 
 }

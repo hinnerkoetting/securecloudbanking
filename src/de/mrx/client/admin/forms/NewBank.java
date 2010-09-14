@@ -1,5 +1,8 @@
 package de.mrx.client.admin.forms;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -14,12 +17,13 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.BankDTO;
-import de.mrx.client.admin.Admin;
+import de.mrx.client.Observable;
+import de.mrx.client.Observer;
 import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
-public class NewBank extends Composite {
+public class NewBank extends Composite implements Observable {
 
 	private static NewBankUiBinder uiBinder = GWT.create(NewBankUiBinder.class);
 
@@ -44,12 +48,16 @@ public class NewBank extends Composite {
 	@UiField
 	Button submit;
 	
-	Admin adminPage;
+	public static final int ADD_BANK_SUCCEEDED = 5223;
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
 	
-	public NewBank(Admin admin) {
-		this.adminPage = admin;
+	List<Observer> observer;
+	
+	
+	public NewBank() {
+		observer = new ArrayList<Observer>();
+
 		initWidget(uiBinder.createAndBindUi(this));
 		title.setText(constants.addNewBank());
 		descName.setText(constants.name());
@@ -68,7 +76,7 @@ public class NewBank extends Composite {
 			@Override
 			public void onSuccess(String result) {
 				Window.alert(result);
-				adminPage.showExternalBanks();				
+				notifyObservers(ADD_BANK_SUCCEEDED, null);			
 				
 			}
 			
@@ -78,6 +86,20 @@ public class NewBank extends Composite {
 			}
 		});
 			
+	}
+
+	@Override
+	public void addObserver(Observer o) {
+		observer.add(o);
+		
+	}
+
+	@Override
+	public void notifyObservers(Integer eventType, Object parameter) {
+		for (Observer o: observer) {
+			o.update(this, eventType, parameter);
+		}
+		
 	}
 
 }

@@ -49,7 +49,7 @@ public class AccountOverview extends Composite implements UseSearchForm, Observa
 		initWidget(uiBinder.createAndBindUi(this));
 		searchForm = new SearchAccountsForm(this);
 		searchForm.enableColumns(true, true, true);
-		searchForm.enableButton(true, constants.edit());
+		searchForm.enableButton(true, constants.properties());
 		content.setWidget(searchForm);
 		
 	
