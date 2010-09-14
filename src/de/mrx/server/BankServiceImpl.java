@@ -11,13 +11,37 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.BankService;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
+import de.mrx.shared.SCBException;
 
 public abstract class BankServiceImpl extends RemoteServiceServlet implements
 BankService {
 
+	/**
+	 * get all account details
+	 * 
+	 * @param accountNr
+	 *            account that should be fetched
+	 * @return detailled information
+	 * @throws SCBException
+	 *             if data can not be fetched
+	 */
+	public AccountDetailDTO getAccountDetails(String accountNr)
+			throws SCBException {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		InternalSCBAccount acc = InternalSCBAccount.getOwnByAccountNr(pm,
+				accountNr);
+		if (acc == null) {
+			throw new SCBException("Account data for Account '" + accountNr
+					+ "' can not be loaded at the moment!");
+		}
+		return acc.getDetailedDTO(pm);
+	}
+	
+	
 	/**
 	 * 
 	 */

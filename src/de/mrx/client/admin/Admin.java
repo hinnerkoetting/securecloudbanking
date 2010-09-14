@@ -233,9 +233,9 @@ public class Admin extends Composite implements EntryPoint,Observer {
 								GWT.log("Language: " + language);
 								changeToLocalisedVersion(language);
 							}
-							if (identityInfo.isAdmin()) {								
+//							if (identityInfo.isAdmin()) {								
 								loadAdminPage();
-							}
+//							}
 							signOut.setHref(identityInfo.getLogoutUrl()+Window.Location.getQueryString());
 							signOut.setText(constants.signOut());
 							signIn.setVisible(false);

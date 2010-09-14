@@ -21,13 +21,7 @@ public interface BankService extends RemoteService {
 	 */
 	public SCBIdentityDTO  login(String requestUri);
 
-	/**
-	 * fetches the balance of a given account. 
-	 * Can be only used by the owner of the account or an admin?
-	 * @param accountNr account that should be access
-	 * @return balance of the account
-	 */
-	public double getBalance(String accountNr);
+	
 	
 	
 	/**
