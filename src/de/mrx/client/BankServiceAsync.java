@@ -15,13 +15,7 @@ public interface BankServiceAsync {
 	void  login(String requestUri,
 			AsyncCallback<SCBIdentityDTO> callback);
 	
-	/**
-	 * fetches the balance of a given account. 
-	 * Can be only used by the owner of the account or an admin?
-	 * @param accountNr account that should be access
-	 * @return balance of the account
-	 */
-	void getBalance(String accountNr, AsyncCallback<Double> callback);
+	
 	
 	/**
 	 * gets all transaction of one account
