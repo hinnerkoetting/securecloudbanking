@@ -12,6 +12,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 import de.mrx.shared.SCBData;
 
@@ -23,27 +24,25 @@ import de.mrx.shared.SCBData;
 @PersistenceCapable
 public class AllBanks {
 
+	private static int KEY_VALUE = 53353;
 	
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
 	
-	@Persistent
-	private Set<Bank> allBanks;
-	
 	public Key getId() {
 		return id;
 	}
+	
+	Set<Bank> allBanks;
 
-	public void setId(Key id) {
+	private void setID(Key id) {
 		this.id = id;
 	}
 
-
-
-//	public Set<Bank> getBanks() {
-//		return allBanks;
-//	}
+	public Set<Bank> getBanks() {
+		return allBanks;
+	}
 
 	public void addBank(Bank bank) {
 		allBanks.add(bank);
@@ -101,6 +100,7 @@ public class AllBanks {
 			if (result == null) {
 				//create new if not stored
 				result = new AllBanks();
+				result.setID(KeyFactory.createKey(AllBanks.class.getSimpleName(), KEY_VALUE));
 				pm.currentTransaction().begin();
 				pm.makePersistent(result);
 				pm.currentTransaction().commit();
