@@ -134,7 +134,7 @@ public static InternalSCBAccount getOwnByEmail(PersistenceManager pm, String ema
     }
 	
 	public InternalSCBAccount( String owner, String accountNr, double balance, Bank bank) {
-		super(owner,accountNr, bank);
+		super(owner,accountNr, bank, InternalSCBAccount.class.getSimpleName());
 		setBalance(balance);		
 		tans=new TANList();
 		tans.generatedTANs();

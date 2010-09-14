@@ -22,7 +22,6 @@ import de.mrx.client.Observable;
 import de.mrx.client.Observer;
 import de.mrx.client.TableStyler;
 import de.mrx.client.admin.AdminConstants;
-import de.mrx.shared.SCBData;
 
 
 public class AdminExternalBanks extends Composite implements Observable, Observer {
@@ -72,8 +71,6 @@ public class AdminExternalBanks extends Composite implements Observable, Observe
 		
 		int row= 1;
 		for (final BankDTO bank: banks) {
-			if (bank.getName().equals(SCBData.SCB_NAME))
-				continue;
 			//name
 			table.setWidget(row, namePos, new Label(bank.getName()));
 			

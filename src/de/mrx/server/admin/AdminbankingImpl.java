@@ -10,7 +10,6 @@ import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
@@ -159,12 +158,11 @@ AdminService {
 		
 		
 		log.log(Level.INFO, "Requesting to add new bank. Name: " + bankDTO.getName() + " - BLZ: " + bankDTO.getBlz());
-		AllBanks bankWrapper = AllBanks.getBankWrapper(PMF.get()
+		AllBanks bankWrapper = AllBanks.getSingleton(PMF.get()
 					.getPersistenceManager());
 		
-		Bank bank = new Bank(bankDTO.getBlz(), bankDTO.getName());
-		bank.setId(KeyFactory.createKey(bankWrapper.getId(),
-				Bank.class.getSimpleName(), bankDTO.getBlz()));
+		Bank bank = new Bank(bankDTO.getBlz(), bankDTO.getName(), bankWrapper);
+
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.makePersistent(bank);
 		return "Success";
@@ -199,28 +197,25 @@ AdminService {
 		//generate test banks
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.currentTransaction().begin();
-		AllBanks bankWrapper = AllBanks.getBankWrapper(pm);
-		if (bankWrapper == null) {
-			bankWrapper = new AllBanks();
-			pm.makePersistent(bankWrapper);
-		}
+		AllBanks bankWrapper = AllBanks.getSingleton(pm);
+
 		
+		Bank ownBank = bankWrapper.getSCBBank(pm);
 		//create own bank
-		Bank ownBank = new Bank(SCBData.SCB_PLZ, SCBData.SCB_NAME);
-		ownBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-				Bank.class.getSimpleName(), SCBData.SCB_PLZ));
-		bankWrapper.setOwnBanks(ownBank);
-		pm.makePersistent(ownBank);
+		if (ownBank == null) {
+			ownBank = new Bank(SCBData.SCB_PLZ, SCBData.SCB_NAME, bankWrapper);
+			bankWrapper.addBank(ownBank);
+			pm.makePersistent(ownBank);
+		}
 		
 		Random random = new Random();
 		for (int i= 0; i < EXTERNAL_BANKS; i++) {
 			Integer rndBlz = random.nextInt(999999);
 			String bankname = "Testbank" + i;
-			Bank bank = new Bank(rndBlz.toString(), bankname);
-			bank.setId(KeyFactory.createKey(bankWrapper.getId(),
-					Bank.class.getSimpleName(), bank.getBlz()));
+			Bank bank = new Bank(rndBlz.toString(), bankname, bankWrapper);
+
 			
-			bankWrapper.getOtherBanks().add(bank);
+			bankWrapper.addBank(bank);
 			pm.makePersistent(bank);
 			//generate accounts for each bank
 			for (int j=0; j < EXTERNAL_ACCS; j++) {
@@ -228,8 +223,8 @@ AdminService {
 				GeneralAccount acc = new ExternalAccount( "Testaccount" + j + "@" + bankname + ".com",accNr.toString(), bank);
 
 
-				acc.setId(KeyFactory.createKey(bank.getId(), ExternalAccount.class
-						.getSimpleName(), accNr));
+//				acc.setId(KeyFactory.createKey(bank.getId(), ExternalAccount.class
+//						.getSimpleName(), accNr));
 				bank.addAccount(acc);
 				pm.makePersistent(acc);
 				
@@ -247,8 +242,8 @@ AdminService {
 			acc.setAccountDescription(AccountDTO.SAVING_ACCOUNT_DES);
 			acc.setOwnerEmail(accOwner + "@scbbank.com");
 			
-			acc.setId(KeyFactory.createKey(ownBank.getId(), InternalSCBAccount.class
-					.getSimpleName(), accNr));
+//			acc.setId(KeyFactory.createKey(ownBank.getId(), InternalSCBAccount.class
+//					.getSimpleName(), accNr));
 			
 			ownBank.addAccount(acc);
 			pm.makePersistent(acc);
@@ -348,7 +343,7 @@ AdminService {
 		List<AccountDTO> accountsDTO = new ArrayList<AccountDTO>();
 		log.log(Level.INFO, externalAccounts.size() +"");
 		for (ExternalAccount account: externalAccounts) {
-			if (account.getBank(pm).getBlz().equals(blz))
+			if (account.getBLZ().equals(blz))
 				accountsDTO.add(account.getDTO());
 		}
 		return accountsDTO;
@@ -371,7 +366,7 @@ AdminService {
 		@SuppressWarnings("unchecked")
 		List<ExternalAccount> accounts = (List<ExternalAccount>)query.execute();
 		for (ExternalAccount account: accounts) {
-			if (account.getBank(pm).getBlz().equals(blz))
+			if (account.getBLZ().equals(blz))
 				pm.deletePersistent(account);
 		}
 		
