@@ -322,26 +322,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		}
 	}
 
-	/**
-	 * get all account details
-	 * 
-	 * @param accountNr
-	 *            account that should be fetched
-	 * @return detailled information
-	 * @throws SCBException
-	 *             if data can not be fetched
-	 */
-	public AccountDetailDTO getAccountDetails(String accountNr)
-			throws SCBException {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		InternalSCBAccount acc = InternalSCBAccount.getOwnByAccountNr(pm,
-				accountNr);
-		if (acc == null) {
-			throw new SCBException("Account data for Account '" + accountNr
-					+ "' can not be loaded at the moment!");
-		}
-		return acc.getDetailedDTO(pm);
-	}
+	
 
 	private MimeBodyPart createPINAttachment(InternalSCBAccount account)
 			throws DocumentException, MessagingException, IOException {

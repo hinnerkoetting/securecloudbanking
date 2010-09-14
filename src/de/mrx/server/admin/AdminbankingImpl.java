@@ -11,9 +11,10 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 import de.mrx.client.AccountDTO;
-import de.mrx.client.AccountDetailDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.admin.AdminService;
 import de.mrx.server.AllBanks;
@@ -26,7 +27,6 @@ import de.mrx.server.MoneyTransfer;
 import de.mrx.server.MoneyTransferPending;
 import de.mrx.server.PMF;
 import de.mrx.shared.SCBData;
-import de.mrx.shared.SCBException;
 
 public class AdminbankingImpl extends BankServiceImpl implements
 AdminService {
@@ -37,17 +37,21 @@ AdminService {
 	private static final long serialVersionUID = 4064677766020894396L;
 	Logger log = Logger.getLogger(AdminbankingImpl.class.getName());
 	
-	@Override
-	public AccountDetailDTO getAccountDetails(String accountNr)
-			throws SCBException {
-		// TODO Auto-generated method stub
-		return null;
+	private boolean checkAdmin() {
+		UserService userService = UserServiceFactory.getUserService();
+		if (!userService.isUserAdmin()) {
+			log.severe("Unauthorized user called admin function!");
+			return false;
+		}
+		return true;
 	}
-
 	/**
 	 * 
 	 */
 	private List<InternalSCBAccount> getPersistentInternalAccounts() {
+		if (!checkAdmin())
+			return null;
+			
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		Extent<InternalSCBAccount> extent = pm.getExtent(InternalSCBAccount.class);
@@ -63,7 +67,9 @@ AdminService {
 	 */
 	@Override
 	public List<AccountDTO> getAllInternalAccounts() {
-//		log.setLevel(Level.OFF);
+
+		if (!checkAdmin())
+			return null;
 		log.log(Level.INFO, "Admin requests accounts");
 		
 		List<AccountDTO> accountsDTO = new ArrayList<AccountDTO>();
@@ -79,6 +85,8 @@ AdminService {
 	@Override
 	public List<AccountDTO> searchInternalAccounts(String owner,
 			String accountnr) {
+		if (!checkAdmin())
+			return null;
 		log.log(Level.INFO, "Admin is searching for account. Name like:" + owner + "Accountnr: " + accountnr);
 		List<AccountDTO> result = new ArrayList<AccountDTO>();
 		
@@ -93,11 +101,6 @@ AdminService {
 		return result;
 	}
 	
-	@Override
-	public double getBalance(String accountNr) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 
 
@@ -106,6 +109,8 @@ AdminService {
 	 * @return stored banks
 	 */
 	private List<Bank> getPersistentBanks() {
+		if (!checkAdmin())
+			return null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		Extent<Bank> extent = pm.getExtent(Bank.class);
@@ -122,6 +127,8 @@ AdminService {
 	 */
 	@Override
 	public List<BankDTO> getAllBanks() {
+		if (!checkAdmin())
+			return null;
 		log.log(Level.INFO,  "Admin requests list of banks");
 		
 		List<BankDTO> banksDTO = new ArrayList<BankDTO>();
@@ -136,9 +143,19 @@ AdminService {
 	}
 
 	@Override
-	public String addBank(BankDTO bankDTO) {	
-		//TODO: check for valid input
-		log.setLevel(Level.ALL);
+	public String addBank(BankDTO bankDTO) {
+		if (!checkAdmin())
+			return "Error";
+		String blz = bankDTO.getBlz();
+		try {
+			Double.parseDouble(blz);
+		}
+		catch (NumberFormatException e) {
+			log("Invalid BLZ");
+			return "Error. Invalid BLZ";
+		}
+		
+		
 		log.log(Level.INFO, "Requesting to add new bank. Name: " + bankDTO.getName() + " - BLZ: " + bankDTO.getBlz());
 		AllBanks bankWrapper = AllBanks.getBankWrapper(PMF.get()
 					.getPersistenceManager());
@@ -161,7 +178,6 @@ AdminService {
 		query.deletePersistentAll(query);	
 	}
 	private void resetData() {
-		
 		log.log(Level.INFO, "Resetting all data");
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
@@ -174,6 +190,8 @@ AdminService {
 	
 	@Override
 	public String generateTestData() {
+		if (!checkAdmin())
+			return null;
 		resetData();
 
 		//number of test data
@@ -291,6 +309,8 @@ AdminService {
 	@Override
 	public String adminSendMoney(String senderAccountNr, String senderBLZ,
 			String receiveraccountNr, double amount, String remark) {
+		if (!checkAdmin())
+			return null;
 		if (amount < 0)
 			return "Amount must be positive!";
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -321,6 +341,8 @@ AdminService {
 
 	@Override
 	public List<AccountDTO> getExternalAccounts(String blz) {
+		if (!checkAdmin())
+			return null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Extent<ExternalAccount> extent = pm.getExtent(ExternalAccount.class);
 		Query query = pm.newQuery(extent);
@@ -339,6 +361,8 @@ AdminService {
 
 	@Override
 	public String deleteBank(String blz) {
+		if (!checkAdmin())
+			return null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		Bank bank = Bank.getByBLZ(pm, blz);
@@ -363,6 +387,8 @@ AdminService {
 
 	@Override
 	public String deleteInternalAccount(String accountNr) {
+		if (!checkAdmin())
+			return null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		InternalSCBAccount account = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);
 		if (account == null)
@@ -374,7 +400,8 @@ AdminService {
 	@Override
 	public String editBankDetails(String oldName, String oldBLZ,
 			String newName, String newBLZ) {
-		
+		if (!checkAdmin())
+			return null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.currentTransaction().begin();
 		Extent<Bank> extent = pm.getExtent(Bank.class);

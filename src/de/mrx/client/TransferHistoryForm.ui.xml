@@ -4,7 +4,15 @@
 	ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">	
-	<ui:style src="SCB.css">
+	<ui:style src="SCB.css" type='de.mrx.client.TransferHistoryForm.MyStyle'>
+		.active {
+			color:blue;
+			text-decoration:none;
+		}
+		.nonActive {
+			color:black;
+			text-decoration:none;
+		}
 	</ui:style>
 	
 	<g:HTMLPanel>

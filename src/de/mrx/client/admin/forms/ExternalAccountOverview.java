@@ -12,7 +12,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.TableStyler;
-import de.mrx.client.admin.Admin;
 import de.mrx.client.admin.AdminConstants;
 /**
  * 
@@ -31,15 +30,13 @@ public class ExternalAccountOverview extends Composite {
 	@UiField
 	FlexTable table;
 	
-	Admin adminPage;
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
 	
-	public ExternalAccountOverview( Admin admin) {
+	public ExternalAccountOverview() {
 		initWidget(uiBinder.createAndBindUi(this));
 //		table.setWidget(0,0, new Label(bank.getBlz()));
 //		table.setWidget(0,1, new Label(bank.getName()));
-		this.adminPage = admin;
 		
 	}
 	
