@@ -1,0 +1,46 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+	<ui:style src="../../SCB.css" type='de.mrx.client.admin.forms.SearchAccountsForm.MyStyle'>
+		.searchDiv {
+			background-color:#DDDDDD;
+			position:relative;			
+			margin-top:50px; 
+		}
+		.tableDiv {
+				position:relative;
+				margin-top:20px;
+		}
+		.active {
+			color:blue;
+			text-decoration:none;
+		}
+		.nonActive {
+			color:black;
+			text-decoration:none;
+		}
+	</ui:style>
+	<g:HTMLPanel>
+		<g:Label styleName="{style.title}" ui:field="title"/>
+		<div>
+			<div class="{style.searchDiv}">
+				<table>
+					<tr>
+						<td><ui:msg description="owner">Owner</ui:msg></td>
+						<td><g:TextBox ui:field ="searchOwner"/></td>
+						<td><ui:msg description="accountNr">Account No.</ui:msg></td>
+						<td><g:TextBox ui:field ="searchAccountNr"/></td>
+						<td><g:Button ui:field="search"/></td>
+					</tr>
+				</table>
+			</div>
+			<div>
+				<g:FlexTable styleName="{style.tableDiv}" ui:field="overviewTable"/>
+				<g:FlexTable ui:field="selectPages"/>	
+			</div>
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder> 
