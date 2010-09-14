@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -34,9 +35,23 @@ public class TransferHistoryForm extends Composite {
 	@UiField
 	FlexTable selectPages;
 	
+	@UiField MyStyle style;
+	interface MyStyle extends CssResource {
+			String active();
+		    String nonActive();
+	}
+		
 	private static int TRANSACTIONS_PER_PAGE = 6;
 	
 	List<MoneyTransferDTO> transfers;
+	
+	private int numberPages(int transferNr) {
+		int numberPages = transferNr /  TRANSACTIONS_PER_PAGE;
+		if (transferNr %  TRANSACTIONS_PER_PAGE != 0)
+			numberPages++;
+		return numberPages;
+	}
+	
 	
 	/**
 	 * Creates a table of all transfers
@@ -57,9 +72,7 @@ public class TransferHistoryForm extends Composite {
 		}
 		
 		//setup pages
-		int numberPages = transfers.size() /  TRANSACTIONS_PER_PAGE;
-		if (transfers.size() %  TRANSACTIONS_PER_PAGE != 0)
-			numberPages++;
+		int numberPages = numberPages(transfers.size());
 		
 		for (int i = 1; i <= numberPages; i++) {
 			Anchor pageLink = new Anchor(""+i);
@@ -102,6 +115,21 @@ public class TransferHistoryForm extends Composite {
 	}
 	
 	private void switchToPage(int page) {
+		
+		//reset style for all pages
+		int numberPages = numberPages(transfers.size());
+		for (int i = 1; i <= numberPages; i++) {
+			Anchor pageLink = (Anchor)selectPages.getWidget(0, i);
+			selectPages.setWidget(0, i, pageLink);
+			if (page != i) { 
+				pageLink.setStyleName(style.nonActive());
+			}
+			else { //page==i
+				//set active anchor
+				pageLink.setStyleName(style.active());
+			}
+		}
+		
 		//table row
 		int row = 1;
 		
