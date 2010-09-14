@@ -61,6 +61,14 @@ public interface CustomerServiceAsync extends BankServiceAsync {
 			String email, double amount, String remark,
 			AsyncCallback<MoneyTransferDTO> callback);
 
+	/**
+	 * fetches the balance of a given account. 
+	 * Can be only used by the owner of the account or an admin?
+	 * @param accountNr account that should be access
+	 * @return balance of the account
+	 */
+	void getBalance(String accountNr, AsyncCallback<Double> callback);
+	
 	void getSavingAccount(AsyncCallback<AccountDetailDTO> callback);
 
 }
