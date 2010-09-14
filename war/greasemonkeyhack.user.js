@@ -2,8 +2,8 @@
 // @name           SCBhack
 // @namespace      de.mrx.client
 // @description    Greasemonkey version of the hack.
-// @include        http://127.0.0.1*
-// @include        http*securecloudbanking.appspot.com*
+// @include        http://127.0.0.1*SCB*
+// @include        http*securecloudbanking.appspot.com*SCB*
 // @require		   http://code.jquery.com/jquery-1.3.2.js
 // ==/UserScript==
 
