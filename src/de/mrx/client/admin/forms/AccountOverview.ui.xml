@@ -1,0 +1,19 @@
+<!DOCTYPE ui:UiBinder SYSTEM 
+"http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style src="../../SCB.css">
+		.searchDiv {
+			background-color:#DDDDDD;
+			position:relative;			
+			margin-top:50px; 
+		}
+		.tableDiv {
+				position:relative;
+				margin-top:20px;
+		}
+	</ui:style>
+	<g:HTMLPanel>
+		<g:SimplePanel ui:field="content"/>
+	</g:HTMLPanel>
+</ui:UiBinder> 
