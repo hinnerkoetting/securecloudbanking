@@ -110,4 +110,8 @@ public interface AdminConstants extends Constants{
 	
 	@DefaultStringValue("Sign Out")
 	 String signOut();
+	
+	@DefaultStringValue("Account details")
+	 String accountDetails();
+
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -12,6 +13,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -43,10 +45,36 @@ public class AccountDetails extends Composite implements Observable, Observer{
 	@UiField
 	Button enableTransactions;
 	
+	@UiField
+	Label title;
+	
+	@UiField
+	Label subTitle;
+	
 	public final static int ACCOUNT_DELETED = 20;
+	
+	  @UiField MyStyle style;
+	interface MyStyle extends CssResource {
+		    String active();
+		    String nonActive();
+ }
+
+		
 	
 	public void showTransactions(List<MoneyTransferDTO> result) {
 		content.setWidget(new TransferHistoryForm(result));
+	}
+	
+	private void setActive(Button button) {
+		//reset all buttons
+		delete.setStyleName(style.nonActive());
+		enableTransfer.setStyleName(style.nonActive());
+		enableTransactions.setStyleName(style.nonActive());
+		
+		//activate the button
+		button.setStyleName(style.active());
+		
+		
 	}
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
@@ -55,21 +83,26 @@ public class AccountDetails extends Composite implements Observable, Observer{
 	
 	List<Observer> observer;
 	
-	public AccountDetails(AccountDTO account) {		
+	public AccountDetails(AccountDTO account) {	
+		
 		observer = new ArrayList<Observer>();
 		this.account = account;
 		initWidget(uiBinder.createAndBindUi(this));
 		
+		title.setText(constants.accountDetails());
+		subTitle.setText(account.getOwner());
 		enableTransfer.setText(constants.transfer());
 		enableTransactions.setText(constants.transactions());
 		delete.setText(constants.delete());
 		clickOnTransfer(null);
 	
 		
+		
 	}
 
 	@UiHandler("enableTransactions")
-	public void clickOnTransfer(ClickEvent e) {
+	public void clickOnTransactions(ClickEvent e) {
+		setActive(enableTransactions);
 		AdminServiceAsync service = GWT.create(AdminService.class);
 		service.getTransaction(account.getAccountNr(), new AsyncCallback<List<MoneyTransferDTO>>() {
 
@@ -87,7 +120,8 @@ public class AccountDetails extends Composite implements Observable, Observer{
 	
 	
 	@UiHandler("enableTransfer")
-	public void clickOnTransactions(ClickEvent e) {
+	public void clickOnTransfer(ClickEvent e) {
+		setActive(enableTransfer);
 		AdminTransfer adminTransfer = new AdminTransfer(account.getAccountNr(), account.getOwner());
 		adminTransfer.addObserver(this);
 		content.setWidget(adminTransfer);

@@ -6,6 +6,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -57,11 +58,15 @@ public class SearchAccountsForm extends Composite implements UseSearchForm {
 	
 	private List<AccountDTO> accounts;
 	
-	private final int ACCOUNTS_PER_PAGE = 8;
+	private final int ACCOUNTS_PER_PAGE = 5;
 	
-//	private final int posTransfer 		= 4;
-//	private final int posDelete 		= 5;
-	
+
+	  @UiField MyStyle style;
+		interface MyStyle extends CssResource {
+			    String active();
+			    String nonActive();
+	 }
+		
 	
 	//call this form if user clicks on button in searchform
 	UseSearchForm callee;
@@ -71,6 +76,12 @@ public class SearchAccountsForm extends Composite implements UseSearchForm {
 	int posBalance;		
 	int posButton;
 	
+	private int numerPages(int accountsNr) {
+		int numberPages = accountsNr /  ACCOUNTS_PER_PAGE;
+		if (accountsNr %  ACCOUNTS_PER_PAGE != 0)
+			numberPages++;
+		return numberPages;
+	}
 	public SearchAccountsForm(UseSearchForm callee) {
 		this.callee = callee;
 		initWidget(uiBinder.createAndBindUi(this));
@@ -127,22 +138,11 @@ public class SearchAccountsForm extends Composite implements UseSearchForm {
 	
 	
 	public void setAccounts(List<AccountDTO> accounts) {
-		
-		
-		
-		this.accounts = accounts;
-		
-		this.accounts = accounts;
-		
-		overviewTable.clear();
-		
-
-		int numberPages = accounts.size() /  ACCOUNTS_PER_PAGE;
-		if (accounts.size() %  ACCOUNTS_PER_PAGE != 0)
-			numberPages++;
-		
+		int numberPages = numerPages(accounts.size());
 		for (int i = 1; i <= numberPages; i++) {
 			Anchor pageLink = new Anchor(""+i);
+			selectPages.setWidget(0, i, pageLink);
+			pageLink.setStyleName(style.nonActive());
 			final int j = i;
 			pageLink.addClickHandler(new ClickHandler() {
 				
@@ -152,9 +152,17 @@ public class SearchAccountsForm extends Composite implements UseSearchForm {
 					
 				}
 			});
-			selectPages.setWidget(0, i, pageLink);
-			
 		}
+		
+		
+		this.accounts = accounts;
+		
+		this.accounts = accounts;
+		
+		overviewTable.clear();
+		
+
+		
 		
 		
 		
@@ -181,7 +189,21 @@ public class SearchAccountsForm extends Composite implements UseSearchForm {
 	}
 
 	private void switchToPage(int page) {
+		//reset style for all pages
+		int numberPages = numerPages(accounts.size());
+		for (int i = 1; i <= numberPages; i++) {
+			Anchor pageLink = (Anchor)selectPages.getWidget(0, i);
+			selectPages.setWidget(0, i, pageLink);
+			if (page != i) { 
+				pageLink.setStyleName(style.nonActive());
+			}
+			else { //page==i
+				//set active anchor
+				pageLink.setStyleName(style.active());
+			}
+		}
 
+		
 		
 		
 		int row = 1;
