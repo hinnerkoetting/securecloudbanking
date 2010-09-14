@@ -40,6 +40,7 @@ import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.AccountNotExistException;
 import de.mrx.shared.SCBException;
+import de.mrx.shared.WrongTANException;
 
 /**
  * implementation class for the bankingservice
@@ -280,14 +281,14 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 			int tanPos = pendingTrans.getRequiredTan();
 			String referenzTan = senderAccount.getTan(tanPos);
-			// if (!tan.equals(referenzTan)) {
-			// log.severe("Wrong TAN. Request TAN Pos : " + tanPos
-			// + " \t Send TAN: " + tan);
-			// senderAccount.increaseWrongTANCounter();
-			// throw new WrongTANException(senderAccount.getWrongTANCounter());
-			// } else {
-			// senderAccount.resetWrongTANCounter();
-			// }
+			 if (!tan.equals(referenzTan)) {
+			 log.severe("Wrong TAN. Request TAN Pos : " + tanPos
+			 + " \t Send TAN: " + tan);
+			 senderAccount.increaseWrongTANCounter();
+			 throw new WrongTANException(senderAccount.getWrongTANCounter());
+			 } else {
+			 senderAccount.resetWrongTANCounter();
+			 }
 
 			MoneyTransfer transfer = new MoneyTransfer(pm, senderAccount,
 					recAccount, amount, recAccount.getOwner(), remark);
