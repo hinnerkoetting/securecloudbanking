@@ -3,7 +3,6 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<ui:style src="../../SCB.css"/>
 	<g:HTMLPanel>		
-		<g:Label styleName="{style.title}" ui:field="title"/>
 		<table>
 			<tr>				
 				<td><g:Label ui:field="descName"/></td>

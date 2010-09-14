@@ -1,5 +1,8 @@
 package de.mrx.client.admin.forms;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -11,12 +14,13 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import de.mrx.client.admin.Admin;
+import de.mrx.client.Observable;
+import de.mrx.client.Observer;
 import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
-public class Adminmenu extends Composite {
+public class Adminmenu extends Composite implements Observable {
 
 	private static AdminmenuUiBinder uiBinder = GWT
 			.create(AdminmenuUiBinder.class);
@@ -33,12 +37,17 @@ public class Adminmenu extends Composite {
 	@UiField
 	Button generateData;
 	
-	Admin adminpage;
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
 	
-	public Adminmenu(Admin admin) {
-		adminpage = admin;
+	List<Observer> observer;
+	
+	public static final int SHOW_ACCOUNTS = 50;
+	public static final int SHOW_EXTERNAL_BANKS = 51;
+	
+	public Adminmenu() {
+		observer = new ArrayList<Observer>();
+
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		accounts.setText(constants.accounts());
@@ -49,13 +58,13 @@ public class Adminmenu extends Composite {
 
 	@UiHandler("accounts")
 	void onClickAccounts(ClickEvent e) {
-		adminpage.showAccounts();
+		notifyObservers(SHOW_ACCOUNTS, null);
 	}
 	
 
 	@UiHandler("externalBanks")
 	void onClickExternalBanks(ClickEvent e) {
-		adminpage.showExternalBanks();
+		notifyObservers(SHOW_EXTERNAL_BANKS, null);
 	}
 	
 	@UiHandler("generateData")
@@ -78,5 +87,18 @@ public class Adminmenu extends Composite {
 				}
 			});
 		}
+	}
+
+	@Override
+	public void addObserver(Observer o) {
+		observer.add(o);
+		
+	}
+
+	@Override
+	public void notifyObservers(Integer eventType, Object parameter) {
+		for (Observer o: observer)
+			o.update(this, eventType, parameter);
+		
 	}
 }

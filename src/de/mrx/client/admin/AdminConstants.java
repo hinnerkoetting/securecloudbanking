@@ -60,6 +60,9 @@ public interface AdminConstants extends Constants{
 	@DefaultStringValue("Display")
 	 String display();
 	
+	@DefaultStringValue("Display accounts")
+	 String displayAccounts();
+	
 	@DefaultStringValue("Transfer")
 	 String transfer();
 	
@@ -113,5 +116,8 @@ public interface AdminConstants extends Constants{
 	
 	@DefaultStringValue("Account details")
 	 String accountDetails();
+	
+	@DefaultStringValue("Properties")
+	 String properties();
 
 }

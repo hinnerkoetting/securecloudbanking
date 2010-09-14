@@ -53,11 +53,11 @@ public class AccountDetails extends Composite implements Observable, Observer{
 	
 	public final static int ACCOUNT_DELETED = 20;
 	
-	  @UiField MyStyle style;
+	 @UiField MyStyle style;
 	interface MyStyle extends CssResource {
 		    String active();
 		    String nonActive();
- }
+	}
 
 		
 	

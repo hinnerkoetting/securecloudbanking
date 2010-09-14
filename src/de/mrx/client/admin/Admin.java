@@ -28,20 +28,18 @@ import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
-import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.Observable;
 import de.mrx.client.Observer;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.SCBMenu;
-import de.mrx.client.TransferHistoryForm;
 import de.mrx.client.admin.forms.AccountDetails;
 import de.mrx.client.admin.forms.AccountOverview;
 import de.mrx.client.admin.forms.AdminExternalBanks;
 import de.mrx.client.admin.forms.AdminTransfer;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
-import de.mrx.client.admin.forms.EditBankDetails;
-import de.mrx.client.admin.forms.ExternalAccountOverview;
+import de.mrx.client.admin.forms.BankDetails;
+import de.mrx.client.admin.forms.EditBank;
 import de.mrx.client.admin.forms.NewBank;
 
 
@@ -80,20 +78,12 @@ public class Admin extends Composite implements EntryPoint,Observer {
 	@UiField 
 	SimplePanel content;
 
-    /**
-     * show all transactions
-     * 
-     */
-	public void showAccountTransfers(List<MoneyTransferDTO> transfers) {
-		setContent(new TransferHistoryForm(transfers));
-	}
 
-	public void showNewTransaction() {
-		setContent(new Label("PLaceholder1"));
-	}
 	
-	public void showEditBankDetails(String name, String blz) {
-		setContent(new EditBankDetails(this, blz, name));
+	private void showEditBankDetails(String name, String blz) {
+		BankDetails bankDetails = new BankDetails(name, blz);
+		bankDetails.addObserver(this);
+		setContent(bankDetails);
 	}
 	
 	/*
@@ -117,8 +107,9 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		Window.open(reloadURL, "_self", null);
 	}
 	
-	public void showExternalBanks() {
-		final AdminExternalBanks externalBanks = new AdminExternalBanks(this);
+	private void showExternalBanks() {
+		final AdminExternalBanks externalBanks = new AdminExternalBanks();
+		externalBanks.addObserver(this);
 		
 		AdminServiceAsync bankingService = GWT.create(AdminService.class);
 		bankingService.getAllBanks(new AsyncCallback<List<BankDTO>>() {
@@ -138,14 +129,14 @@ public class Admin extends Composite implements EntryPoint,Observer {
 			
 		});
 		
-		setContent(new AdminExternalBanks(null));
+		setContent(externalBanks);
 	}
 	
 	
 	/**
 	 * show information about all accounts
 	 */
-	public void showAccounts() {
+	private void showAccounts() {
 		final AccountOverview accountOverview = new AccountOverview(this);
 		accountOverview.addObserver(this);
 		AdminServiceAsync bankingService = GWT.create(AdminService.class);
@@ -166,31 +157,7 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		});
 	}
 	
-	public void showNewBank() {
-		setContent(new NewBank(this));
-	}
-	
-	public void showExternalAccounts(String blz) {
-		final ExternalAccountOverview accountOverview = new ExternalAccountOverview(this);
-		AdminServiceAsync bankingService = GWT.create(AdminService.class);
-		bankingService.getExternalAccounts(blz, new AsyncCallback<List<AccountDTO>>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log(caught.toString());
-				
-			}
-
-			@Override
-			public void onSuccess(List<AccountDTO> result) {
-				
-				accountOverview.setAccounts(result);
-				setContent(accountOverview);
-				
-			}
-		});
-		
-	}
 	
 	/**
 	 * 
@@ -202,9 +169,12 @@ public class Admin extends Composite implements EntryPoint,Observer {
 	}
 	
 	private void loadAdminPage() {
-		adminMenu.add(new Adminmenu(this));
+		Adminmenu menu = new Adminmenu();
+		menu.addObserver(this);
+		adminMenu.add(menu);
 		setContent(new AdminWelcome());
 	}
+
 	
 	private void checkGoogleStatus() {
 		AdminServiceAsync adminService = GWT.create(AdminService.class);
@@ -233,9 +203,9 @@ public class Admin extends Composite implements EntryPoint,Observer {
 								GWT.log("Language: " + language);
 								changeToLocalisedVersion(language);
 							}
-//							if (identityInfo.isAdmin()) {								
+							if (identityInfo.isAdmin()) {								
 								loadAdminPage();
-//							}
+							}
 							signOut.setHref(identityInfo.getLogoutUrl()+Window.Location.getQueryString());
 							signOut.setText(constants.signOut());
 							signIn.setVisible(false);
@@ -271,6 +241,12 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		
 	}
 
+	private void showAddBank() {
+		NewBank newBank = new NewBank();
+		newBank.addObserver(this);
+		setContent(newBank);
+	}
+	
 	@Override
 	public void update(Observable source, Object event, Object parameter) {
 		if (source instanceof SCBMenu) {
@@ -279,34 +255,67 @@ public class Admin extends Composite implements EntryPoint,Observer {
 			}
 			else if (event == SCBMenu.EVENT_CHANGE_LANGUAGE) {
 				changeToLocalisedVersion((String)parameter);
+				return;
 			}
-			else 
-				Log.info("missing event");
 		}
 		else if (source instanceof AccountOverview) {
 			if ((Integer)event == AccountDetails.ACCOUNT_DELETED) {
 				showAccounts();
+				return;
 			}
 			else if ((Integer)event == AdminTransfer.TRANSACTION_SUCCEEDED) {
 				showAccounts();
+				return;
 			}
-			else 
-				Log.info("missing event");
 		}
-		else 
-			Log.info("missing event");
+		else if (source instanceof AdminExternalBanks) {
+			if ((Integer)event == AdminExternalBanks.ADD_BANK) {
+				showAddBank();
+				return;
+			}
+			if ((Integer)event == AdminExternalBanks.EDIT_BANK) {
+				BankDTO bank = (BankDTO)parameter;
+				showEditBankDetails(bank.getName(), bank.getBlz());
+				return;
+			}
+		}
+		else if (source instanceof NewBank) {
+			if ((Integer)event == NewBank.ADD_BANK_SUCCEEDED) {
+				showExternalBanks();
+				return;
+			}
+		}
+		else if (source instanceof BankDetails) {
+			if ((Integer)event == EditBank.EDIT_BANK_SUCCEED) {
+				showExternalBanks();
+				return;
+			}
+			if ((Integer)event == BankDetails.DELETE_BANK_SUCCEED) {
+				showExternalBanks();
+				return;
+			}
+		}
+		else if (source instanceof Adminmenu) {
+			if ((Integer)event == Adminmenu.SHOW_ACCOUNTS) {
+				showAccounts();
+				return;
+			}
+			else if ((Integer)event == Adminmenu.SHOW_EXTERNAL_BANKS) {
+				showExternalBanks();
+				return;
+			}
+		}
+		Log.info("missing event" + source.getClass() + " - " + event.toString());
 		
 	}
 
 	@Override
 	public void reportInfo(String info) {
-		 GWT.log("test");
 		
 	}
 
 	@Override
 	public void reportError(String error) {
-		 GWT.log("test");
 		
 	}
 

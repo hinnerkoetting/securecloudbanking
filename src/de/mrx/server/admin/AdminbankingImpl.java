@@ -145,9 +145,17 @@ AdminService {
 	@Override
 	public String addBank(BankDTO bankDTO) {
 		if (!checkAdmin())
-			return null;
-		//TODO: check for valid input
-		log.setLevel(Level.ALL);
+			return "Error";
+		String blz = bankDTO.getBlz();
+		try {
+			Double.parseDouble(blz);
+		}
+		catch (NumberFormatException e) {
+			log("Invalid BLZ");
+			return "Error. Invalid BLZ";
+		}
+		
+		
 		log.log(Level.INFO, "Requesting to add new bank. Name: " + bankDTO.getName() + " - BLZ: " + bankDTO.getBlz());
 		AllBanks bankWrapper = AllBanks.getBankWrapper(PMF.get()
 					.getPersistenceManager());
