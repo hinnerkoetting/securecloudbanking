@@ -18,7 +18,5 @@
 			<g:Button ui:field="delete"/>
 		</g:HorizontalPanel>
 		<g:SimplePanel ui:field="content"/>
-		
-		
 	</g:HTMLPanel>
 </ui:UiBinder> 

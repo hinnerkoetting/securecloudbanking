@@ -16,7 +16,7 @@ import de.mrx.client.Observer;
 import de.mrx.client.admin.Admin;
 import de.mrx.client.admin.AdminConstants;
 
-public class AccountOverview extends Composite implements UseSearchForm, Observable, Observer{
+public class AccountOverview extends Composite implements Observable, Observer{
 
 	private static AccountOverviewUiBinder uiBinder = GWT
 			.create(AccountOverviewUiBinder.class);
@@ -47,7 +47,8 @@ public class AccountOverview extends Composite implements UseSearchForm, Observa
 
 		
 		initWidget(uiBinder.createAndBindUi(this));
-		searchForm = new SearchAccountsForm(this);
+		searchForm = new SearchAccountsForm();
+		searchForm.addObserver(this);
 		searchForm.enableColumns(true, true, true);
 		searchForm.enableButton(true, constants.properties());
 		content.setWidget(searchForm);
@@ -62,16 +63,18 @@ public class AccountOverview extends Composite implements UseSearchForm, Observa
 
 	}
 
-	@Override
-	public void clickedOnAccount(AccountDTO account) {
-		AccountDetails accountDetails = new AccountDetails(account);
-		accountDetails.addObserver(this);
-		content.setWidget(accountDetails);
-		
-	}
 
 	@Override
 	public void update(Observable source, Object event, Object parameter) {
+		if (source instanceof SearchAccountsForm) {
+			if ((Integer)event == SearchAccountsForm.SELECTED_ACCOUNT) {
+				AccountDTO account = (AccountDTO)parameter;
+				AccountDetails accountDetails = new AccountDetails(account);
+				accountDetails.addObserver(this);
+				content.setWidget(accountDetails);
+				return;
+			}		
+		}
 		notifyObservers((Integer)event, parameter);
 		
 	}

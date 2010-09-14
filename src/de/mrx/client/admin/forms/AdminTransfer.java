@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -13,22 +12,20 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.Observable;
 import de.mrx.client.Observer;
-import de.mrx.client.TableStyler;
 import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 import de.mrx.shared.SCBData;
 
-public class AdminTransfer extends Composite implements Observable {
+public class AdminTransfer extends Composite implements Observable, Observer {
 
 	private static AdminTransferUiBinder uiBinder = GWT
 			.create(AdminTransferUiBinder.class);
@@ -88,27 +85,7 @@ public class AdminTransfer extends Composite implements Observable {
 	Button submit;
 	
 	@UiField
-	TextBox searchOwner;
-	
-	@UiField
-	TextBox searchAccountNr;
-	
-	@UiField
-	Button search;
-	
-	@UiField
-	Label searchTitle;
-	
-	@UiField
-	Label descOwner;
-	
-	@UiField
-	Label descAccountNr;
-	
-	@UiField
-	FlexTable searchTable;
-	
-	DialogBox a;
+	SimplePanel searchForm;
 	
 	List<Observer> observer;
 	
@@ -136,18 +113,20 @@ public class AdminTransfer extends Composite implements Observable {
 		recipientNr.setText(accNr);
 		recipientNr.setEnabled(false);
 		
-		//TODO this should be a reference to BLZ string
 		recipientBLZ.setText(SCBData.SCB_PLZ);
 		recipientBLZ.setEnabled(false);
 		
-		descOwner.setText(constants.owner());
-		descAccountNr.setText(constants.accountNr());			
-		descRemark.setText(constants.remark());		
-		descAmount.setText(constants.amount());
 		submit.setText(constants.submit());
-		search.setText(constants.search());
-		searchTitle.setText(constants.searchForSender());
+		descAmount.setText(constants.amount());
+		descRemark.setText(constants.remark());
 		
+		
+		SearchAccountsForm search = new SearchAccountsForm();
+		search.addObserver(this);
+		search.enableColumns(true, true, false);
+		search.enableButton(true, "Insert");
+		
+		searchForm.setWidget(search);		
 	}
 
 	@UiHandler("submit")
@@ -179,69 +158,49 @@ public class AdminTransfer extends Composite implements Observable {
 					});
 		
 	}
-	
-	@UiHandler("search")
-	public void onClickSearch(ClickEvent event) {
 
-		AdminServiceAsync adminService = GWT.create(AdminService.class);
-		
-		adminService.searchInternalAccounts(searchOwner.getText(), searchAccountNr.getText(), new AsyncCallback<List<AccountDTO>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log(caught.toString());
-				
-			}
-
-			@Override
-			public void onSuccess(List<AccountDTO> result) {
-				setAccounts(result);
-				
-			}
-		});
-	}
 	
 	/**
 	 * 
 	 * @param accounts
 	 */
-	public void setAccounts(List<AccountDTO> accounts){
-		searchTable.clear();
-		
-
-		final int posOwner 			= 0;
-		final int posAccount 		= 1;
-		final int posInsert			= 2;
-		//add header
-		searchTable.setWidget(0, posOwner, new Label(constants.owner()));
-		searchTable.setWidget(0, posAccount, new Label(constants.accountNr()));
-		searchTable.setWidget(0, posInsert, new Label(constants.insert()));
-		
-		//add all accounts to table
-		int row = 1;		
-
-		for (AccountDTO account: accounts) {	
-			searchTable.setWidget(row, posAccount, new Label(account.getAccountNr()));			
-			searchTable.setWidget(row, posOwner, new Label(account.getOwner()));
-			Button insertButton = new Button(constants.insert());
-			final String accNr = account.getAccountNr();
-			final String accOwner = account.getOwner();
-			insertButton.addClickHandler(new ClickHandler() {
-				
-				@Override
-				public void onClick(ClickEvent event) {
-					senderBLZ.setText(SCBData.SCB_PLZ);
-					senderName.setText(accOwner);
-					senderNr.setText(accNr);
-				}
-			});
-			searchTable.setWidget(row, posInsert, insertButton);
-			row++;
-		}
-		TableStyler.setTableStyle(searchTable);
-
-
-	}
+//	public void setAccounts(List<AccountDTO> accounts){
+//		searchTable.clear();
+//		
+//
+//		final int posOwner 			= 0;
+//		final int posAccount 		= 1;
+//		final int posInsert			= 2;
+//		//add header
+//		searchTable.setWidget(0, posOwner, new Label(constants.owner()));
+//		searchTable.setWidget(0, posAccount, new Label(constants.accountNr()));
+//		searchTable.setWidget(0, posInsert, new Label(constants.insert()));
+//		
+//		//add all accounts to table
+//		int row = 1;		
+//
+//		for (AccountDTO account: accounts) {	
+//			searchTable.setWidget(row, posAccount, new Label(account.getAccountNr()));			
+//			searchTable.setWidget(row, posOwner, new Label(account.getOwner()));
+//			Button insertButton = new Button(constants.insert());
+//			final String accNr = account.getAccountNr();
+//			final String accOwner = account.getOwner();
+//			insertButton.addClickHandler(new ClickHandler() {
+//				
+//				@Override
+//				public void onClick(ClickEvent event) {
+//					senderBLZ.setText(SCBData.SCB_PLZ);
+//					senderName.setText(accOwner);
+//					senderNr.setText(accNr);
+//				}
+//			});
+//			searchTable.setWidget(row, posInsert, insertButton);
+//			row++;
+//		}
+//		TableStyler.setTableStyle(searchTable);
+//
+//
+//	}
 
 	@Override
 	public void addObserver(Observer o) {
@@ -254,6 +213,35 @@ public class AdminTransfer extends Composite implements Observable {
 		for (Observer o: observer) {
 			o.update(this, eventType, parameter);
 		}
+		
+	}
+
+
+
+	@Override
+	public void update(Observable source, Object event, Object parameter) {
+		if (source instanceof SearchAccountsForm) {
+			if ((Integer)event == SearchAccountsForm.SELECTED_ACCOUNT) {
+				AccountDTO account = (AccountDTO)parameter;
+				senderBLZ.setText(SCBData.SCB_PLZ);
+				senderName.setText(account.getOwner());
+				senderNr.setText(account.getAccountNr());
+				return;
+			}		
+		}
+		GWT.log("event not implemented");
+		
+	}
+
+	@Override
+	public void reportInfo(String info) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void reportError(String error) {
+		// TODO Auto-generated method stub
 		
 	}
 }

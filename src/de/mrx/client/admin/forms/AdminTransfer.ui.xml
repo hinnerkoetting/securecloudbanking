@@ -57,21 +57,6 @@
 				<td></td>
 			</tr>
 		</table>
-
-		<div class="{style.searchDiv}">
-			<g:Label styleName="{style.title}" ui:field="searchTitle"/>
-			<table>
-				<tr>
-					<td><g:Label ui:field="descOwner"/></td>
-					<td><g:TextBox ui:field ="searchOwner"/></td>
-					<td><g:Label ui:field="descAccountNr"/></td>
-					<td><g:TextBox ui:field ="searchAccountNr"/></td>
-					<td><g:Button ui:field ="search"/></td>
-				</tr>
-			</table>
-			<g:FlexTable ui:field="searchTable"/>
-	
-		</div>
-		
+		<g:SimplePanel ui:field="searchForm"/>
 	</g:HTMLPanel>
 </ui:UiBinder> 
