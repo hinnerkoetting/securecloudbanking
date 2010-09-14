@@ -13,6 +13,8 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
 
+import de.mrx.shared.SCBData;
+
 /**
  * Container for all banks (SCB and external.
  * Works as a root object for the persistence layer
@@ -26,6 +28,9 @@ public class AllBanks {
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
 	
+	@Persistent
+	private Set<Bank> allBanks;
+	
 	public Key getId() {
 		return id;
 	}
@@ -36,43 +41,74 @@ public class AllBanks {
 
 
 
-	public Set<Bank> getOtherBanks() {
-		return otherBanks;
+//	public Set<Bank> getBanks() {
+//		return allBanks;
+//	}
+
+	public void addBank(Bank bank) {
+		allBanks.add(bank);
 	}
 
-	public void setOtherBanks(Set<Bank> otherBanks) {
-		this.otherBanks = otherBanks;
+	public Bank getSCBBank(PersistenceManager pm) {
+		Extent<Bank> e=pm.getExtent(Bank.class);
+		Query query=pm.newQuery(e);
+		query.setUnique(true);
+		query.setFilter("blz == param1 && name == param2");
+		query.declareParameters("String param1, String param2");
+		Bank result = (Bank)query.execute(SCBData.SCB_PLZ, SCBData.SCB_NAME);
+		if (result == null) {
+			
+			result = new Bank(SCBData.SCB_PLZ, SCBData.SCB_NAME, this);
+			pm.makePersistent(result);
+		}
+		return result;
 	}
 
-	public Bank getOwnBanks() {
-		return ownBank;
+
+	private AllBanks() {
+		allBanks = new HashSet<Bank>();
 	}
 
-	public void setOwnBanks(Bank ownBanks) {
-		this.ownBank = ownBanks;
+	public Bank getBankByBlz(PersistenceManager pm, String blz) {
+		Extent<Bank> e=pm.getExtent(Bank.class);
+		Query query=pm.newQuery(e);
+		query.setUnique(true);
+		query.setFilter("blz == param");
+		query.declareParameters("String param");
+		query.setUnique(true);
+		Bank result = (Bank)query.execute(blz);
+
+		return result;
 	}
 
-
-
-	@Persistent
-	Set<Bank> otherBanks=new HashSet<Bank>();
-	
-	@Persistent
-	Bank ownBank;
+	private static AllBanks singleton;
 	
 	/**
 	 * gets the Root-Object of the JDO-Persistence
 	 * @param pm
 	 * @return
 	 */
-	public static AllBanks getBankWrapper(PersistenceManager pm){
-		Extent<AllBanks> e=pm.getExtent(AllBanks.class);
-		Query query=pm.newQuery(e);
-//		query.setFilter("accountNr == accountNrParam");
-//		query.declareParameters("java.lang.String accountNrParam");
-		query.setUnique(true);
-		AllBanks result= (AllBanks) query.execute();
+	public static AllBanks getSingleton(PersistenceManager pm){
 		
-		return result;
+		if (singleton == null) {
+			//request singleton from storage
+			Extent<AllBanks> e=pm.getExtent(AllBanks.class);
+			Query query=pm.newQuery(e);
+	
+			query.setUnique(true);
+			AllBanks result= (AllBanks) query.execute();
+			
+			if (result == null) {
+				//create new if not stored
+				result = new AllBanks();
+				pm.currentTransaction().begin();
+				pm.makePersistent(result);
+				pm.currentTransaction().commit();
+			}
+			return result;
+		}
+		else
+			return singleton;
+		
 	}
 }

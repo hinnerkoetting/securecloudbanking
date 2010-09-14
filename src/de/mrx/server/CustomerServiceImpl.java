@@ -23,7 +23,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -40,7 +39,6 @@ import de.mrx.client.CustomerService;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.AccountNotExistException;
-import de.mrx.shared.SCBData;
 import de.mrx.shared.SCBException;
 
 /**
@@ -114,22 +112,11 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 
-			bankWrapper = AllBanks.getBankWrapper(pm);
+			bankWrapper = AllBanks.getSingleton(pm);
 			pm.currentTransaction().begin();
-			if (bankWrapper == null) {
 
-				bankWrapper = new AllBanks();
-				pm.makePersistent(bankWrapper);
+			ownBank = bankWrapper.getSCBBank(pm);
 
-			}
-			ownBank = bankWrapper.getOwnBanks();
-			if (ownBank == null) {
-				ownBank = new Bank(SCBData.SCB_PLZ, SCBData.SCB_NAME);
-				ownBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-						Bank.class.getSimpleName(), SCBData.SCB_PLZ));
-				bankWrapper.setOwnBanks(ownBank);
-
-			}
 
 			pm.currentTransaction().commit();
 
@@ -210,9 +197,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			InternalSCBAccount acc = new InternalSCBAccount(
 					identityInfo.getEmail(), format.format(kontoNr), 5, ownBank);
-			acc.setBank(ownBank);
-			acc.setId(KeyFactory.createKey(ownBank.getId(),
-					InternalSCBAccount.class.getSimpleName(), kontoNr));
+
+//			acc.setId(KeyFactory.createKey(ownBank.getId(),
+//					InternalSCBAccount.class.getSimpleName(), kontoNr));
 			acc.setAccountType(AccountDTO.SAVING_ACCOUNT);
 			acc.setAccountDescription(AccountDTO.SAVING_ACCOUNT_DES);
 
@@ -254,8 +241,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 					+ "\t BLZ" + blz + "\tReceiver Acc: " + receiveraccountNr
 					+ " ReceiverName :" + receiverName + " Amount: " + amount);
 
-			bankWrapper = AllBanks.getBankWrapper(pm);
-			ownBank = bankWrapper.getOwnBanks();
+			bankWrapper = AllBanks.getSingleton(pm);
+			ownBank = bankWrapper.getSCBBank(pm);
 			InternalSCBAccount senderAccount = InternalSCBAccount
 					.getOwnByAccountNr(pm, senderAccountNr);
 			if (senderAccount == null) {
@@ -424,8 +411,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 
-			bankWrapper = AllBanks.getBankWrapper(pm);
-			ownBank = bankWrapper.getOwnBanks();
+			bankWrapper = AllBanks.getSingleton(pm);
+			ownBank = bankWrapper.getSCBBank(pm);
 			InternalSCBAccount senderAccount = InternalSCBAccount
 					.getOwnByAccountNr(pm, senderAccountNr);
 			if (senderAccount == null) {
@@ -438,16 +425,17 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 				if (bankName == null || bankName.trim().equals("")) {
 					bankName = "Neue Bank";
 				}
-				receiverBank = new Bank(blz.trim(), bankName);
-				receiverBank.setId(KeyFactory.createKey(bankWrapper.getId(),
-						Bank.class.getSimpleName(), blz));
+				receiverBank = new Bank(blz.trim(), bankName, bankWrapper);
+				
+				
 
-				bankWrapper.getOtherBanks().add(receiverBank);
+				
+				bankWrapper.addBank(receiverBank);
 				log.info("Create external bank");
 				pm.currentTransaction().begin();
-				pm.makePersistent(bankWrapper);
+				pm.makePersistent(receiverBank);
+				
 				pm.currentTransaction().commit();
-
 			}
 
 			GeneralAccount recAccount;
@@ -469,16 +457,26 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 							+ " is not yet known at " + receiverBank.getName()
 							+ "(" + receiverBank.getBlz() + "). Create it.");
 					log.info("Create external account");
-					pm.currentTransaction().begin();
+					
 					recAccount = new ExternalAccount(receiverName,
 							receiveraccountNr, receiverBank);
-					recAccount.setId(KeyFactory.createKey(receiverBank.getId(),
-							ExternalAccount.class.getSimpleName(),
-							receiverBank.getBlz() + "_" + receiveraccountNr));
+//					recAccount.setId(KeyFactory.createKey(receiverBank.getId(),
+//							ExternalAccount.class.getSimpleName(),
+//							receiverBank.getBlz() + "_" + receiveraccountNr));
+					
+					
+					
+					
 					receiverBank.addAccount(recAccount);
-					pm.makePersistent(recAccount);
-
+					pm.currentTransaction().begin();
+					pm.makePersistent(receiverBank);
 					pm.currentTransaction().commit();
+					
+					pm.currentTransaction().begin();
+					pm.makePersistent(recAccount);
+					pm.currentTransaction().commit();
+
+					
 				}
 			}
 			// pm.currentTransaction().commit();
@@ -529,8 +527,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 
-			bankWrapper = AllBanks.getBankWrapper(pm);
-			ownBank = bankWrapper.getOwnBanks();
+			bankWrapper = AllBanks.getSingleton(pm);
+			ownBank = bankWrapper.getSCBBank(pm);
 			InternalSCBAccount senderAccount = InternalSCBAccount
 					.getOwnByAccountNr(pm, senderAccountNr);
 			if (senderAccount == null) {
@@ -544,14 +542,17 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 				throw new AccountNotExistException();
 			}
 
+			
+			Bank recieverBank = bankWrapper.getBankByBlz(pm, receiverAcc.getBLZ());
+			
 			MoneyTransferPending transfer = new MoneyTransferPending();
 			transfer.setRemark(remark);
 			transfer.setReceiverName(receiverAcc.getOwnerEmail());
 			transfer.setSenderAccountNr(senderAccountNr);
-			transfer.setReceiverBLZ(receiverAcc.getBank(pm).getBlz());
+			transfer.setReceiverBLZ(recieverBank.getBlz());
 			transfer.setReceiverAccountNr(receiverAcc.getAccountNr());
 			transfer.setAmount(amount);
-			transfer.setReceiverBankName(receiverAcc.getBank(pm).getName());
+			transfer.setReceiverBankName(recieverBank.getName());
 
 			Random r = new Random();
 			int transNr = r.nextInt(100);

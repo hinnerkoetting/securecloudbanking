@@ -137,7 +137,6 @@ public class BankDetails extends Composite implements Observer, Observable {
 				
 				@Override
 				public void onSuccess(String result) {
-					Window.alert(result);
 					notifyObservers(DELETE_BANK_SUCCEED, null);
 				}
 				

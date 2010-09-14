@@ -11,6 +11,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.AccountDetailDTO;
@@ -27,16 +28,17 @@ public abstract class GeneralAccount {
 	private String accountNr;
 	
 	@Persistent
-	private Key bankID;
+	private String blz;
 
 	
-	public Key getBankID() {
-		return bankID;
+	public String getBLZ() {
+		return blz;
 	}
 
-	public void setBankID(Key bankID) {
-		this.bankID = bankID;
-	}
+	
+//	public void setBankID(Key bankID) {
+//		this.bankID = bankID;
+//	}
 	
 	
 
@@ -59,20 +61,20 @@ public abstract class GeneralAccount {
 		 transfers=new ArrayList<MoneyTransfer>();
 	}
 	
-	public GeneralAccount(AccountDTO dto, Bank bank) {
-		this.owner = dto.getOwner();
-		this.accountNr = dto.getAccountNr();
-		this.bankID=bank.getId();
-		transfers= new ArrayList<MoneyTransfer>();
+	
 
-	}
-
-	public GeneralAccount(String owner, String accountNr,Bank bank){
+	protected GeneralAccount(String owner, String accountNr,Bank bank, String accountType){
 		this.owner=owner;
 		this.accountNr=accountNr;
-		this.bankID=bank.getId();
+		this.blz = bank.getBlz();
 		transfers= new ArrayList<MoneyTransfer>();
+		id = KeyFactory.createKey(bank.getId(),
+				accountType, accountNr);
 		
+	}
+	
+	protected GeneralAccount(AccountDTO dto, Bank bank, String accountType) {
+		this(dto.getOwner(), dto.getAccountNr(), bank, accountType);
 	}
 
 	public void addMoneyTransfer(MoneyTransfer transfer) {
@@ -83,11 +85,7 @@ public abstract class GeneralAccount {
 		return accountNr;
 	}
 
-	public Bank getBank(PersistenceManager pm) {
 
-		Bank bank=pm.getObjectById(Bank.class,getBankID());
-		return bank;
-	}
 	public AccountDTO getDTO() {
 		AccountDTO dto = new AccountDTO(getOwner(), getAccountNr());
 		
@@ -121,13 +119,13 @@ public abstract class GeneralAccount {
 		this.accountNr = accountNr;
 	}
 
-	public void setBank(Bank bank) {
-		this.bankID = bank.getId();
-	}
+//	public void setBank(Bank bank) {
+//		this.bankID = bank.getId();
+//	}
 
-	public void setId(Key id) {
-		this.id = id;
-	}
+//	public void setId(Key id) {
+//		this.id = id;
+//	}
 
 	public void setOwner(String owner) {
 		this.owner = owner;

@@ -82,9 +82,9 @@ public class MoneyTransfer {
 		}
 		this.amount = amount;
 		senderAccountNr=sender.getAccountNr();
-		senderBLZ=sender.getBank(pm).getBlz();
+		senderBLZ=sender.getBLZ();
 		receiverAccountNr=receiver.getAccountNr();
-		receiverBLZ=receiver.getBank(pm).getBlz();
+		receiverBLZ=receiver.getBLZ();
 		this.receiverName=receiverName;
 		this.remark=remark;
 		timestamp=new Date();
@@ -110,7 +110,7 @@ public class MoneyTransfer {
 			receiverAccount=(ExternalAccount)ExternalAccount.getAccountByBLZAndAccountNr(pm,b,receiverAccountNr);	
 		}		
 		if (receiverAccount!=null){
-		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBank(pm).getBlz(),s.getAccountNr(),receiverAccount.getBank(pm).getBlz(),receiverAccount.getAccountNr(),getAmount());
+		MoneyTransferDTO dto=new MoneyTransferDTO(s.getBLZ(),s.getAccountNr(),receiverAccount.getBLZ(),receiverAccount.getAccountNr(),getAmount());
 		dto.setTimestamp(getTimestamp());
 		dto.setRemark(getRemark());
 		dto.setReceiverName(getReceiverName());
@@ -122,7 +122,7 @@ public class MoneyTransfer {
 			MoneyTransferDTO dto=new MoneyTransferDTO();
 			dto.setAmount(getAmount());
 			dto.setSenderAccountNr(s.getAccountNr());
-			dto.setSenderBankNr(s.getBank(pm).getBlz());
+			dto.setSenderBankNr(s.getBLZ());
 			dto.setReceiverAccountNr("Unbekannt");
 			dto.setReceiverBankNr("Unbekannt");
 			dto.setRemark(getRemark());

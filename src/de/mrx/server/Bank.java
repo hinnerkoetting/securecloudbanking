@@ -13,6 +13,7 @@ import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 import de.mrx.client.BankDTO;
 
@@ -37,9 +38,9 @@ public class Bank {
 	@Persistent
 	private Key id;
 
-	public void setId(Key id) {
-		this.id = id;
-	}
+//	public void setId(Key id) {
+//		this.id = id;
+//	}
 
 	public Key getId() {
 		return id;
@@ -55,7 +56,7 @@ public class Bank {
 	}
 
 	public boolean equals(Bank otherBank) {
-		return (this.getBlz() == otherBank.getBlz() && this.getName() == otherBank.getName());
+		return (this.getBlz().equals(otherBank.getBlz()) && this.getName().equals(otherBank.getName()));
 	}
 
 	@Override
@@ -96,19 +97,21 @@ public class Bank {
 	@Unique
 	private String name;
 
-	public Bank(String blz, String name) {
+	public Bank(String blz, String name, AllBanks bankWrapper) {
 		this.blz = blz;
 		this.name = name;
+		id = KeyFactory.createKey(bankWrapper.getId(),
+				Bank.class.getSimpleName(), blz);
 	}
 
 	public Bank() {
 
 	}
 
-	public Bank(BankDTO dto) {
-		setBlz(dto.getBlz());
-		setName(dto.getName());
-	}
+//	public Bank(BankDTO dto) {
+//		setBlz(dto.getBlz());
+//		setName(dto.getName());
+//	}
 
 	public String getBlz() {
 		return blz;
