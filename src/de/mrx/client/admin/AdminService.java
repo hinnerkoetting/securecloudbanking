@@ -27,6 +27,8 @@ public interface AdminService extends BankService {
 	
 	public String generateTestData();
 	
+	public String deleteData();
+	
 	public String adminSendMoney(String senderAccountNr, String sendBLZ,
 			String receiveraccountNr, double amount, String remark);
 	

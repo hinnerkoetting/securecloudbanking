@@ -76,6 +76,9 @@ public interface AdminConstants extends Constants{
 	 String deleteAccountConfirm();
 	
 	@DefaultStringValue("Are you sure?\nThis will delete all current data!")
+	 String deleteDataConfirm();
+	
+	@DefaultStringValue("Are you sure?\nThis will create some random test data!")
 	 String generateDataConfirm();
 	
 	@DefaultStringValue("Recipient")
@@ -120,4 +123,6 @@ public interface AdminConstants extends Constants{
 	@DefaultStringValue("Properties")
 	 String properties();
 
+	@DefaultStringValue("Delete data")
+	 String deleteData();
 }

@@ -26,6 +26,8 @@ import de.mrx.server.InternalSCBAccount;
 import de.mrx.server.MoneyTransfer;
 import de.mrx.server.MoneyTransferPending;
 import de.mrx.server.PMF;
+import de.mrx.server.SCBIdentity;
+import de.mrx.server.TANList;
 import de.mrx.shared.SCBData;
 
 public class AdminbankingImpl extends BankServiceImpl implements
@@ -177,22 +179,11 @@ AdminService {
 		Query query = pm.newQuery(cl);
 		query.deletePersistentAll(query);	
 	}
-	private void resetData() {
-		log.log(Level.INFO, "Resetting all data");
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		
-		delete(pm, Bank.class);
-		delete(pm, ExternalAccount.class);		    		 
-		delete(pm, MoneyTransfer.class);
-		delete(pm, MoneyTransferPending.class);
-		delete(pm, InternalSCBAccount.class);
-	}
-	
+
 	@Override
 	public String generateTestData() {
 		if (!checkAdmin())
 			return null;
-		resetData();
 
 		//number of test data
 		final int EXTERNAL_BANKS = 3;
@@ -209,6 +200,10 @@ AdminService {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.currentTransaction().begin();
 		AllBanks bankWrapper = AllBanks.getBankWrapper(pm);
+		if (bankWrapper == null) {
+			bankWrapper = new AllBanks();
+			pm.makePersistent(bankWrapper);
+		}
 		
 		//create own bank
 		Bank ownBank = new Bank(SCBData.SCB_PLZ, SCBData.SCB_NAME);
@@ -415,6 +410,24 @@ AdminService {
 		bank.setName(newName);
 		bank.setBlz(newBLZ);
 		pm.currentTransaction().commit();
+		return "Success";
+	}
+	
+	@Override
+	public String deleteData() {
+		if (!checkAdmin())
+			return null;
+		log.log(Level.INFO, "Deleting all data");
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		delete(pm, AllBanks.class);
+		delete(pm, Bank.class);
+		delete(pm, ExternalAccount.class);		    		 
+		delete(pm, MoneyTransfer.class);
+		delete(pm, MoneyTransferPending.class);
+		delete(pm, InternalSCBAccount.class);
+		delete(pm, TANList.class);
+		delete(pm, SCBIdentity.class);
 		return "Success";
 	}
 

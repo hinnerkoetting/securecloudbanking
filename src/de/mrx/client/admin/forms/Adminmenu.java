@@ -35,6 +35,9 @@ public class Adminmenu extends Composite implements Observable {
 	Button externalBanks;
 	
 	@UiField
+	Button deleteData;
+	
+	@UiField
 	Button generateData;
 	
 	
@@ -52,7 +55,7 @@ public class Adminmenu extends Composite implements Observable {
 		
 		accounts.setText(constants.accounts());
 		externalBanks.setText(constants.externalBanks());
-		
+		deleteData.setText(constants.deleteData());
 		generateData.setText(constants.generateData());
 	}
 
@@ -75,20 +78,36 @@ public class Adminmenu extends Composite implements Observable {
 				
 				@Override
 				public void onSuccess(String result) {
-					
-						Window.alert(result);
-					
+						Window.alert(result);	
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					GWT.log(caught.toString());
-					
+					GWT.log(caught.toString());	
 				}
 			});
 		}
 	}
 
+	@UiHandler("deleteData")
+	void onClickDeleteData(ClickEvent e) {
+		if (Window.confirm(constants.deleteDataConfirm())) {
+			AdminServiceAsync bankingService = GWT.create(AdminService.class);
+			bankingService.deleteData(new AsyncCallback<String>() {
+				
+				@Override
+				public void onSuccess(String result) {
+						Window.alert(result);	
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log(caught.toString());	
+				}
+			});
+		}
+	}
+	
 	@Override
 	public void addObserver(Observer o) {
 		observer.add(o);

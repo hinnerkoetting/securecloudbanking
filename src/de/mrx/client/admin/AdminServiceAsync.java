@@ -43,6 +43,8 @@ public interface AdminServiceAsync extends BankServiceAsync {
 	void editBankDetails(String oldName, String oldBLZ, String newName,
 			String newBLZ, AsyncCallback<String> callback);
 
+	void deleteData(AsyncCallback<String> callback);
+
 
 
 }
