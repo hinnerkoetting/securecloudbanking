@@ -280,7 +280,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 				throw new SCBException("Invalid transaction");
 			}
 			int tanPos = pendingTrans.getRequiredTan();
-			String referenzTan = senderAccount.getTan(tanPos - 1);
+			String referenzTan = senderAccount.getTan(tanPos);
 			 if (!tan.equals(referenzTan)) {
 			 log.severe("Wrong TAN. Request TAN Pos : " + tanPos
 			 + " \t Send TAN: " + tan);
