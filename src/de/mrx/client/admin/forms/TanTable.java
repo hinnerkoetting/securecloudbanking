@@ -59,8 +59,8 @@ public class TanTable extends Composite {
 		
 		//setup pages
 		int numberPages = numerPages(tans.size());
-		for (int i = 1; i <= numberPages; i++) {
-			Anchor pageLink = new Anchor(""+i);
+		for (int i = 0; i < numberPages; i++) {
+			Anchor pageLink = new Anchor(""+(i*10));
 			selectPages.setWidget(0, i, pageLink);
 			pageLink.setStyleName(style.nonActive());
 			final int j = i;
@@ -75,7 +75,7 @@ public class TanTable extends Composite {
 		}
 		
 		//select page 1
-		switchToPage(1);
+		switchToPage(0);
 	}
 	
 	public void switchToPage(int page) {
@@ -83,7 +83,7 @@ public class TanTable extends Composite {
 		//header
 		//reset style for all pages
 		int numberPages = numerPages(tans.size());
-		for (int i = 1; i <= numberPages; i++) {
+		for (int i = 0; i < numberPages; i++) {
 			Anchor pageLink = (Anchor)selectPages.getWidget(0, i);
 			selectPages.setWidget(0, i, pageLink);
 			if (page != i) { 
@@ -101,7 +101,7 @@ public class TanTable extends Composite {
 		//entries
 		int row = 1;
 		for (int i = 0; i < NUMBER_TANS_PER_PAGE; i++) {
-			int index = (page-1) * NUMBER_TANS_PER_PAGE + i;
+			int index = (page) * NUMBER_TANS_PER_PAGE + i;
 			if (index >= tans.size()) {
 				if (tanTable.getRowCount() > row)
 					tanTable.removeRow(row);
@@ -109,7 +109,7 @@ public class TanTable extends Composite {
 				continue;
 			}
 			String entry = tans.get(index);
-			tanTable.setWidget(row , 0, new Label(""+(index+1)));
+			tanTable.setWidget(row , 0, new Label(""+index));
 			tanTable.setWidget(row, 1, new Label(entry));
 			row++;
 		}
