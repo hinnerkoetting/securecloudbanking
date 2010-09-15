@@ -139,7 +139,7 @@ public class MoneyTransferPending {
 		this.requiredTan = requiredTan;
 		
 		this.id = KeyFactory.createKey(senderAccount.getId(), MoneyTransferPending.class.getSimpleName(),
-							"senderAccount" + requiredTan + "remark");
+							senderAccount.getAccountNr()+ "_" + requiredTan + "_" +remark);
 		
 	}
 	
@@ -163,9 +163,9 @@ public class MoneyTransferPending {
 	}
 
 
-	public void setRequiredTan(int requiredTan) {
-		this.requiredTan = requiredTan;
-	}
+//	public void setRequiredTan(int requiredTan) {
+//		this.requiredTan = requiredTan;
+//	}
 
 
 
