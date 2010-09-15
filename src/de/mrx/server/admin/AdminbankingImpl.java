@@ -15,6 +15,7 @@ import com.google.appengine.api.users.UserServiceFactory;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
+import de.mrx.client.TansDTO;
 import de.mrx.client.admin.AdminService;
 import de.mrx.server.AllBanks;
 import de.mrx.server.Bank;
@@ -424,6 +425,16 @@ AdminService {
 		delete(pm, TANList.class);
 		delete(pm, SCBIdentity.class);
 		return "Success";
+	}
+	/**
+	 * get all tans from internal account
+	 */
+	@Override
+	public TansDTO getTans(String accountNr) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		InternalSCBAccount account = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);
+		return new TansDTO(account.getTans().getTan());
+		
 	}
 
 
