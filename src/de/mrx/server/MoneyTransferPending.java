@@ -8,6 +8,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 import de.mrx.client.MoneyTransferDTO;
 
@@ -24,7 +25,7 @@ public class MoneyTransferPending {
 	private double amount;
 	
 	@PrimaryKey
-	 @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key id;
 
 	@Persistent
@@ -124,10 +125,23 @@ public class MoneyTransferPending {
 		this.amount = amount;
 	}
 
-	public void setId(Key id) {
-		this.id = id;
-	}
  
+	public MoneyTransferPending(String remark, String receiverName, String bankName,
+								InternalSCBAccount senderAccount, String blz, String receiveraccountNr,
+								double amount, int requiredTan) {
+		this.remark = remark;
+		this.receiverName =  receiverName;
+		this.receiverBankName = bankName;
+		this.senderAccountNr = senderAccount.getAccountNr();
+		this.receiverBLZ = blz;
+		this.receiverAccountNr = receiveraccountNr;
+		this.amount = amount;
+		this.requiredTan = requiredTan;
+		
+		this.id = KeyFactory.createKey(senderAccount.getId(), MoneyTransferPending.class.getSimpleName(),
+							"senderAccount" + requiredTan + "remark");
+		
+	}
 	
 	public void setReceiverAccountNr(String receiverAccountNr) {
 		this.receiverAccountNr = receiverAccountNr;
