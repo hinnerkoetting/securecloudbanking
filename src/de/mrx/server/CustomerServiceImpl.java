@@ -294,9 +294,12 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 					recAccount, amount, recAccount.getOwner(), remark);
 			
 			pm.currentTransaction().begin();
+			pm.makeTransient(senderAccount);
+			MoneyTransferPending pending = senderAccount.getPendingTransaction();
+			pm.deletePersistent(pending);
 			senderAccount.setPendingTransaction(null);
-			pm.deletePersistent(senderAccount.getPendingTransaction());
-			pm.makePersistent(senderAccount);
+			
+
 			pm.currentTransaction().commit();
 			
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
