@@ -21,6 +21,7 @@ import de.mrx.client.AccountDTO;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.Observable;
 import de.mrx.client.Observer;
+import de.mrx.client.TansDTO;
 import de.mrx.client.TransferHistoryForm;
 import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
@@ -44,6 +45,9 @@ public class AccountDetails extends Composite implements Observable, Observer{
 	
 	@UiField
 	Button enableTransactions;
+	
+	@UiField
+	Button enableTans;
 	
 	@UiField
 	Label title;
@@ -70,6 +74,7 @@ public class AccountDetails extends Composite implements Observable, Observer{
 		delete.setStyleName(style.nonActive());
 		enableTransfer.setStyleName(style.nonActive());
 		enableTransactions.setStyleName(style.nonActive());
+		enableTans.setStyleName(style.nonActive());
 		
 		//activate the button
 		button.setStyleName(style.active());
@@ -93,6 +98,7 @@ public class AccountDetails extends Composite implements Observable, Observer{
 		subTitle.setText(account.getOwner());
 		enableTransfer.setText(constants.transfer());
 		enableTransactions.setText(constants.transactions());
+		enableTans.setText(constants.tans());
 		delete.setText(constants.delete());
 		clickOnTransfer(null);
 	
@@ -100,6 +106,11 @@ public class AccountDetails extends Composite implements Observable, Observer{
 		
 	}
 
+	public void showTans(TansDTO tanList) {
+		TanTable tanTable = new TanTable(tanList.getTans());
+		content.setWidget(tanTable);
+	}
+	
 	@UiHandler("enableTransactions")
 	public void clickOnTransactions(ClickEvent e) {
 		setActive(enableTransactions);
@@ -128,26 +139,50 @@ public class AccountDetails extends Composite implements Observable, Observer{
 		
 	}
 
-	@UiHandler("delete")
-	public void clickOnDelete(ClickEvent e) {
-	if (Window.confirm(constants.deleteAccountConfirm())) {
+	@UiHandler("enableTans")
+	public void clickOnTans(ClickEvent e) {
+		setActive(enableTans);
 		AdminServiceAsync adminService = GWT.create(AdminService.class);
-		adminService.deleteInternalAccount(account.getAccountNr(), new AsyncCallback<String>() {
+		adminService.getTans(account.getAccountNr(), new AsyncCallback<TansDTO>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				GWT.log(caught.toString());								
+				GWT.log(caught.toString());
+				
 			}
 
 			@Override
-			public void onSuccess(String result) {
-				GWT.log(result);
-				notifyObservers(ACCOUNT_DELETED, null);
+			public void onSuccess(TansDTO result) {
+				showTans(result);
 				
 			}
+			
 		});
+
 	}
-}
+			
+	@UiHandler("delete")
+	public void clickOnDelete(ClickEvent e) {
+		if (Window.confirm(constants.deleteAccountConfirm())) {
+			AdminServiceAsync adminService = GWT.create(AdminService.class);
+			adminService.deleteInternalAccount(account.getAccountNr(), new AsyncCallback<String>() {
+	
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log(caught.toString());								
+				}
+	
+				@Override
+				public void onSuccess(String result) {
+					GWT.log(result);
+					notifyObservers(ACCOUNT_DELETED, null);
+					
+				}
+			});
+		}
+	}
+	
+	
 
 	@Override
 	public void addObserver(Observer o) {

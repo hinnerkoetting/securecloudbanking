@@ -280,7 +280,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 				throw new SCBException("Invalid transaction");
 			}
 			int tanPos = pendingTrans.getRequiredTan();
-			String referenzTan = senderAccount.getTan(tanPos);
+			String referenzTan = senderAccount.getTan(tanPos - 1);
 			 if (!tan.equals(referenzTan)) {
 			 log.severe("Wrong TAN. Request TAN Pos : " + tanPos
 			 + " \t Send TAN: " + tan);
@@ -480,27 +480,30 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 					
 				}
 			}
-			// pm.currentTransaction().commit();
-			MoneyTransferPending transfer = new MoneyTransferPending();
-			transfer.setRemark(remark);
-			transfer.setReceiverName(receiverName);
-			transfer.setReceiverBankName(bankName);
-			transfer.setSenderAccountNr(senderAccountNr);
-			transfer.setReceiverBLZ(blz);
-			transfer.setReceiverAccountNr(receiveraccountNr);
-			transfer.setAmount(amount);
 
 			Random r = new Random();
 			int transNr = r.nextInt(100);
-			transfer.setRequiredTan(transNr);
+//			transfer.setRequiredTan(transNr);
+			
+			// pm.currentTransaction().commit();
+			MoneyTransferPending transfer = new MoneyTransferPending(remark, receiverName,
+					bankName, senderAccount, blz, receiveraccountNr, amount, transNr);
+//			transfer.setRemark(remark);
+//			transfer.setReceiverName(receiverName);
+//			transfer.setReceiverBankName(bankName);
+//			transfer.setSenderAccountNr(senderAccountNr);
+//			transfer.setReceiverBLZ(blz);
+//			transfer.setReceiverAccountNr(receiveraccountNr);
+//			transfer.setAmount(amount);
+
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
 			// MoneyTransfer.class.getSimpleName(), 19));
 			log.info("Save Moneytransfer");
 			pm.currentTransaction().begin();
 
-			// pm.makePersistent(transfer);
+			
 			senderAccount.setPendingTransaction(transfer);
-
+			pm.makePersistent(transfer);
 			pm.makePersistent(senderAccount);
 			pm.currentTransaction().commit();
 			return transfer.getDTO();
@@ -546,23 +549,18 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			
 			Bank recieverBank = bankWrapper.getBankByBlz(pm, receiverAcc.getBLZ());
 			
-			MoneyTransferPending transfer = new MoneyTransferPending();
-			transfer.setRemark(remark);
-			transfer.setReceiverName(receiverAcc.getOwnerEmail());
-			transfer.setSenderAccountNr(senderAccountNr);
-			transfer.setReceiverBLZ(recieverBank.getBlz());
-			transfer.setReceiverAccountNr(receiverAcc.getAccountNr());
-			transfer.setAmount(amount);
-			transfer.setReceiverBankName(recieverBank.getName());
-
 			Random r = new Random();
 			int transNr = r.nextInt(100);
-			transfer.setRequiredTan(transNr);
+			MoneyTransferPending transfer = new MoneyTransferPending(remark, receiverAcc.getOwnerEmail(),
+					recieverBank.getName(), senderAccount, recieverBank.getBlz(), receiverAcc.getAccountNr(), amount, transNr);
+
+			
+
 			log.info("Save Moneytransfer");
 			pm.currentTransaction().begin();
 
 			senderAccount.setPendingTransaction(transfer);
-
+			pm.makePersistent(transfer);
 			pm.makePersistent(senderAccount);
 			pm.currentTransaction().commit();
 			return transfer.getDTO();
