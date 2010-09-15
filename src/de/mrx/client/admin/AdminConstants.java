@@ -125,4 +125,14 @@ public interface AdminConstants extends Constants{
 
 	@DefaultStringValue("Delete data")
 	 String deleteData();
+	
+	@DefaultStringValue("Tans")
+	 String tans();
+	
+	@DefaultStringValue("No.")
+	 String nr();
+	
+	@DefaultStringValue("Tan")
+	 String tan();
+	
 }
