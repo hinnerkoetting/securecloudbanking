@@ -292,7 +292,13 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			MoneyTransfer transfer = new MoneyTransfer(pm, senderAccount,
 					recAccount, amount, recAccount.getOwner(), remark);
-
+			
+			pm.currentTransaction().begin();
+			senderAccount.setPendingTransaction(null);
+			pm.deletePersistent(senderAccount.getPendingTransaction());
+			pm.makePersistent(senderAccount);
+			pm.currentTransaction().commit();
+			
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
 			// MoneyTransfer.class.getSimpleName(), 1));
 			log.info("Save Moneytransfer");
@@ -498,13 +504,22 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
 			// MoneyTransfer.class.getSimpleName(), 19));
+			if (senderAccount.getPendingTransaction() != null) {
+				log.severe("Pending transfer still existing!");
+				pm.currentTransaction().begin();
+				pm.makeTransient(senderAccount);
+				senderAccount.setPendingTransaction(null);
+				pm.currentTransaction().commit();
+			}
 			log.info("Save Moneytransfer");
 			pm.currentTransaction().begin();
-
+			pm.makeTransient(senderAccount);
 			
 			senderAccount.setPendingTransaction(transfer);
+			
 			pm.makePersistent(transfer);
-			pm.makePersistent(senderAccount);
+			
+
 			pm.currentTransaction().commit();
 			return transfer.getDTO();
 
