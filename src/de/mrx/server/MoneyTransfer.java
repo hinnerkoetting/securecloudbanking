@@ -99,8 +99,10 @@ public class MoneyTransfer {
 	}
 
 
-	public MoneyTransferDTO getDTO(PersistenceManager pm){		
-		InternalSCBAccount s=(InternalSCBAccount)InternalSCBAccount.getOwnByAccountNr(pm,senderAccountNr);
+	public MoneyTransferDTO getDTO(PersistenceManager pm){
+		//change internal account to generalaccount
+		GeneralAccount s = GeneralAccount.getAccount(pm, getSenderAccountNr(), getSenderBLZ());
+//		InternalSCBAccount s=(InternalSCBAccount)InternalSCBAccount.getOwnByAccountNr(pm,senderAccountNr);
 		Bank b=Bank.getByBLZ(pm,receiverBLZ);
 		GeneralAccount receiverAccount;
 		if (b.getBlz().equals(Bank.SCB_BLZ)){

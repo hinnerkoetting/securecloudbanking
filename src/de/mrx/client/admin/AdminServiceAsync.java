@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.BankServiceAsync;
+import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.TansDTO;
 
 /**
@@ -47,6 +48,9 @@ public interface AdminServiceAsync extends BankServiceAsync {
 	void deleteData(AsyncCallback<String> callback);
 
 	void getTans(String accountNr, AsyncCallback<TansDTO> callback);
+
+	void getTransfers(String accountNr, String blz,
+			AsyncCallback<List<MoneyTransferDTO>> callback);
 
 
 

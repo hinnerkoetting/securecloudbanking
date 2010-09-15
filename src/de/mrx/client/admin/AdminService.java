@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.BankService;
+import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.TansDTO;
 
 
@@ -42,4 +43,6 @@ public interface AdminService extends BankService {
 	public String editBankDetails(String oldName, String oldBLZ, String newName, String newBLZ);
 	
 	public TansDTO getTans(String accountNr);
+	
+	public List<MoneyTransferDTO> getTransfers(String accountNr, String blz);
 }

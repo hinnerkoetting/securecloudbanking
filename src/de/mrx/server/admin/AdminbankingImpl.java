@@ -15,6 +15,7 @@ import com.google.appengine.api.users.UserServiceFactory;
 
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
+import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.TansDTO;
 import de.mrx.client.admin.AdminService;
 import de.mrx.server.AllBanks;
@@ -435,6 +436,23 @@ AdminService {
 		InternalSCBAccount account = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);
 		return new TansDTO(account.getTans().getTan());
 		
+	}
+	@Override
+	public List<MoneyTransferDTO> getTransfers(String accountNr, String blz) {
+		//internal account
+		if (blz.equals(SCBData.SCB_PLZ))
+			return getTransaction(accountNr);
+		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		GeneralAccount acc = ExternalAccount.getExternalAccount(pm, accountNr, blz);		
+		List<MoneyTransferDTO> mtDTOs = new ArrayList<MoneyTransferDTO>();
+		for (MoneyTransfer mtransfer : acc.getTransfers()) {
+			MoneyTransferDTO dto = mtransfer.getDTO(pm);
+			mtDTOs.add(dto);
+			log.info(dto.toString());
+		}
+		return mtDTOs;
 	}
 
 
