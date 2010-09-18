@@ -22,6 +22,8 @@ public interface BankService extends RemoteService {
 	public SCBIdentityDTO  login(String requestUri);
 
 	
+	public boolean checkLogin();
+		
 	
 	
 	/**

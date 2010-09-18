@@ -75,6 +75,7 @@ BankService {
 	}
 	
 	
+	
 	/**
 	 * gets all transaction of one account
 	 * may only be called by the owner or an admin?
@@ -105,6 +106,16 @@ BankService {
 
 	}
 	
+	/**
+	 * checks if user is logged in
+	 */
+	public boolean checkLogin() {
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		if (user == null)
+			return false;
+		return true;
+	}
 	
 	/**
 	 * login to only banking

@@ -35,5 +35,9 @@ public interface BankServiceAsync {
 	void getAccountDetails(String accountNr,
 			AsyncCallback<AccountDetailDTO> callback);
 
+
+
+	void checkLogin(AsyncCallback<Boolean> callback);
+
 	
 }
