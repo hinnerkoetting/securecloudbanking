@@ -401,6 +401,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 	}
 
+
 	/**
 	 * send all details for a money transaction. The money is not yet
 	 * transferred, but in a second step must be confirmed with a TAN
@@ -478,7 +479,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			int transNr = r.nextInt(100);
 
 			if (senderAccount.getPendingTransaction() != null) {
-				log.severe("Pending transfer still existing!");
+				log.info("Pending transfer still exists!");
 
 				pm.deletePersistent(senderAccount.getPendingTransaction());
 				senderAccount.setPendingTransaction(null);
@@ -486,15 +487,11 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			log.info("Save Moneytransfer");
 			MoneyTransferPending transfer = new MoneyTransferPending(remark, receiverName,
 					bankName, senderAccount, blz, receiveraccountNr, amount, transNr);
-			pm.currentTransaction().begin();
-			pm.makeTransient(senderAccount);
+			
 			
 			senderAccount.setPendingTransaction(transfer);
-			
 			pm.makePersistent(transfer);
 			
-
-			pm.currentTransaction().commit();
 			return transfer.getDTO();
 
 		} catch (Exception e) {
@@ -536,12 +533,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 
 			if (senderAccount.getPendingTransaction() != null) {
-				log.severe("Pending transfer still existing!");
-				pm.currentTransaction().begin();
-				pm.makeTransient(senderAccount);
+				log.info("Pending transfer still exists!");
 				pm.deletePersistent(senderAccount.getPendingTransaction());
 				senderAccount.setPendingTransaction(null);
-				pm.currentTransaction().commit();
 			}
 			
 			
@@ -555,11 +549,8 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			
 
 			log.info("Save Moneytransfer");
-			pm.currentTransaction().begin();
-			pm.makeTransient(senderAccount);
 			senderAccount.setPendingTransaction(transfer);
 			pm.makePersistent(transfer);
-			pm.currentTransaction().commit();
 			return transfer.getDTO();
 
 		} catch (Exception e) {
