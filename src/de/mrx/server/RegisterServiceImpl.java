@@ -28,7 +28,6 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import de.mrx.client.RegisterService;
 import de.mrx.client.SCBIdentityDTO;
-import de.mrx.shared.EmailAdressNotAcceptedException;
 import de.mrx.shared.SCBException;
 import de.mrx.shared.UserAlreadyUsedException;
 
@@ -58,9 +57,7 @@ public class RegisterServiceImpl extends RemoteServiceServlet implements
 			if (existingIDentity!=null){
 				throw new UserAlreadyUsedException();
 			}
-			if (!(identity.getEmail().endsWith("@googlemail.com") || identity.getEmail().endsWith("@gmail.com"))){
-				throw new EmailAdressNotAcceptedException();
-			}
+
 			
 			SCBIdentity id = new SCBIdentity(identity);
 			// At the moment, directly activate the user
