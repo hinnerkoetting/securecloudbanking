@@ -291,12 +291,12 @@ public class RegistrationForm extends Composite {
 
 		hints.clear();
 
-		if (!isFieldConfirmToExpresion(lastName, "[\\w]+",
+		if (!isFieldConfirmToExpresion(lastName, "[\\p{L}&&\\p{Lu}]+",
 				constants.registerValidateName())) {
 			result = false;
 		}
 		
-		if (!isFieldConfirmToExpresion(firstName, "[\\w]+",
+		if (!isFieldConfirmToExpresion(firstName, "[\\p{L}&&\\p{Lu}]+",
 		constants.registerValidateFirstName())) {
 			result = false;
 		}
@@ -306,7 +306,7 @@ public class RegistrationForm extends Composite {
 				constants.registerValidateEmail())) {
 			result = false;
 		}
-		if (!isFieldConfirmToExpresion(street, "[\\w]+",
+		if (!isFieldConfirmToExpresion(street, "[\\p{L}&&\\p{Lu}]+",
 				constants.registerValidateStreet())) {
 			result = false;
 		}
@@ -320,7 +320,7 @@ public class RegistrationForm extends Composite {
 			result = false;
 		}
 
-		if (!isFieldConfirmToExpresion(city, "[\\w]+",
+		if (!isFieldConfirmToExpresion(city, "[\\p{L}&&\\p{Lu}]+",
 				constants.registerValidateCity())) {
 			result = false;
 		}
