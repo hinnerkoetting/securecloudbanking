@@ -245,4 +245,7 @@ public interface SCBConstants extends Constants{
 	@DefaultStringValue("Application is still initializing. Please try again in 30 seconds.")
 	String initializing();
 	
+	@DefaultStringValue("Please login first!")
+	String pleaseLogin();
+	
 }

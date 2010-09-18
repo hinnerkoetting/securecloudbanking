@@ -16,12 +16,16 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import de.mrx.client.CustomerService;
+import de.mrx.client.CustomerServiceAsync;
 import de.mrx.client.GeneralConstants;
 import de.mrx.client.RegisterService;
 import de.mrx.client.RegisterServiceAsync;
@@ -92,15 +96,56 @@ public class RegistrationForm extends Composite {
 	
 	@UiField
 	CheckBox agb;
+	
+	@UiField
+	HTMLPanel content;
+	
+	@UiField
+	SimplePanel notLoggedIn;
+	
+	@UiField
+	Label pleaseLogin;
+	
 	private SCBIdentityDTO id;
 
+	private void displayRegistrationFormular() {
+		content.setVisible(true);
+		
+	}
+	
+	private void notLoggedIn() {
+		notLoggedIn.setVisible(true);
+		
+	}
+	
 	public RegistrationForm(Anchor signInLink) {
 		// sets listBox
-		initWidget(uiBinder.createAndBindUi(this));		
+		CustomerServiceAsync customerService = GWT.create(CustomerService.class);
+		customerService.checkLogin(new AsyncCallback<Boolean>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log(caught.toString());
+				
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				if (result.booleanValue())
+					displayRegistrationFormular();
+				else
+					notLoggedIn();
+			}
+		});
+		initWidget(uiBinder.createAndBindUi(this));
+		content.setVisible(false);
+		notLoggedIn.setVisible(false);
 		language.addItem(constants.languageGerman());
 		language.addItem(constants.languageEnglish());
 		agblink.setHref(GeneralConstants.AGB_LINK);
 		signInLinkWrapper.add(signInLink);
+		notLoggedIn.add(signInLink);
+		pleaseLogin.setText(constants.pleaseLogin());
 		
 	}
 	
