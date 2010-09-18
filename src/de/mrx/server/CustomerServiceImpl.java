@@ -39,6 +39,7 @@ import de.mrx.client.CustomerService;
 import de.mrx.client.MoneyTransferDTO;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.shared.AccountNotExistException;
+import de.mrx.shared.SCBData;
 import de.mrx.shared.SCBException;
 import de.mrx.shared.WrongTANException;
 
@@ -282,25 +283,25 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			int tanPos = pendingTrans.getRequiredTan();
 			String referenzTan = senderAccount.getTan(tanPos);
 			 if (!tan.equals(referenzTan)) {
-			 log.severe("Wrong TAN. Request TAN Pos : " + tanPos
-			 + " \t Send TAN: " + tan);
-			 senderAccount.increaseWrongTANCounter();
-			 throw new WrongTANException(senderAccount.getWrongTANCounter());
+				 log.severe("Wrong TAN. Request TAN Pos : " + tanPos
+				 + " \t Send TAN: " + tan);
+				 senderAccount.increaseWrongTANCounter();
+				 throw new WrongTANException(senderAccount.getWrongTANCounter());
 			 } else {
-			 senderAccount.resetWrongTANCounter();
+				 senderAccount.resetWrongTANCounter();
 			 }
 
 			MoneyTransfer transfer = new MoneyTransfer(pm, senderAccount,
 					recAccount, amount, recAccount.getOwner(), remark);
 			
-			pm.currentTransaction().begin();
-			pm.makeTransient(senderAccount);
+
+
 			MoneyTransferPending pending = senderAccount.getPendingTransaction();
 			pm.deletePersistent(pending);
 			senderAccount.setPendingTransaction(null);
 			
 
-			pm.currentTransaction().commit();
+			
 			
 			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
 			// MoneyTransfer.class.getSimpleName(), 1));
@@ -436,10 +437,6 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 					bankName = "Neue Bank";
 				}
 				receiverBank = new Bank(blz.trim(), bankName, bankWrapper);
-				
-				
-
-				
 				bankWrapper.addBank(receiverBank);
 				log.info("Create external bank");
 				pm.currentTransaction().begin();
@@ -449,72 +446,46 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 
 			GeneralAccount recAccount;
-			if (receiverBank.equals(ownBank)) {
-				recAccount = InternalSCBAccount.getOwnByAccountNr(pm,
-						receiveraccountNr);
-				if (recAccount == null) {
+			recAccount = GeneralAccount.getAccount(pm, receiveraccountNr, blz);
+
+			if (recAccount == null) {
+				if (blz.equals(SCBData.SCB_PLZ)) { //account must exist if recieverbank is scb bank 
 					throw new RuntimeException(
 							"Dieser Account existiert nicht bei der Bank "
 									+ receiveraccountNr);
 				}
-
-			} else {
-				recAccount = ExternalAccount.getAccountByBLZAndAccountNr(pm,
-						receiverBank, receiveraccountNr);
-
-				if (recAccount == null) {
+				else { //if recieveraccount does not exist and its an external bank: create new account
 					log.info("Account" + receiveraccountNr
 							+ " is not yet known at " + receiverBank.getName()
 							+ "(" + receiverBank.getBlz() + "). Create it.");
 					log.info("Create external account");
 					
 					recAccount = new ExternalAccount(receiverName,
-							receiveraccountNr, receiverBank);
-//					recAccount.setId(KeyFactory.createKey(receiverBank.getId(),
-//							ExternalAccount.class.getSimpleName(),
-//							receiverBank.getBlz() + "_" + receiveraccountNr));
-					
-					
+							receiveraccountNr, receiverBank);				
 					
 					
 					receiverBank.addAccount(recAccount);
 					pm.currentTransaction().begin();
 					pm.makePersistent(receiverBank);
-					pm.currentTransaction().commit();
-					
-					pm.currentTransaction().begin();
 					pm.makePersistent(recAccount);
 					pm.currentTransaction().commit();
-
-					
 				}
+				
 			}
+			
 
 			Random r = new Random();
 			int transNr = r.nextInt(100);
-//			transfer.setRequiredTan(transNr);
-			
-			// pm.currentTransaction().commit();
-			MoneyTransferPending transfer = new MoneyTransferPending(remark, receiverName,
-					bankName, senderAccount, blz, receiveraccountNr, amount, transNr);
-//			transfer.setRemark(remark);
-//			transfer.setReceiverName(receiverName);
-//			transfer.setReceiverBankName(bankName);
-//			transfer.setSenderAccountNr(senderAccountNr);
-//			transfer.setReceiverBLZ(blz);
-//			transfer.setReceiverAccountNr(receiveraccountNr);
-//			transfer.setAmount(amount);
 
-			// transfer.setId(KeyFactory.createKey(senderAccount.getId(),
-			// MoneyTransfer.class.getSimpleName(), 19));
 			if (senderAccount.getPendingTransaction() != null) {
 				log.severe("Pending transfer still existing!");
-				pm.currentTransaction().begin();
-				pm.makeTransient(senderAccount);
+
+				pm.deletePersistent(senderAccount.getPendingTransaction());
 				senderAccount.setPendingTransaction(null);
-				pm.currentTransaction().commit();
 			}
 			log.info("Save Moneytransfer");
+			MoneyTransferPending transfer = new MoneyTransferPending(remark, receiverName,
+					bankName, senderAccount, blz, receiveraccountNr, amount, transNr);
 			pm.currentTransaction().begin();
 			pm.makeTransient(senderAccount);
 			
@@ -564,6 +535,15 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 				throw new AccountNotExistException();
 			}
 
+			if (senderAccount.getPendingTransaction() != null) {
+				log.severe("Pending transfer still existing!");
+				pm.currentTransaction().begin();
+				pm.makeTransient(senderAccount);
+				pm.deletePersistent(senderAccount.getPendingTransaction());
+				senderAccount.setPendingTransaction(null);
+				pm.currentTransaction().commit();
+			}
+			
 			
 			Bank recieverBank = bankWrapper.getBankByBlz(pm, receiverAcc.getBLZ());
 			
@@ -576,10 +556,9 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			log.info("Save Moneytransfer");
 			pm.currentTransaction().begin();
-
+			pm.makeTransient(senderAccount);
 			senderAccount.setPendingTransaction(transfer);
 			pm.makePersistent(transfer);
-			pm.makePersistent(senderAccount);
 			pm.currentTransaction().commit();
 			return transfer.getDTO();
 

@@ -238,17 +238,6 @@ public class MoneyTransfer {
 		this.senderBLZ = senderBLZ;
 	}
 	
-
-
-
-
-	
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
-	}
-
-	
-	
 	
 
 }

@@ -137,9 +137,9 @@ public class MoneyTransferPending {
 		this.receiverAccountNr = receiveraccountNr;
 		this.amount = amount;
 		this.requiredTan = requiredTan;
-		
+		this.timestamp = new Date();
 		this.id = KeyFactory.createKey(senderAccount.getId(), MoneyTransferPending.class.getSimpleName(),
-							senderAccount.getAccountNr()+ "_" + requiredTan + "_" +remark);
+							senderAccount.getAccountNr()+ "_" + requiredTan + "_" + timestamp);
 		
 	}
 	
@@ -181,8 +181,5 @@ public class MoneyTransferPending {
 		this.senderBLZ = senderBLZ;
 	}
 
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
-	}
 
 }

@@ -61,20 +61,16 @@ BankService {
 		pm.currentTransaction().begin();
 
 		senderAccount.addMoneyTransfer(transfer);
-		// recAccount.addMoneyTransfer(transfer);Sp�ter eine Kopie anlegen
+
 
 		senderAccount.changeMoney(-amount);
-		MoneyTransfer receivertransfer = new MoneyTransfer(pm, recAccount,
-				senderAccount, -amount,senderAccount.getOwner(),remark);
+		MoneyTransfer receivertransfer = new MoneyTransfer(pm, senderAccount,
+				recAccount, -amount, recAccount.getOwner(),remark);
 		
 		recAccount.addMoneyTransfer(receivertransfer);
 						
 		recAccount.changeMoney(amount);
-		
-		
-		
-		pm.makePersistent(senderAccount);
-		pm.makePersistent(recAccount);
+
 		pm.currentTransaction().commit();
 	}
 	
