@@ -25,6 +25,7 @@ import de.mrx.client.Observable;
 import de.mrx.client.Observer;
 import de.mrx.client.SCB;
 import de.mrx.client.SCBConstants;
+import de.mrx.client.TableStyler;
 import de.mrx.shared.WrongTANException;
 
 /**
@@ -125,6 +126,9 @@ public class MoneyTransferForm extends Composite implements Observable{
 		remark.setText(dto.getRemark());
 		receiverName.setText(dto.getReceiverName());
 		receiverAccountNr.setText(dto.getReceiverAccountNr());
+		//expand numbers to format like ??? ??? ???
+		TableStyler.expandNumber(receiverBLZ);
+		TableStyler.expandNumber(receiverAccountNr);
 		receiverAccountNr.setEnabled(false);
 		receiverBLZ.setEnabled(false);
 		receiverBankName.setEnabled(false);
@@ -199,11 +203,11 @@ public class MoneyTransferForm extends Composite implements Observable{
 		boolean result = true;
 		Log.info("Text: " + receiverAccountNr.getText());
 		hints.clear();
-		if (!isFieldConfirmToExpresion(receiverAccountNr, "^[0-9]{1,10}$",
+		if (!isFieldConfirmToExpresion(receiverAccountNr, "[\\s0-9]{1,15}$",
 				constants.sendMoneyValidateaccount())) {
 			result = false;
 		}
-		if (!isFieldConfirmToExpresion(receiverBLZ, "^[0-9]{1,10}$",
+		if (!isFieldConfirmToExpresion(receiverBLZ, "[\\s0-9]{1,15}$",
 				constants.sendMoneyValidateBLZ())) {
 			result = false;
 		}
@@ -289,6 +293,8 @@ public class MoneyTransferForm extends Composite implements Observable{
 				createHintTable();
 				return;
 			}
+		
+			
 			
 			if (bankingService == null) {
 				bankingService = GWT.create(CustomerService.class);
@@ -306,7 +312,14 @@ public class MoneyTransferForm extends Composite implements Observable{
 								WrongTANException wte = (WrongTANException) caught;
 								Window.alert("Falsche TAN eingegeben: "
 										+ wte.getTrials() + " x");
-							} else {
+							} 
+							else if (caught instanceof NumberFormatException) { 
+
+								Log.error("Sending money failed", caught);
+								Window.alert("Invalid input :"
+										+ caught.getMessage());
+							}
+							else {
 
 								Log.error("Sending money failed", caught);
 								Window.alert("Money sent failed :"
@@ -342,6 +355,8 @@ public class MoneyTransferForm extends Composite implements Observable{
 					createHintTable();
 					return;
 				}
+				
+				
 				if (bankingService == null) {
 					bankingService = GWT.create(CustomerService.class);
 				}
@@ -355,6 +370,10 @@ public class MoneyTransferForm extends Composite implements Observable{
 						new AsyncCallback<MoneyTransferDTO>() {
 
 							public void onFailure(Throwable caught) {
+								if (caught instanceof NumberFormatException) {
+									Window.alert("Invalid input " + caught.getMessage());
+								}
+								
 								Log.error("Sending money failed", caught);
 
 							}
@@ -367,6 +386,9 @@ public class MoneyTransferForm extends Composite implements Observable{
 								amount.setText("" + dto.getAmount());
 								remark.setText(dto.getRemark());
 								receiverName.setText(dto.getReceiverName());
+								//expand numbers to format like ??? ??? ???
+								TableStyler.expandNumber(receiverBLZ);
+								TableStyler.expandNumber(receiverAccountNr);
 								receiverAccountNr.setEnabled(false);
 								receiverBLZ.setEnabled(false);
 								receiverBankName.setEnabled(false);
@@ -375,6 +397,7 @@ public class MoneyTransferForm extends Composite implements Observable{
 								receiverName.setEnabled(false);
 								receiverAccountNr.setEnabled(false);
 								receiverBankName.setText(dto.getReceiverBankName());
+								
 								
 								
 								

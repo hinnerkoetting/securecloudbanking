@@ -26,6 +26,7 @@ import de.mrx.server.GeneralAccount;
 import de.mrx.server.InternalSCBAccount;
 import de.mrx.server.MoneyTransfer;
 import de.mrx.server.MoneyTransferPending;
+import de.mrx.server.NumberFormater;
 import de.mrx.server.PMF;
 import de.mrx.server.SCBIdentity;
 import de.mrx.server.TANList;
@@ -288,20 +289,44 @@ AdminService {
 		}
 	}
 
-
+	/**
+	 * @throws NumberFormatException
+	 */
 	@Override
 	public String adminSendMoney(String senderAccountNr, String senderBLZ,
 			String receiveraccountNr, double amount, String remark) {
 		if (!checkAdmin())
 			return null;
 		if (amount < 0)
-			return "Amount must be positive!";
+			throw new NumberFormatException("Amount must not be negative!");
+		String formatedSenderAccountNr;
+		String formatedSenderBLZ;
+		String formatedRecAccountNr;
+		try{
+			formatedSenderAccountNr = NumberFormater.convertToStorageFormat(senderAccountNr);
+		}
+		catch (NumberFormatException e){
+			throw new NumberFormatException("Sender accountnumber");
+		}
+		try{
+			formatedSenderBLZ = NumberFormater.convertToStorageFormat(senderBLZ);
+		}
+		catch (NumberFormatException e){
+			throw new NumberFormatException("Sender BLZ");
+		}
+		try {
+			formatedRecAccountNr = NumberFormater.convertToStorageFormat(receiveraccountNr);
+		}
+		catch (NumberFormatException e){
+			throw new NumberFormatException("Reciever accountnumber");
+		}
+		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			//reciever bank is internal bank
-			log.setLevel(Level.ALL);
-			GeneralAccount recieverAcc = InternalSCBAccount.getOwnByAccountNr(pm, receiveraccountNr);
-			GeneralAccount senderAcc = GeneralAccount.getAccount(pm, senderAccountNr, senderBLZ);
+			//reciever bank is always internal bank
+			
+			GeneralAccount recieverAcc = InternalSCBAccount.getOwnByAccountNr(pm, formatedRecAccountNr);
+			GeneralAccount senderAcc = GeneralAccount.getAccount(pm, formatedSenderAccountNr, formatedSenderBLZ);
 		
 	
 			if (recieverAcc == null) {

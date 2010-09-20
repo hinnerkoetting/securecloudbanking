@@ -46,7 +46,7 @@ public interface CustomerService extends BankService {
 	/*
 	 * sends money. For this service, the sender must be a customer of SCB
 	 */
-	public void sendMoney(String senderAccountNr, String blz, String accountNr, double amount, String remark, String receiverName, String bankName, String tan) throws SCBException;
+	public void sendMoney(String senderAccountNr, String blz, String accountNr, double amount, String remark, String receiverName, String bankName, String tan) throws SCBException, NumberFormatException;
 	
 	/**
 	 * send all details for a money transaction. The money is not yet transferred, but in a second step must be confirmed with a TAN
@@ -60,12 +60,12 @@ public interface CustomerService extends BankService {
 	 * @return
 	 * @throws SCBException
 	 */
-	public MoneyTransferDTO sendMoneyAskForConfirmationData(String senderAccountNr, String blz, String accountNr, double amount, String remark, String receiverName, String bankName) throws SCBException;
+	public MoneyTransferDTO sendMoneyAskForConfirmationData(String senderAccountNr, String blz, String accountNr, double amount, String remark, String receiverName, String bankName) throws SCBException, NumberFormatException;
 
 	/**
 	 * send all details for a money transaction. The recipient must be customer of SCB and is determined with his email. The money is not yet transferred, but in a second step must be confirmed with a TAN
 	 */
-	public MoneyTransferDTO sendMoneyAskForConfirmationDataWithEmail(String senderAccountNr, String email, double amount, String remark) throws SCBException;
+	public MoneyTransferDTO sendMoneyAskForConfirmationDataWithEmail(String senderAccountNr, String email, double amount, String remark) throws SCBException, NumberFormatException;
 	
 
 	

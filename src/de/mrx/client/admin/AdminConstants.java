@@ -135,4 +135,6 @@ public interface AdminConstants extends Constants{
 	@DefaultStringValue("Tan")
 	 String tan();
 	
+	@DefaultStringValue("Invalid input!")
+	 String invalidInput();
 }
