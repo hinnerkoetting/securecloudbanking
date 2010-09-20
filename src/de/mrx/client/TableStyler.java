@@ -34,7 +34,7 @@ public class TableStyler {
 			int startIndex = c * 3;
 			int endIndex = c * 3 + 3;
 			if (endIndex >= number.length())
-				endIndex = number.length() - 1;
+				endIndex = number.length();
 			formatedNumber += number.substring(startIndex, endIndex)+ " ";
 		}
 		widget.setText(formatedNumber);
