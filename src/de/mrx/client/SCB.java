@@ -216,6 +216,7 @@ public class SCB implements EntryPoint, Observer {
 		Label accHeader = new Label(constants.accountOverviewLblHeaderAccount());
 		Label amountHeader = new Label(
 				constants.accountOverviewLblHeaderBalance());
+		
 		accHeader.setStyleName("TransfersHeader");
 		amountHeader.setStyleName("TransfersHeader");
 		grid.setWidget(0, 0, accHeader);
@@ -234,6 +235,7 @@ public class SCB implements EntryPoint, Observer {
 				balanceElement.setStyleName("negativeMoney");
 			}
 			grid.setWidget(row, 0, accountElement);
+			TableStyler.expandNumber(accountElement);
 			grid.setWidget(row, 1, balanceElement);
 			row++;
 		}

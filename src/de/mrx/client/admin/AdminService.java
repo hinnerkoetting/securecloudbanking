@@ -31,8 +31,17 @@ public interface AdminService extends BankService {
 	
 	public String deleteData();
 	
+	/**
+	 * @throws NumberFormatException
+	 * @param senderAccountNr
+	 * @param sendBLZ
+	 * @param receiveraccountNr
+	 * @param amount
+	 * @param remark
+	 * @return
+	 */
 	public String adminSendMoney(String senderAccountNr, String sendBLZ,
-			String receiveraccountNr, double amount, String remark);
+			String receiveraccountNr, double amount, String remark) throws NumberFormatException;
 	
 	public List<AccountDTO> getExternalAccounts(String blz);
 	

@@ -90,6 +90,9 @@ public class FastMoneyTransferForm  extends Composite implements Observable{
 							if (caught instanceof AccountNotExistException){
 								Window.alert(constants.sendMoneyErrorNoAccountInOurInstitute());	
 							}
+							else if (caught instanceof NumberFormatException) {
+								Window.alert("Invalid input " + caught.getMessage());
+							}
 							else{						
 								Log.error("Sending money failed", caught);
 							}

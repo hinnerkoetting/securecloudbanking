@@ -236,7 +236,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	public void sendMoney(String senderAccountNr, String blz,
 			String receiveraccountNr, double amount, String remark,
 			String receiverName, String bankName, String tan)
-			throws SCBException {
+			throws SCBException, NumberFormatException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			log.info("Send Money Confirmation (senderAcc:" + senderAccountNr
@@ -245,30 +245,57 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 
 			bankWrapper = AllBanks.getSingleton(pm);
 			ownBank = bankWrapper.getSCBBank(pm);
+			
+			
+			//check and parse input
+			String parsedSenderAccountNr;
+			try {
+				parsedSenderAccountNr = NumberFormater.convertToStorageFormat(senderAccountNr);
+			}
+			catch (NumberFormatException e) {
+				throw new NumberFormatException("Sender account Number");
+			}
+			
+			String parsedBLZ;
+			try {
+				parsedBLZ = NumberFormater.convertToStorageFormat(blz);
+			}
+			catch (NumberFormatException e) {
+				throw new NumberFormatException("BLZ");
+			}
+			
+			String parsedRecieverAccountNr;
+			try {
+				parsedRecieverAccountNr  = NumberFormater.convertToStorageFormat(receiveraccountNr);
+			}
+			catch (NumberFormatException e) {
+				throw new NumberFormatException("Reciever account Number");
+			}
+			
 			InternalSCBAccount senderAccount = InternalSCBAccount
-					.getOwnByAccountNr(pm, senderAccountNr);
+					.getOwnByAccountNr(pm, parsedSenderAccountNr);
 			if (senderAccount == null) {
-				throw new SCBException("Sender Account " + senderAccountNr
+				throw new SCBException("Sender Account " + parsedSenderAccountNr
 						+ " doesn't exist! Bug?");
 			}
 
-			Bank receiverBank = Bank.getByBLZ(pm, blz);
+			Bank receiverBank = Bank.getByBLZ(pm, parsedBLZ);
 			if (receiverBank == null) {
-				throw new SCBException("Bank with BLZ " + blz
+				throw new SCBException("Bank with BLZ " + parsedBLZ
 						+ " is not known. Bug?");
 			}
 
 			GeneralAccount recAccount;
 			if (receiverBank.equals(ownBank)) {
 				recAccount = InternalSCBAccount.getOwnByAccountNr(pm,
-						receiveraccountNr);
+						parsedRecieverAccountNr);
 				if (recAccount == null) {
-					throw new AccountNotExistException(receiveraccountNr);
+					throw new AccountNotExistException(parsedRecieverAccountNr);
 				}
 
 			} else {// external Bank
 				recAccount = ExternalAccount.getAccountByBLZAndAccountNr(pm,
-						receiverBank, receiveraccountNr);
+						receiverBank, parsedRecieverAccountNr);
 
 				if (recAccount == null) {
 					throw new RuntimeException("this account must exist by now");
@@ -419,25 +446,51 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	public MoneyTransferDTO sendMoneyAskForConfirmationData(
 			String senderAccountNr, String blz, String receiveraccountNr,
 			double amount, String remark, String receiverName, String bankName)
-			throws SCBException {
+			throws SCBException, NumberFormatException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 
 			bankWrapper = AllBanks.getSingleton(pm);
 			ownBank = bankWrapper.getSCBBank(pm);
+			
+			//check and parse input
+			String parsedSenderAccountNr;
+			try {
+				parsedSenderAccountNr = NumberFormater.convertToStorageFormat(senderAccountNr);
+			}
+			catch (NumberFormatException e) {
+				throw new NumberFormatException("Sender account number");
+			}
+			
+			String parsedBLZ;
+			try {
+				parsedBLZ = NumberFormater.convertToStorageFormat(blz);
+			}
+			catch (NumberFormatException e) {
+				throw new NumberFormatException("BLZ");
+			}
+			
+			String parsedRecieverAccountNr;
+			try {
+				parsedRecieverAccountNr = NumberFormater.convertToStorageFormat(receiveraccountNr);
+			}
+			catch (NumberFormatException e) {
+				throw new NumberFormatException("Reciever account number");
+			}
+			
 			InternalSCBAccount senderAccount = InternalSCBAccount
-					.getOwnByAccountNr(pm, senderAccountNr);
+					.getOwnByAccountNr(pm, parsedSenderAccountNr);
 			if (senderAccount == null) {
-				throw new SCBException("Sender Account " + senderAccountNr
+				throw new SCBException("Sender Account " + parsedSenderAccountNr
 						+ " existiert nicht!");
 			}
 
-			Bank receiverBank = Bank.getByBLZ(pm, blz);
+			Bank receiverBank = Bank.getByBLZ(pm, parsedBLZ);
 			if (receiverBank == null) {
 				if (bankName == null || bankName.trim().equals("")) {
 					bankName = "Neue Bank";
 				}
-				receiverBank = new Bank(blz.trim(), bankName, bankWrapper);
+				receiverBank = new Bank(parsedBLZ.trim(), bankName, bankWrapper);
 				bankWrapper.addBank(receiverBank);
 				log.info("Create external bank");
 				pm.currentTransaction().begin();
@@ -447,22 +500,22 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 
 			GeneralAccount recAccount;
-			recAccount = GeneralAccount.getAccount(pm, receiveraccountNr, blz);
+			recAccount = GeneralAccount.getAccount(pm, parsedRecieverAccountNr, parsedBLZ);
 
 			if (recAccount == null) {
-				if (blz.equals(SCBData.SCB_PLZ)) { //account must exist if recieverbank is scb bank 
+				if (parsedBLZ.equals(SCBData.SCB_PLZ)) { //account must exist if recieverbank is scb bank 
 					throw new RuntimeException(
 							"Dieser Account existiert nicht bei der Bank "
-									+ receiveraccountNr);
+									+ parsedRecieverAccountNr);
 				}
 				else { //if recieveraccount does not exist and its an external bank: create new account
-					log.info("Account" + receiveraccountNr
+					log.info("Account" + parsedRecieverAccountNr
 							+ " is not yet known at " + receiverBank.getName()
 							+ "(" + receiverBank.getBlz() + "). Create it.");
 					log.info("Create external account");
 					
 					recAccount = new ExternalAccount(receiverName,
-							receiveraccountNr, receiverBank);				
+							parsedRecieverAccountNr, receiverBank);				
 					
 					
 					receiverBank.addAccount(recAccount);
@@ -486,7 +539,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 			}
 			log.info("Save Moneytransfer");
 			MoneyTransferPending transfer = new MoneyTransferPending(remark, receiverName,
-					bankName, senderAccount, blz, receiveraccountNr, amount, transNr);
+					bankName, senderAccount, parsedBLZ, receiveraccountNr, amount, transNr);
 			
 			
 			senderAccount.setPendingTransaction(transfer);
@@ -513,16 +566,28 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 	 */
 	public MoneyTransferDTO sendMoneyAskForConfirmationDataWithEmail(
 			String senderAccountNr, String email, double amount, String remark)
-			throws SCBException {
+			throws SCBException, NumberFormatException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 
 			bankWrapper = AllBanks.getSingleton(pm);
 			ownBank = bankWrapper.getSCBBank(pm);
+			
+			//check and parse input
+			String parsedSenderAccountNr;
+			try {
+				parsedSenderAccountNr = NumberFormater.convertToStorageFormat(senderAccountNr);
+			}
+			catch (NumberFormatException e) {
+				throw new NumberFormatException("Sender account number");
+			}
+			
+
+			
 			InternalSCBAccount senderAccount = InternalSCBAccount
-					.getOwnByAccountNr(pm, senderAccountNr);
+					.getOwnByAccountNr(pm, parsedSenderAccountNr);
 			if (senderAccount == null) {
-				throw new SCBException("Sender Account " + senderAccountNr
+				throw new SCBException("Sender Account " + parsedSenderAccountNr
 						+ " existiert nicht!");
 			}
 
