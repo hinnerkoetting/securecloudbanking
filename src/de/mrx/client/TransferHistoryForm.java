@@ -41,7 +41,7 @@ public class TransferHistoryForm extends Composite {
 		    String nonActive();
 	}
 		
-	private static int TRANSACTIONS_PER_PAGE = 6;
+	private static int TRANSACTIONS_PER_PAGE = 8;
 	
 	List<MoneyTransferDTO> transfers;
 	
