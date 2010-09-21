@@ -179,7 +179,11 @@ public class Admin extends Composite implements EntryPoint,Observer {
 	private void checkGoogleStatus() {
 		AdminServiceAsync adminService = GWT.create(AdminService.class);
 
-		adminService.login(GWT.getHostPageBaseURL(),
+		String debugFlag = Window.Location.getParameter("gwt.codesvr");
+		String reloadURL = GWT.getHostPageBaseURL() + "Admin.html";
+		if (debugFlag != null)
+			reloadURL += "?gwt.codesvr=" + debugFlag;
+		adminService.login(reloadURL,
 				new AsyncCallback<SCBIdentityDTO>() {
 
 					@Override
@@ -206,7 +210,8 @@ public class Admin extends Composite implements EntryPoint,Observer {
 							if (identityInfo.isAdmin()) {								
 								loadAdminPage();
 							}
-							signOut.setHref(identityInfo.getLogoutUrl()+Window.Location.getQueryString());
+
+							signOut.setHref(identityInfo.getLogoutUrl());
 							signOut.setText(constants.signOut());
 							signIn.setVisible(false);
 							signOut.setVisible(true);

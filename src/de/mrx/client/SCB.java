@@ -247,8 +247,13 @@ public class SCB implements EntryPoint, Observer {
 	private void checkGoogleStatus() {
 
 		getBankingService();
-		GWT.log(GWT.getHostPageBaseURL());
-		bankingService.login(GWT.getHostPageBaseURL(),
+		String debugFlag = Window.Location.getParameter("gwt.codesvr");
+		String reloadURL = GWT.getHostPageBaseURL() + "SCB.html";
+		if (debugFlag != null)
+			reloadURL += "?gwt.codesvr=" + debugFlag;
+		GWT.log(reloadURL);
+		
+		bankingService.login(reloadURL,
 				new AsyncCallback<SCBIdentityDTO>() {
 					public void onFailure(Throwable error) {
 						error.printStackTrace();
@@ -295,7 +300,7 @@ public class SCB implements EntryPoint, Observer {
 	 */
 	private void loadLogin() {
 		// Assemble login panel.
-		signIn.setHref(identityInfo.getLoginUrl()+Window.Location.getQueryString());
+		signIn.setHref(identityInfo.getLoginUrl());
 		signIn.setText(constants.signIn());
 		signIn.setVisible(true);
 		signOut.setVisible(false);
@@ -307,7 +312,7 @@ public class SCB implements EntryPoint, Observer {
 	private void loadLoggedInSetup() {
 		// Assemble logout panel.
 
-		signOut.setHref(identityInfo.getLogoutUrl()+Window.Location.getQueryString());
+		signOut.setHref(identityInfo.getLogoutUrl());
 		signOut.setText(constants.signOut());
 		signIn.setVisible(false);
 		signOut.setVisible(true);
