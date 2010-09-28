@@ -286,27 +286,34 @@ public class RegistrationForm extends Composite {
 	}
 	
 	
+
 	private boolean isRegisterFormValid() {
 		boolean result = true;
 
 		hints.clear();
-
-		if (!isFieldConfirmToExpresion(lastName, "[\\p{L}]+",
+		
+		//one upper case letter char then 1-infinite lower case chars (\u00DF is ß)
+		String oneWordRegExp = "([A-ZÖÜÄ][a-zöüä\u00DF]+)";
+		String spaceOrMinus = "([\\p{Space}-])";
+		String wordRegExp   = oneWordRegExp +        "(" + spaceOrMinus + oneWordRegExp +        ")*";
+		String streetRegExp = oneWordRegExp + ".{0,1}" + "(" + spaceOrMinus + oneWordRegExp + ".{0,1}" + ")*";
+		
+		if (!isFieldConfirmToExpresion(lastName, wordRegExp,
 				constants.registerValidateName())) {
 			result = false;
 		}
 		
-		if (!isFieldConfirmToExpresion(firstName, "[\\p{L}]+",
+		if (!isFieldConfirmToExpresion(firstName, wordRegExp,
 		constants.registerValidateFirstName())) {
 			result = false;
 		}
 		
 		if (!isFieldConfirmToExpresion(email,
-				"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b",
+				"\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}\\b",
 				constants.registerValidateEmail())) {
 			result = false;
 		}
-		if (!isFieldConfirmToExpresion(street, "[\\p{L}\\p{Space}]+",
+		if (!isFieldConfirmToExpresion(street, streetRegExp,
 				constants.registerValidateStreet())) {
 			result = false;
 		}
@@ -320,7 +327,7 @@ public class RegistrationForm extends Composite {
 			result = false;
 		}
 
-		if (!isFieldConfirmToExpresion(city, "[\\p{L}]+",
+		if (!isFieldConfirmToExpresion(city, wordRegExp,
 				constants.registerValidateCity())) {
 			result = false;
 		}
@@ -335,7 +342,7 @@ public class RegistrationForm extends Composite {
 	
 	private boolean isFieldConfirmToExpresion(TextBox input, String expression,
 			String errorMessage) {
-		if (input.getText().trim().toUpperCase().matches(expression)) {
+		if (input.getText().trim().matches(expression)) {
 			input.setStyleName("");
 			return true;
 		} else {
