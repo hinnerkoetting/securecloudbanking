@@ -111,11 +111,7 @@ public class RegistrationForm extends Composite {
 		content.setVisible(true);
 		
 	}
-	
-	private void notLoggedIn() {
-		notLoggedIn.setVisible(true);
-		
-	}
+
 	
 	public RegistrationForm(Anchor signInLink) {
 		// sets listBox
@@ -130,15 +126,19 @@ public class RegistrationForm extends Composite {
 
 			@Override
 			public void onSuccess(Boolean result) {
-				if (result.booleanValue())
+				if (result.booleanValue()) {
 					displayRegistrationFormular();
-				else
-					notLoggedIn();
+					pleaseLogin.setVisible(false);
+					notLoggedIn.setVisible(false);
+				}
+				else {
+					notLoggedIn.setVisible(true);
+					pleaseLogin.setVisible(true);
+				}
 			}
 		});
 		initWidget(uiBinder.createAndBindUi(this));
 		content.setVisible(false);
-		notLoggedIn.setVisible(false);
 		language.addItem(constants.languageGerman());
 		language.addItem(constants.languageEnglish());
 		agblink.setHref(GeneralConstants.AGB_LINK);
