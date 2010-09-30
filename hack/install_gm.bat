@@ -1,3 +1,4 @@
+::legacy
 SET FIREFOX="C:\Program Files (x86)\Mozilla Firefox\firefox.exe"
 SET EXTENSIONSFOLDER=C:\Users\Hinni\AppData\Roaming\Mozilla\Firefox\Profiles\nf2jybuf.default\extensions\
 SET GREASEMONKEY_DIR=.\
