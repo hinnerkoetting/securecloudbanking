@@ -5,6 +5,5 @@
 		<Exclude>http://127.0.0.1*Admin*</Exclude>
 		<Exclude>http*securecloudbanking.appspot.com*Admin*</Exclude>
 		<Require filename="jquery-132.js"/>
-		<Require filename="jquery-132-1.js"/>
 	</Script>
 </UserScriptConfig>

