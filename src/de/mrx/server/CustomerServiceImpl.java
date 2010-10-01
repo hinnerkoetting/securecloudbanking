@@ -79,6 +79,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		String query = " SELECT FROM " + InternalSCBAccount.class.getName()
 				+ " WHERE owner =='" + user.getEmail() + "'";
 		log.info("geTAccounts Query: " + query);
+		@SuppressWarnings("unchecked")
 		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>) pm
 				.newQuery(query).execute();
 		List<AccountDTO> accountDTOs = new ArrayList<AccountDTO>();
@@ -159,6 +160,7 @@ public class CustomerServiceImpl extends BankServiceImpl implements
 		// log.info( acc.toString());
 		// }
 		// log.info("geTAccounts Query: "+query);
+		@SuppressWarnings("unchecked")
 		List<InternalSCBAccount> accounts = (List<InternalSCBAccount>) pm
 				.newQuery(query).execute();
 		if (accounts.size() != 1) {

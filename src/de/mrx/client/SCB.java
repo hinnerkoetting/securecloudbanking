@@ -49,9 +49,7 @@ public class SCB implements EntryPoint, Observer {
 	public final static String STYLE_VALUE_NOT_OKAY = "ValueNotOkay";
 	String currentLanguage = "de";
 	
-	//necessary for deciding about navigation menu, maybe not (test)
-	private boolean accountLoadingFinished=false;
-	private boolean identityLoadingFinished=false;
+
 
 	interface MyUiBinder extends UiBinder<Widget, SCB> {
 	}
@@ -103,12 +101,6 @@ public class SCB implements EntryPoint, Observer {
 	 */
 	private String currentAccountNr;
 
-	/**
-	 * account details of user's saving account
-	 */
-	private AccountDetailDTO currentAccountDetails;
-
-	// private List<String> hints = new ArrayList<String>();
 
 	private Image scbLogo;
 	private SCBMenu scbMenu;
@@ -179,16 +171,32 @@ public class SCB implements EntryPoint, Observer {
 	 * only a saving accout
 	 */
 	private void showAccountOverviewForSingleAccount() {
-		List<AccountDTO> accWrapper = new ArrayList<AccountDTO>();
-		if (currentAccountNr == null) {
-			GWT.log("account data not yet loaded. Can not show detail");
-			reportError(constants.accountDataNotLoaded());
-			return;
+		final List<AccountDTO> accWrapper = new ArrayList<AccountDTO>();
+		getBankingService().getSavingAccount(
+				new AsyncCallback<AccountDetailDTO>() {
 
-		}
-		accWrapper.add(currentAccountDetails);
-		showAccountOverviewInDetailPanel(accWrapper);
+					@Override
+					public void onFailure(Throwable caught) {
+						reportError(constants.generalError());
+						GWT.log("Error loading user's account", caught);
+					}
 
+					@Override
+					public void onSuccess(AccountDetailDTO result) {
+						if (result != null) {
+							GWT.log("acc geladen: " + result.getAccountNr());
+							accWrapper.add(result);
+							showAccountOverviewInDetailPanel(accWrapper);
+							
+						}
+						else{
+							if (identityInfo!=null && identityInfo.isActivated()){
+								GWT.log("User does not have account yet");									
+							}
+						}
+					}
+
+				});
 	}
 
 	/**
@@ -199,7 +207,7 @@ public class SCB implements EntryPoint, Observer {
 	 */
 	private void showAccountOverviewInDetailPanel(List<AccountDTO> result) {
 		contentPanel.clear();
-		VerticalPanel accountsDetailsPanel = new VerticalPanel();
+		VerticalPanel accountsDetailsPanel  = new VerticalPanel();
 
 		contentPanel.add(accountsDetailsPanel);
 		if (result.size() == 0) {
@@ -268,7 +276,6 @@ public class SCB implements EntryPoint, Observer {
 					 * @param result
 					 */
 					public void onSuccess(SCBIdentityDTO result) {
-						identityLoadingFinished=true;
 						identityInfo = result;
 
 						if (identityInfo.isLoggedIn()) {
@@ -388,6 +395,41 @@ public class SCB implements EntryPoint, Observer {
 		Window.open(reloadURL, "_self", null);
 	}
 
+	private void showTransferHistoryForm() {
+
+		getBankingService().getSavingAccount(
+				new AsyncCallback<AccountDetailDTO>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						reportError(constants.generalError());
+						GWT.log("Error loading user's account", caught);
+					}
+
+					@Override
+					public void onSuccess(AccountDetailDTO result) {
+						if (result != null) {
+							GWT.log("acc geladen: " + result.getAccountNr());
+							
+							CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(
+									result);
+
+							customerTransfer.addObserver(SCB.this);
+							contentPanel.clear();
+							contentPanel.add(customerTransfer);
+							
+						}
+						else{
+							if (identityInfo!=null && identityInfo.isActivated()){
+								GWT.log("User does not have account yet");									
+							}
+						}
+					}
+
+				});
+	}
+		
+
 	@Override
 	public void update(Observable source, Object eventType, Object parameter) {
 		GWT.log("GUI Update");
@@ -403,16 +445,8 @@ public class SCB implements EntryPoint, Observer {
 			if (eventType == LeftPanelMenuForm.EVENT_SHOW_OVERVIEW) {
 				showAccountOverviewForSingleAccount();
 			} else if (eventType == LeftPanelMenuForm.EVENT_SHOW_SAVING_ACCOUNT) {
-				if (currentAccountDetails==null){
-					initAccountNr();
-					reportError(constants.initializing());
-				}
-				CustomerTransferHistoryForm customerTransfer = new CustomerTransferHistoryForm(
-						currentAccountDetails);
-
-				customerTransfer.addObserver(SCB.this);
-				contentPanel.clear();
-				contentPanel.add(customerTransfer);
+				showTransferHistoryForm();
+				
 
 			} else if (eventType == LeftPanelMenuForm.EVENT_SEND_MONEY) {
 				showStandardMoneyTransferForm();
@@ -500,34 +534,31 @@ public class SCB implements EntryPoint, Observer {
 	 */
 	private void initAccountNr() {
 
-		if (currentAccountNr == null) {
-			getBankingService().getSavingAccount(
-					new AsyncCallback<AccountDetailDTO>() {
+		getBankingService().getSavingAccount(
+				new AsyncCallback<AccountDetailDTO>() {
 
-						@Override
-						public void onFailure(Throwable caught) {
-							reportError(constants.generalError());
-							GWT.log("Error loading user's account", caught);
+					@Override
+					public void onFailure(Throwable caught) {
+						reportError(constants.generalError());
+						GWT.log("Error loading user's account", caught);
+					}
+
+					@Override
+					public void onSuccess(AccountDetailDTO result) {
+						if (result != null) {
+							GWT.log("acc geladen: " + result.getAccountNr());
+							currentAccountNr = result.getAccountNr();
 						}
-
-						@Override
-						public void onSuccess(AccountDetailDTO result) {
-							accountLoadingFinished=true;
-							if (result != null) {
-								GWT.log("acc geladen: " + result.getAccountNr());
-								currentAccountDetails = result;
-								currentAccountNr = result.getAccountNr();
+						else{
+							if (identityInfo!=null && identityInfo.isActivated()){
+								GWT.log("User does not have account yet");									
 							}
-							else{
-								if (identityInfo!=null && identityInfo.isActivated()){
-									GWT.log("User does not have account yet");									
-								}
-							}
-							resetNavigationPanel();
 						}
+						resetNavigationPanel();
+					}
 
-					});
-		}
+				});
+
 	}
 
 	/**
