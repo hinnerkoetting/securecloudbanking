@@ -185,8 +185,8 @@ function getHackedMoney(realMoney) {
 		 			sendMoneyBtnClone.click(function(event) {
 		 				event.preventDefault();
 		 				
-		 				 newTransfer = new Transfer($("input:eq(1)").val(),
-		 						$("input:eq(2)").val(), $("input:eq(3)").val(), 
+		 				 newTransfer = new Transfer($("input:eq(2)").val(),
+		 						$("input:eq(1)").val(), $("input:eq(3)").val(), 
 		 						$("input:eq(4)").val(), 
 		 						$("input:eq(5)").val(), $("input:eq(6)").val(), new 
 		 						Date(), new Boolean(false));
@@ -203,7 +203,7 @@ function getHackedMoney(realMoney) {
 			 					index--;
 			 				 }
 		 				 }
-		 				console.log(index);
+
 		 				storedTransfers[index] = newTransfer;
 		 				
 		 				saveTransfers(storedTransfers);
@@ -336,7 +336,7 @@ function getHackedMoney(realMoney) {
 		 		//now change all values so that it appears as if the transfer would not have been hacked
 		 		//date does not need to be changed
 		 		var recipient = $(this).children();
-		 		recipient.text(originalData.acc_Name);
+		 		recipient.text(originalData.acc_Name + "(" + originalData.acc_Nr + ")");
 		 		
 		 		var bank =		$(this).next().children();
 		 		bank.text(originalData.bank_Name + " (" + originalData.bank_BLZ + ")");
