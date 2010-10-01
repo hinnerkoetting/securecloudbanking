@@ -248,4 +248,6 @@ public interface SCBConstants extends Constants{
 	@DefaultStringValue("Please login first!")
 	String pleaseLogin();
 	
+	@DefaultStringValue("Wrong TAN!")
+	String wrongTAN();	
 }
