@@ -35,7 +35,7 @@ ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     		</td>
 		</tr>
     </table>
-    
+    <g:Label ui:field="wrongTAN"/>
     <g:FlexTable ui:field="validateErrorTable"/>
    
    </g:HTMLPanel>

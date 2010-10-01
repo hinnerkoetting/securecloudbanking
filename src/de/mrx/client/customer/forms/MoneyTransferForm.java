@@ -78,7 +78,8 @@ public class MoneyTransferForm extends Composite implements Observable{
 	@UiField
 	Button sendMoney;
 	
-	
+	@UiField
+	Label wrongTAN;
 	
 	@UiField
 	Button sendMoneyConfirm;
@@ -96,7 +97,6 @@ public class MoneyTransferForm extends Composite implements Observable{
 		return tan;
 	}
 
-	
 	@UiField
 	FlexTable validateErrorTable;
 	public MoneyTransferForm(String accountNr){		
@@ -104,7 +104,8 @@ public class MoneyTransferForm extends Composite implements Observable{
 		assert(accountNr!=null);	
 		this.currentAccountNr=accountNr;		
 		updateForm();
-		
+		wrongTAN.setVisible(false);
+		wrongTAN.setText(constants.wrongTAN());
 	}
 	
 
@@ -309,9 +310,8 @@ public class MoneyTransferForm extends Composite implements Observable{
 
 						public void onFailure(Throwable caught) {
 							if (caught instanceof WrongTANException) {
-								WrongTANException wte = (WrongTANException) caught;
-								Window.alert("Falsche TAN eingegeben: "
-										+ wte.getTrials() + " x");
+								//WrongTANException wte = (WrongTANException) caught;
+								wrongTAN.setVisible(true);
 							} 
 							else if (caught instanceof NumberFormatException) { 
 
