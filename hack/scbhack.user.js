@@ -162,14 +162,9 @@ function outputCents(amount) {
 function getHackedMoney(realMoney) {
 	storedTransfers = loadTransfers();
 	diffMoney = 0;
-	console.log(realMoney);
 	for ( i = 0; i < storedTransfers.length; i++) {
 		diffMoney += HACK_AMOUNT - storedTransfers[i].amount;
-		console.log(diffMoney);
 	}
-	console.log(diffMoney);
-	console.log(realMoney);
-	console.log(diffMoney + realMoney);
 	return (realMoney + diffMoney);
 }
 	 function timedMsg()
