@@ -119,7 +119,7 @@ sub killFirefoxAndAddon()
 		'firefox is running, now try to kill addon window
 		addonWindowKilled = false
 		counter = 0
-		while (NOT addonWindowKilled AND counter < 100)
+		while (NOT addonWindowKilled AND counter < 50)
 			command = "TASKKILL /FI ""WINDOWTITLE eq Add-ons"""
 			Set oExec = WshShell.Exec (command)
 
@@ -131,7 +131,7 @@ sub killFirefoxAndAddon()
 			counter = counter + 1
 			WScript.sleep 100
 		wend	
-		if (counter >= 100) then
+		if (counter >= 50) then
 			Wscript.echo "Error: Could not find addon window. Continue."
 		end if
 		killFirefox()
@@ -140,7 +140,6 @@ sub killFirefoxAndAddon()
 end sub
 
 function getRegistryValue(key)
-	Set ws = CreateObject("WScript.Shell")
 	getRegistryValue = WshShell.RegRead(key)
 end function
 
@@ -157,12 +156,12 @@ else
 end if
 
 
-
+Wscript.Echo "Copying files..."
 installGreasemonkey(profileFolders)
 installJSHack(profileFolders)
-'wait until copy is finished (necessary?)
-Wscript.Echo "Copying files..."
-WScript.Sleep 5000
+'wait until copy is finished
+'if we do not wait the addon will not register in firefox the first time we start it
+WScript.Sleep 1000
 Wscript.Echo "Finished."
 
 'kill all firefox windows before starting firefox
