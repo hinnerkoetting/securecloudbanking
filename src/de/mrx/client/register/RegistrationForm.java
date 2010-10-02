@@ -294,8 +294,8 @@ public class RegistrationForm extends Composite {
 		
 		//one upper case letter char then 1-infinite lower case chars (unicodes are ÖÄÜ, öüä and ß)
 		String oneWordRegExp = "([A-Z\u00C4\u00D6\u00DC][a-z\u00E4\u00F6\u00FC\u00DF.]+)";
-		String spaceOrMinus = "([\\p{Space}-])";
-		String wordRegExp   = oneWordRegExp +        "(" + spaceOrMinus + oneWordRegExp +        ")*";
+		String spaceOrMinus = "([ -])";
+		String wordRegExp   = oneWordRegExp + "(" + spaceOrMinus + oneWordRegExp + ")*";
 		String streetRegExp = oneWordRegExp + "(" + spaceOrMinus + oneWordRegExp + ")*";
 		
 		if (!isFieldConfirmToExpresion(lastName, wordRegExp,

