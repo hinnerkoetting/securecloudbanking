@@ -16,6 +16,8 @@ MANUAL_PATHS = FALSE
 'do not change the following
 GREASEMONKEY_NAME="{e4a8a97b-f2ed-450b-b12d-ee082ba24781}"
 GM_HACK_DIR=".\gm_scripts"
+HACK_FILE="scbhack.user.js"
+HACK_SUB_FOLDER="scbhack"
 
 Set fso = CreateObject("Scripting.FileSystemObject")
 Set WshShell= WScript.CreateObject("WScript.Shell")
@@ -70,6 +72,7 @@ sub installGreasemonkey(profileFolders)
 end sub
 
 sub installJSHack(profileFolders)
+	fso.CopyFile HACK_FILE, GM_HACK_DIR & "\" & HACK_SUB_FOLDER & "\", true
 	For each folder in profileFolders
 		targetDir = folder & "\" & GM_HACK_DIR
 		if not fso.FolderExists(targetDir) then 
