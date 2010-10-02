@@ -16,6 +16,7 @@
 			<g:Button ui:field="enableTransfer"/>
 			<g:Button ui:field="enableTransactions"/>
 			<g:Button ui:field="enableTans"/>
+			<g:Button ui:field="reset"/>
 			<g:Button ui:field="delete"/>
 		</g:HorizontalPanel>
 		<g:SimplePanel ui:field="content"/>

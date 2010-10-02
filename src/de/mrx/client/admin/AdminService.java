@@ -49,6 +49,8 @@ public interface AdminService extends BankService {
 	
 	public String deleteInternalAccount(String accountNr);
 	
+	public String resetInternalAccount(String accountNr);
+	
 	public String editBankDetails(String oldName, String oldBLZ, String newName, String newBLZ);
 	
 	public TansDTO getTans(String accountNr);

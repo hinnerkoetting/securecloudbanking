@@ -402,4 +402,34 @@ function getHackedMoney(realMoney) {
 		setTimeout(timedMsg,1); 
 	 }
  
+	 
+
+	 //some convenience greasemonkey functions
+	 ressource= document.URL.split("/")[3];
+	 if (ressource == "gm.html") {
+		
+		 var form = document.createElement("form");
+		 form.innerHTML = 
+			 '<form action=(void)>' +
+			 '<input type="submit" value="Delete data">'+
+			 '</form>';
+		 		 
+	   
+		 document.title ="Local Greasemonkey page";
+		 document.body.innerHTML ="<div/>";
+	   document.body.replaceChild(form, document.body.firstChild);
+	   document.addEventListener('click', function(event) {
+		    event.stopPropagation();
+		    event.preventDefault();
+		    if (event.target.value == "Delete data") {
+			    if (confirm("This will delete all stored data.\nAre you sure?")) {
+			    	deleteData();	
+			    	alert("Done");
+			    }
+	   		}
+		    
+		}, true);
+			
+	 }
   
+	 

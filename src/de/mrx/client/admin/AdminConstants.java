@@ -136,5 +136,12 @@ public interface AdminConstants extends Constants{
 	 String tan();
 	
 	@DefaultStringValue("Invalid input!")
-	 String invalidInput();
+	String invalidInput();
+	 
+	@DefaultStringValue("This will reset all transactions from this account" +
+			"and will reset account balance.\n Are you sure?")
+	 String resetConfirmation();
+	
+	@DefaultStringValue("Reset")
+	String reset();
 }

@@ -507,6 +507,22 @@ AdminService {
 			pm.close();
 		}
 	}
+	@Override
+	public String resetInternalAccount(String accountNr) {
+		if (!checkAdmin())
+			return null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			InternalSCBAccount account = InternalSCBAccount.getOwnByAccountNr(pm, accountNr);
+			account.getTransfers().clear();
+			account.setPendingTransaction(null);
+			account.setBalance(5.0);
+			return "Success.";
+		}
+		finally {
+			pm.close();
+		}
+	}
 
 
 

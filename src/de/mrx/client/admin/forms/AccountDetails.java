@@ -50,12 +50,16 @@ public class AccountDetails extends Composite implements Observable, Observer{
 	Button enableTans;
 	
 	@UiField
+	Button reset;
+	
+	@UiField
 	Label title;
 	
 	@UiField
 	Label subTitle;
 	
 	public final static int ACCOUNT_DELETED = 20;
+	public final static int ACCOUNT_RESET = 21;
 	
 	 @UiField MyStyle style;
 	interface MyStyle extends CssResource {
@@ -75,6 +79,7 @@ public class AccountDetails extends Composite implements Observable, Observer{
 		enableTransfer.setStyleName(style.nonActive());
 		enableTransactions.setStyleName(style.nonActive());
 		enableTans.setStyleName(style.nonActive());
+		reset.setStyleName(style.nonActive());
 		
 		//activate the button
 		button.setStyleName(style.active());
@@ -100,6 +105,7 @@ public class AccountDetails extends Composite implements Observable, Observer{
 		enableTransactions.setText(constants.transactions());
 		enableTans.setText(constants.tans());
 		delete.setText(constants.delete());
+		reset.setText(constants.reset());
 		clickOnTransfer(null);
 	
 		
@@ -161,6 +167,27 @@ public class AccountDetails extends Composite implements Observable, Observer{
 
 	}
 			
+	@UiHandler("reset") 
+	public void clickOnReset(ClickEvent e) {
+		if (Window.confirm(constants.resetConfirmation())) {
+			AdminServiceAsync adminService = GWT.create(AdminService.class);
+			adminService.resetInternalAccount(account.getAccountNr(), new AsyncCallback<String>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log(caught.toString());		
+					
+				}
+
+				@Override
+				public void onSuccess(String result) {
+					notifyObservers(ACCOUNT_RESET, null);
+					
+				}
+			});
+		}
+	}
+	
 	@UiHandler("delete")
 	public void clickOnDelete(ClickEvent e) {
 		if (Window.confirm(constants.deleteAccountConfirm())) {

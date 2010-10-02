@@ -272,6 +272,10 @@ public class Admin extends Composite implements EntryPoint,Observer {
 				showAccounts();
 				return;
 			}
+			if ((Integer)event == AccountDetails.ACCOUNT_RESET) {				
+				showAccounts();
+				return;
+			}
 		}
 		else if (source instanceof AdminExternalBanks) {
 			if ((Integer)event == AdminExternalBanks.ADD_BANK) {
