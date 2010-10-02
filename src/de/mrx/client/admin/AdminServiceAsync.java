@@ -38,6 +38,8 @@ public interface AdminServiceAsync extends BankServiceAsync {
 	void deleteBank(String blz, AsyncCallback<String> callback);
 
 	void deleteInternalAccount(String accountNr, AsyncCallback<String> callback);
+	
+	
 
 	void searchInternalAccounts(String owner, String accountnr,
 			AsyncCallback<List<AccountDTO>> callback);
@@ -51,6 +53,8 @@ public interface AdminServiceAsync extends BankServiceAsync {
 
 	void getTransfers(String accountNr, String blz,
 			AsyncCallback<List<MoneyTransferDTO>> callback);
+
+	void resetInternalAccount(String accountNr, AsyncCallback<String> callback);
 
 
 
