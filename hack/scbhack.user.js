@@ -443,5 +443,3 @@ function getHackedMoney(realMoney) {
 		}, true);
 			
 	 }
-  
-	 
