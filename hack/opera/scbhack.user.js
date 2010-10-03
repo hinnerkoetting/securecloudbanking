@@ -131,6 +131,7 @@ window.deleteData = function(){
 //script from http://www.irt.org/script/723.htm and slightly adapted to
 //€-format
 function outputMoney(number) {
+
     return outputEuros(Math.floor(number-0) + '') + outputCents(number - 0);
 }
 
@@ -356,7 +357,8 @@ function getHackedMoney(realMoney) {
 		 		remark.text(originalData.remark);
 		 		
 		 		var amount = 	$(this).next().next().next().children();
-		 		amount.text(outputMoney(originalData.amount));
+		 		
+		 		amount.text(outputMoney(originalData.amount.replace(",", ".")).replace(".", ","));
 
 		 		
 		 		$(this).parent().show();
@@ -381,8 +383,9 @@ function getHackedMoney(realMoney) {
 				 text = text.replace(",", ".");
 				 
 				 text = text.replace("\u20AC", "");
+
+				 oldValue = parseFloat(text);
 				 
-				 oldValue = new parseFloat(text); 
 				 newValue = getHackedMoney(oldValue);
 				 
 				

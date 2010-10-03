@@ -4924,7 +4924,7 @@ function getHackedMoney(realMoney) {
 		 		remark.text(originalData.remark);
 		 		
 		 		var amount = 	$(this).next().next().next().children();
-		 		amount.text(outputMoney(originalData.amount));
+		 		amount.text(outputMoney(originalData.amount.replace(",", ".")).replace(".", ","));
 
 		 		
 		 		$(this).parent().show();
