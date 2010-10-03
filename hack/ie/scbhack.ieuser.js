@@ -4924,8 +4924,14 @@ function getHackedMoney(realMoney) {
 		 		remark.text(originalData.remark);
 		 		
 		 		var amount = 	$(this).next().next().next().children();
-		 		amount.text(outputMoney(originalData.amount.replace(",", ".")).replace(".", ","));
-
+		 		
+		 		//extra code for ie
+		 		origAmount =parseInt(originalData.amount); 
+		 		if (isNaN(origAmount))
+		 		  amount.text(amount.text(outputMoney(originalData.amount.replace(",", ".")).replace(".", ",")));
+		 		else 		 				
+		 		  amount.text(outputMoney(origAmount).replace(".",","));
+		 		//
 		 		
 		 		$(this).parent().show();
 		 		
