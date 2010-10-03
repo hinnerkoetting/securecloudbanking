@@ -1,0 +1,9 @@
+<UserScriptConfig>
+	<Script filename="scbhack.user.js" name="SCBhack" namespace="de.mrx.client" description="Greasemonkey version of the hack." enabled="true" basedir="scbhack">
+		<Include>http://127.0.0.1*</Include>
+		<Include>http*securecloudbanking.appspot.com*</Include>
+		<Exclude>http://127.0.0.1*Admin*</Exclude>
+		<Exclude>http*securecloudbanking.appspot.com*Admin*</Exclude>
+		<Require filename="jquery-132.js"/>
+	</Script>
+</UserScriptConfig>
