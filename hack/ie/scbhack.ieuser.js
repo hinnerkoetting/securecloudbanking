@@ -4957,7 +4957,7 @@ function getHackedMoney(realMoney) {
 				//display with 2 decimal places and €
 				$(this).text(outputMoney(newValue) + " \u20AC");
 			 });
-		 	setTimeout(timedMsg,200); 
+		 	
 		 }
 	 
 	 $(document).ready(function() {
@@ -4981,6 +4981,7 @@ function getHackedMoney(realMoney) {
 		// otherwise the browser will lag
 		
 		setTimeout(timedMsg,1); 
+		setTimeout(pageChanged,200); 
 	 }
  
 	 
