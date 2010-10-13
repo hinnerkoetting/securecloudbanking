@@ -48,7 +48,16 @@
 	</servlet-mapping>
 
 	
+	<servlet-mapping>
+	  <servlet-name>remoteLoggerServiceImpl</servlet-name>
+	  <url-pattern>/secureBySCB/gwt-log</url-pattern>
+	</servlet-mapping>
 
+	<servlet-mapping>
+		<servlet-name>bankingServlet</servlet-name>
+		<url-pattern>/secureBySCB/banking</url-pattern>
+	</servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>bankingServlet</servlet-name>
 		<url-pattern>/scb/banking</url-pattern>
