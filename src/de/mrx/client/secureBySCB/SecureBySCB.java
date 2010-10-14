@@ -26,6 +26,7 @@ import de.mrx.client.Observer;
 import de.mrx.client.SCBConstants;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.SCBMenu;
+import de.mrx.client.TransactionDTO;
 import de.mrx.client.secureBySCB.forms.ConfirmPayment;
 
 
@@ -56,6 +57,9 @@ public class SecureBySCB extends Composite implements EntryPoint,Observer{
 	String currentLanguage = "de";
 	
 	SCBConstants constants = GWT.create(SCBConstants.class);
+	
+	
+
 	
 	@Override
 	public void update(Observable source, Object event, Object parameter) {
@@ -117,12 +121,12 @@ public class SecureBySCB extends Composite implements EntryPoint,Observer{
 							signOut.setText(constants.signOut());
 							signIn.setVisible(false);
 							signOut.setVisible(true);
-							
+							createTransaction();
 							
 							
 						} else {
 							Log.info("User is not yet logged in with his Google account");
-					
+							
 							// Assemble login panel.
 							signIn.setHref(identityInfo.getLoginUrl());
 							signIn.setText(constants.signIn());
@@ -159,8 +163,13 @@ public class SecureBySCB extends Composite implements EntryPoint,Observer{
 		Window.open(reloadURL, "_self", null);
 	}
 
+	private void deleteOldTransactions() {
+		//TODO
+	}
+	
 	@Override
 	public void onModuleLoad() {
+		 deleteOldTransactions();
 		RootLayoutPanel.get().add(uiBinder.createAndBindUi(this));
 		Map<String, List<String>> p = Window.Location.getParameterMap();
 		Collection<List<String>> c = p.values();
@@ -174,9 +183,50 @@ public class SecureBySCB extends Composite implements EntryPoint,Observer{
 		scbMenu = new SCBMenu();
 		scbMenu.addObserver(this);
 		topMenuPanel.add(scbMenu);
-		content.setWidget(new ConfirmPayment());
+
 		checkGoogleStatus();
-		
+		setContent(new Label("Please login"));
+	
 	}
 
+	public void createTransaction() {
+
+		SecuryBySCBServiceAsync serv = GWT.create(SecuryBySCBService.class);
+		serv.addTransaction("myShopTest", 60.0, new AsyncCallback<Long>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log(caught.toString());
+				
+			}
+
+			@Override
+			public void onSuccess(Long result) {
+
+				confirmID(result);
+				
+			}
+		});
+	}
+	//prototype version
+	public void confirmID(Long id) {
+		SecuryBySCBServiceAsync serv = GWT.create(SecuryBySCBService.class);
+		final Long fid = id;
+		serv.getTransactionData(id, new AsyncCallback<TransactionDTO>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log(caught.toString());
+				
+			}
+
+			@Override
+			public void onSuccess(TransactionDTO result) {
+				content.setWidget(new ConfirmPayment(result.getShopName(), result.getAmount(), fid));
+
+				
+			}
+		});
+	}
+	
 }

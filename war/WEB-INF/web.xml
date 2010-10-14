@@ -29,6 +29,11 @@
 		<servlet-class>com.allen_sauer.gwt.log.server.RemoteLoggerServiceImpl</servlet-class>
 	</servlet>
 
+	<servlet>
+		<servlet-name>securyBySCB</servlet-name>
+		<servlet-class>de.mrx.server.secureBySCB.SecuryBySCBImpl</servlet-class>
+	</servlet>
+	
 	<!--admin -->
 	<servlet-mapping>
 		<servlet-name>remoteLoggerServiceImpl</servlet-name>
@@ -53,6 +58,13 @@
 	  <url-pattern>/secureBySCB/gwt-log</url-pattern>
 	</servlet-mapping>
 
+	
+	
+	<servlet-mapping>
+		<servlet-name>securyBySCB</servlet-name>
+		<url-pattern>/secureBySCB/securybyscb</url-pattern>
+	</servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>bankingServlet</servlet-name>
 		<url-pattern>/secureBySCB/banking</url-pattern>
