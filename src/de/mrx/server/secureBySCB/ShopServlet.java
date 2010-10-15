@@ -50,7 +50,7 @@ public class ShopServlet extends HttpServlet {
 					return;
 				}
 				
-				resp.getWriter().println("SUCCESS: Added transaction for shop: " + shopName + "/accountNr: " + accountNr + "/amount:" + amount+ " RESULT::::" + result);
+				resp.getWriter().println("SUCCESS: Added transaction for shop: " + shopName + "/accountNr: " + accountNr + "/amount:" + amount+ " RESULT::::" + result + "::::");
 				
 				return;
 			}
