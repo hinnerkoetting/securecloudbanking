@@ -1,4 +1,4 @@
-package de.mrx.client.admin.forms;
+package de.mrx.client.admin.forms.internalAccounts;
 
 import java.util.List;
 

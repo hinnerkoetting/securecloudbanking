@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+
+
 
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -152,5 +156,7 @@ BankService {
 		
 		return identityInfo;
 	}
+	
+	
 	
 }

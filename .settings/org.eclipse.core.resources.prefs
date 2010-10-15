@@ -1,4 +1,5 @@
-#Mon Aug 16 12:35:11 CEST 2010
+#Fri Oct 15 11:48:37 CEST 2010
 eclipse.preferences.version=1
-encoding//src/de/mrx/client/SCBConstants_de.properties=UTF-8
 encoding//src/com/google/gwt/i18n/client/LocalizableResource_de.properties=UTF-8
+encoding//src/de/mrx/client/SCBConstants_de.properties=UTF-8
+encoding//src/de/mrx/client/admin/AdminConstants_de.properties=UTF-8

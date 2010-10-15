@@ -26,7 +26,7 @@ import de.mrx.client.Observer;
 import de.mrx.client.SCBConstants;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.SCBMenu;
-import de.mrx.client.TransactionDTO;
+import de.mrx.client.Transaction3SDTO;
 import de.mrx.client.secureBySCB.forms.ConfirmPayment;
 
 
@@ -186,33 +186,35 @@ public class SecureBySCB extends Composite implements EntryPoint,Observer{
 
 		checkGoogleStatus();
 		setContent(new Label("Please login"));
+		
+		confirmID(1693);
 	
 	}
 
 	public void createTransaction() {
 
-		SecuryBySCBServiceAsync serv = GWT.create(SecuryBySCBService.class);
-		serv.addTransaction("myShopTest", 60.0, new AsyncCallback<Long>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				GWT.log(caught.toString());
-				
-			}
-
-			@Override
-			public void onSuccess(Long result) {
-
-				confirmID(result);
-				
-			}
-		});
+//		SecuryBySCBServiceAsync serv = GWT.create(SecuryBySCBService.class);
+//		serv.addTransaction("myShopTest", 60.0, new AsyncCallback<Long>() {
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				GWT.log(caught.toString());
+//				
+//			}
+//
+//			@Override
+//			public void onSuccess(Long result) {
+//
+//				confirmID(result);
+//				
+//			}
+//		});
 	}
 	//prototype version
-	public void confirmID(Long id) {
+	public void confirmID(Integer id) {
 		SecuryBySCBServiceAsync serv = GWT.create(SecuryBySCBService.class);
-		final Long fid = id;
-		serv.getTransactionData(id, new AsyncCallback<TransactionDTO>() {
+		final Integer fid = id;
+		serv.getTransactionData(id, new AsyncCallback<Transaction3SDTO>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -221,7 +223,7 @@ public class SecureBySCB extends Composite implements EntryPoint,Observer{
 			}
 
 			@Override
-			public void onSuccess(TransactionDTO result) {
+			public void onSuccess(Transaction3SDTO result) {
 				content.setWidget(new ConfirmPayment(result.getShopName(), result.getAmount(), fid));
 
 				

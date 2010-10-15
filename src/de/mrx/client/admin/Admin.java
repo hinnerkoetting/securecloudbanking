@@ -32,15 +32,21 @@ import de.mrx.client.Observable;
 import de.mrx.client.Observer;
 import de.mrx.client.SCBIdentityDTO;
 import de.mrx.client.SCBMenu;
-import de.mrx.client.admin.forms.AccountDetails;
-import de.mrx.client.admin.forms.AccountOverview;
-import de.mrx.client.admin.forms.AdminExternalBanks;
-import de.mrx.client.admin.forms.AdminTransfer;
+import de.mrx.client.ShopDTO;
 import de.mrx.client.admin.forms.AdminWelcome;
 import de.mrx.client.admin.forms.Adminmenu;
-import de.mrx.client.admin.forms.BankDetails;
-import de.mrx.client.admin.forms.EditBank;
-import de.mrx.client.admin.forms.NewBank;
+import de.mrx.client.admin.forms.external.AdminExternalBanks;
+import de.mrx.client.admin.forms.external.BankDetails;
+import de.mrx.client.admin.forms.external.EditBank;
+import de.mrx.client.admin.forms.external.NewBank;
+import de.mrx.client.admin.forms.internalAccounts.AccountDetails;
+import de.mrx.client.admin.forms.internalAccounts.AccountOverview;
+import de.mrx.client.admin.forms.internalAccounts.AdminTransfer;
+import de.mrx.client.admin.forms.shop.EditShop;
+import de.mrx.client.admin.forms.shop.NewShop;
+import de.mrx.client.admin.forms.shop.ShopDetails;
+import de.mrx.client.admin.forms.shop.ShopOverview;
+
 
 
 public class Admin extends Composite implements EntryPoint,Observer {
@@ -132,6 +138,18 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		setContent(externalBanks);
 	}
 	
+	
+	private void show3S() {
+		ShopOverview s = new ShopOverview();
+		s.addObserver(this);
+		setContent(s);
+	}
+	
+	private void showAddShop() {
+		NewShop n = new NewShop();
+		n.addObserver(this);
+		setContent(n);
+	}
 	
 	/**
 	 * show information about all accounts
@@ -252,6 +270,12 @@ public class Admin extends Composite implements EntryPoint,Observer {
 		setContent(newBank);
 	}
 	
+	private void showShopDetails(ShopDTO shop) {
+		ShopDetails d = new ShopDetails(shop.getName(), shop.getAccountNr(), shop.getBlz(), shop.getUrl());
+		d.addObserver(this);
+		setContent(d);
+	}
+	
 	@Override
 	public void update(Observable source, Object event, Object parameter) {
 		if (source instanceof SCBMenu) {
@@ -302,7 +326,8 @@ public class Admin extends Composite implements EntryPoint,Observer {
 			if ((Integer)event == BankDetails.DELETE_BANK_SUCCEED) {
 				showExternalBanks();
 				return;
-			}
+			} 
+			 
 		}
 		else if (source instanceof Adminmenu) {
 			if ((Integer)event == Adminmenu.SHOW_ACCOUNTS) {
@@ -312,6 +337,34 @@ public class Admin extends Composite implements EntryPoint,Observer {
 			else if ((Integer)event == Adminmenu.SHOW_EXTERNAL_BANKS) {
 				showExternalBanks();
 				return;
+			}
+			else if ((Integer)event == Adminmenu.SHOW_3S) {
+				show3S();
+				return;
+			}
+		}
+		else if (source instanceof ShopOverview) {
+			if ((Integer)event == ShopOverview.ADD_SHOP) {
+				showAddShop();
+				return;
+			}
+			else if ((Integer)event == ShopOverview.PROPERTIES_SHOP) {
+				showShopDetails((ShopDTO)parameter);
+				return;
+			}
+		}
+		else if (source instanceof NewShop) {
+			if ((Integer)event == NewShop.ADD_SHOP_SUCCEEDED) {
+				show3S();
+				return;
+				
+			}
+		}
+		else if (source instanceof ShopDetails) {
+			if ((Integer)event == EditShop.EDIT_SHOP_SUCCEED) {
+				show3S();
+				return;
+				
 			}
 		}
 		Log.info("missing event" + source.getClass() + " - " + event.toString());

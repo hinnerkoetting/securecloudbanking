@@ -1,0 +1,26 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style src="../../../SCB.css" type='de.mrx.client.admin.forms.internalAccounts.AccountDetails.MyStyle'>
+		.active {
+			color:blue
+		}
+		.nonActive {
+			color:black
+		}
+	</ui:style>
+	<g:HTMLPanel>
+		<g:Label ui:field="title" styleName="{style.title}" />
+		<g:Label ui:field="subTitle" styleName="{style.subtitle}" />
+		<g:HorizontalPanel>
+			<g:Button ui:field="enableTransfer"/>
+			<g:Button ui:field="enableTransactions"/>
+			<g:Button ui:field="enableTans"/>
+			<g:Button ui:field="reset"/>
+			<g:Button ui:field="delete"/>
+		</g:HorizontalPanel>
+		<g:SimplePanel ui:field="content"/>
+		
+		
+	</g:HTMLPanel>
+</ui:UiBinder> 

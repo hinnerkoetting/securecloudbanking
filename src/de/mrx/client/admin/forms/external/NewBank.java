@@ -1,4 +1,4 @@
-package de.mrx.client.admin.forms;
+package de.mrx.client.admin.forms.external;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -22,12 +23,11 @@ import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
-public class EditBank extends Composite implements Observable {
+public class NewBank extends Composite implements Observable {
 
-	private static EditBankUiBinder uiBinder = GWT
-			.create(EditBankUiBinder.class);
+	private static NewBankUiBinder uiBinder = GWT.create(NewBankUiBinder.class);
 
-	interface EditBankUiBinder extends UiBinder<Widget, EditBank> {
+	interface NewBankUiBinder extends UiBinder<Widget, NewBank> {
 	}
 
 	@UiField
@@ -43,30 +43,26 @@ public class EditBank extends Composite implements Observable {
 	TextBox blz;
 
 	@UiField
+	Label title;
+	
+	@UiField
 	Button submit;
 	
-	
-	String oldBLZ;
-	String oldName;
-	
-	public static final int EDIT_BANK_SUCCEED = 23455;
+	public static final int ADD_BANK_SUCCEEDED = 5223;
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
 	
 	List<Observer> observer;
 	
-	public EditBank(String oldBLZ, String oldName) {
+	
+	public NewBank() {
 		observer = new ArrayList<Observer>();
 
 		initWidget(uiBinder.createAndBindUi(this));
-		
+		title.setText(constants.addNewBank());
 		descName.setText(constants.name());
 		descBlz.setText(constants.blz());
 		submit.setText(constants.submit());
-		this.oldBLZ = oldBLZ;
-		this.oldName = oldName;
-		name.setText(oldName);
-		blz.setText(oldBLZ);
 	}
 	
 	@UiHandler("submit")
@@ -75,12 +71,13 @@ public class EditBank extends Composite implements Observable {
 		newBank.setBlz(blz.getText());
 		newBank.setName(name.getText());
 		AdminServiceAsync adminService = GWT.create(AdminService.class);
-		adminService.editBankDetails(oldName, oldBLZ, name.getText(), blz.getText(), new AsyncCallback<String>() {
+		adminService.addBank(newBank, new AsyncCallback<String>() {
 			
 			@Override
 			public void onSuccess(String result) {
-				GWT.log(result);
-				notifyObservers(EDIT_BANK_SUCCEED, null);
+				Window.alert(result);
+				notifyObservers(ADD_BANK_SUCCEEDED, null);			
+				
 			}
 			
 			@Override

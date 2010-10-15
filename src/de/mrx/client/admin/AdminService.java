@@ -8,7 +8,9 @@ import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.BankService;
 import de.mrx.client.MoneyTransferDTO;
+import de.mrx.client.ShopDTO;
 import de.mrx.client.TansDTO;
+import de.mrx.client.Transaction3SDTO;
 
 
 /**
@@ -53,7 +55,17 @@ public interface AdminService extends BankService {
 	
 	public String editBankDetails(String oldName, String oldBLZ, String newName, String newBLZ);
 	
+	public String editShopDetails(String oldName, String oldURL, String newName, String newURL);
+	
 	public TansDTO getTans(String accountNr);
 	
 	public List<MoneyTransferDTO> getTransfers(String accountNr, String blz);
+	
+	public Boolean addShop(String name, String url);
+	
+	public List<ShopDTO> getAllShops();
+	
+	public List<Transaction3SDTO> getAllOpenTransactions(String shopName);
+	
+	public Boolean deleteOpenTransactions();
 }

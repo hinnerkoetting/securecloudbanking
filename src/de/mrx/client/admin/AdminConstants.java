@@ -144,4 +144,20 @@ public interface AdminConstants extends Constants{
 	
 	@DefaultStringValue("Reset")
 	String reset();
+	
+	@DefaultStringValue("Secured by SCB")
+	String securedBySCB();
+	
+	@DefaultStringValue("Add Shop")
+	String addShop();
+	
+	@DefaultStringValue("Open Transactions")
+	String openTransactions();
+	
+	@DefaultStringValue("Date")
+	String date();
+	
+	@DefaultStringValue("Delete transactions")
+	String deleteTransactions();
+	
 }

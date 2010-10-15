@@ -15,7 +15,7 @@ import javax.jdo.Query;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
-import de.mrx.client.TransactionDTO;
+import de.mrx.client.Transaction3SDTO;
 import de.mrx.client.secureBySCB.SecuryBySCBService;
 import de.mrx.server.BankServiceImpl;
 import de.mrx.server.GeneralAccount;
@@ -23,95 +23,97 @@ import de.mrx.server.InternalSCBAccount;
 import de.mrx.server.MoneyTransfer;
 import de.mrx.server.PMF;
 import de.mrx.server.SCBIdentity;
+import de.mrx.server.Shop;
 
 
 public class SecuryBySCBImpl extends BankServiceImpl implements SecuryBySCBService{
 
 	Logger log = Logger.getLogger(SecuryBySCBImpl.class.getName());
-	@Override
-	public Long addTransaction(String shop, Double amount) {
-				log.log(Level.INFO, "test");
-		
-		Transaction t = new Transaction(shop, amount);
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		deleteAllTransactions(pm);
-		pm.makePersistent(t);
-		
-		//return id for confirmation
-		return t.getId();
-		
-	}
 	
-	private Transaction getTransaction(PersistenceManager pm, Long id) {
+	
+	
+	
+	private Transaction3S getTransaction(PersistenceManager pm, Integer id) {
 		
-		Extent<Transaction> extent = pm.getExtent(Transaction.class);
+		Extent<Transaction3S> extent = pm.getExtent(Transaction3S.class);
 		Query query = pm.newQuery(extent);
 	
-		List<Transaction> transactions = (List<Transaction>)query.execute();
+		List<Transaction3S> transactions = (List<Transaction3S>)query.execute();
 		
- 		Transaction result = null;
 
- 		for (Transaction trans: transactions) {
+
+ 		for (Transaction3S trans: transactions) {
 			
- 			return trans;
-//			if (trans.getId().equals(id)) {
-//				result = trans;
-//				break;
-//			}
+
+			if (id.intValue() == trans.getID()) {
+				return trans;
+			}
 		}
 		
  		
-		return result;
+		return null;
 	}
 	
 	private void deleteAllTransactions(PersistenceManager pm) {
-		Query query = pm.newQuery(Transaction.class);
+		Query query = pm.newQuery(Transaction3S.class);
 		
 		query.deletePersistentAll(query);
 		
 	}
 	@Override
-	public Boolean confirmTransaction(Long id) {
+	public Boolean confirmTransaction(Integer id) {
+		log.setLevel(Level.INFO);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Transaction trans = getTransaction(pm, id);
-		if (trans == null)
-			return false;
-		//we know that client that requests this owns this transaction
-		// set his accountno to this transaction
-		UserService userService = UserServiceFactory.getUserService();
-		SCBIdentity identity = SCBIdentity.getIdentity(pm, userService.getCurrentUser());
-		InternalSCBAccount account = InternalSCBAccount.getOwnByEmail(pm, identity.getEmail());
-		
-		
-//		GeneralAccount recAcc = GeneralAccount.getAccount(pm, "65", "999666999");
-//		MoneyTransfer transfer = new MoneyTransfer(pm, account,
-//				recAcc, trans.getAmount(),recAcc.getOwner(),"test");
-//		transferMoney(pm, account, recAcc, transfer,  trans.getAmount(), "test");
-		 URL url;
 		try {
-			url = new URL("http://www.stud.uni-karlsruhe.de/~urbhx/phpshop/confirm_transfer.php?id=" + trans.getId());
-			URLConnection conn = url.openConnection();
-			conn.connect();
-			conn.getContent();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			Transaction3S trans = getTransaction(pm, id);
+			
+			if (trans == null)
+				return false;
+			Shop shop = Shop.getShop(trans.getShopName());
+			if (shop == null)
+				return false;
+			
+			UserService userService = UserServiceFactory.getUserService();
+			SCBIdentity identity = SCBIdentity.getIdentity(pm, userService.getCurrentUser());
+			InternalSCBAccount account = InternalSCBAccount.getOwnByEmail(pm, identity.getEmail());
+			assert(account.getAccountNr().equals(trans.accountNo));
+			
+			GeneralAccount recAcc = GeneralAccount.getAccount(pm, "65", "999666999");
+			MoneyTransfer transfer = new MoneyTransfer(pm, account,
+					recAcc, trans.getAmount(),recAcc.getOwner(),"test");
+			transferMoney(pm, account, recAcc, transfer,  trans.getAmount(), "test");
+			 URL url;
+			try {
+				
+				url = new URL(shop.getUrl() + "/confirm_transfer.php?id=" + trans.getID());
+				log.log(Level.INFO, "Calling URL: " + url);
+				URLConnection conn = url.openConnection();
+				conn.connect();
+				pm.deletePersistent(trans);
+				log.log(Level.INFO, conn.getContent().toString());
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			
+	
+			return true;
 		}
-		
-		
-		pm.deletePersistent(trans);
-		return true;
+		finally {
+			pm.close();
+		}
 	}
 	
 	@Override
 	
-	public TransactionDTO getTransactionData(Long id) {
+	public Transaction3SDTO getTransactionData(Integer id) {
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
-		Transaction result = getTransaction(pm, id);
+		Transaction3S result = getTransaction(pm, id);
 		if (result == null)
 			return null;
 		

@@ -1,4 +1,4 @@
-package de.mrx.client.admin.forms;
+package de.mrx.client.admin.forms.shop;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,31 +16,32 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-import de.mrx.client.BankDTO;
 import de.mrx.client.Observable;
 import de.mrx.client.Observer;
 import de.mrx.client.admin.AdminConstants;
 import de.mrx.client.admin.AdminService;
 import de.mrx.client.admin.AdminServiceAsync;
 
-public class NewBank extends Composite implements Observable {
+public class NewShop extends Composite implements Observable {
 
-	private static NewBankUiBinder uiBinder = GWT.create(NewBankUiBinder.class);
+	private static NewShopUiBinder uiBinder = GWT.create(NewShopUiBinder.class);
 
-	interface NewBankUiBinder extends UiBinder<Widget, NewBank> {
+	interface NewShopUiBinder extends UiBinder<Widget, NewShop> {
 	}
 
+	
+	private List<Observer> observers = new ArrayList<Observer>();
 	@UiField
 	Label descName;
 	
 	@UiField
-	Label descBlz;
+	Label descURL;
 	
 	@UiField
 	TextBox name;
 	
 	@UiField
-	TextBox blz;
+	TextBox url;
 
 	@UiField
 	Label title;
@@ -48,58 +49,62 @@ public class NewBank extends Composite implements Observable {
 	@UiField
 	Button submit;
 	
-	public static final int ADD_BANK_SUCCEEDED = 5223;
+	public static final int ADD_SHOP_SUCCEEDED = 9823;
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
 	
-	List<Observer> observer;
+
 	
 	
-	public NewBank() {
-		observer = new ArrayList<Observer>();
+	public NewShop() {
+
 
 		initWidget(uiBinder.createAndBindUi(this));
 		title.setText(constants.addNewBank());
 		descName.setText(constants.name());
-		descBlz.setText(constants.blz());
+		descURL.setText("URL");
 		submit.setText(constants.submit());
 	}
 	
 	@UiHandler("submit")
 	public void onClickSubmit(ClickEvent e) {
-		BankDTO newBank = new BankDTO();
-		newBank.setBlz(blz.getText());
-		newBank.setName(name.getText());
-		AdminServiceAsync adminService = GWT.create(AdminService.class);
-		adminService.addBank(newBank, new AsyncCallback<String>() {
+		AdminServiceAsync service = GWT.create(AdminService.class);
+		service.addShop(name.getText(), url.getText(), new AsyncCallback<Boolean>() {
 			
 			@Override
-			public void onSuccess(String result) {
-				Window.alert(result);
-				notifyObservers(ADD_BANK_SUCCEEDED, null);			
+			public void onSuccess(Boolean result) {
+				if (result.equals(Boolean.TRUE)) {
+					notifyObservers(ADD_SHOP_SUCCEEDED, null);
+				}
+				else {
+					Window.alert("Failed");
+				}
 				
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				GWT.log(caught.toString());				
+				GWT.log(caught.toString());
+				
 			}
 		});
-			
+		
+		
 	}
-
+	
 	@Override
 	public void addObserver(Observer o) {
-		observer.add(o);
+		observers.add(o);
 		
 	}
 
 	@Override
 	public void notifyObservers(Integer eventType, Object parameter) {
-		for (Observer o: observer) {
+		for (Observer o: observers) {
 			o.update(this, eventType, parameter);
 		}
 		
 	}
+
 
 }

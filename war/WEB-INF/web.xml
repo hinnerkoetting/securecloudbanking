@@ -34,7 +34,17 @@
 		<servlet-class>de.mrx.server.secureBySCB.SecuryBySCBImpl</servlet-class>
 	</servlet>
 	
+	<servlet>
+		<servlet-name>shopServlet</servlet-name>
+		<servlet-class>de.mrx.server.secureBySCB.ShopServlet</servlet-class>
+	</servlet>
+	
 	<!--admin -->
+	<servlet-mapping>
+		<servlet-name>shopServlet</servlet-name>
+		<url-pattern>/shopServlet</url-pattern>
+	</servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>remoteLoggerServiceImpl</servlet-name>
 		<url-pattern>/de.mrx.Admin/gwt-log</url-pattern>

@@ -40,6 +40,8 @@ public class Adminmenu extends Composite implements Observable {
 	@UiField
 	Button generateData;
 	
+	@UiField
+	Button securedBySCB;
 	
 	AdminConstants constants = GWT.create(AdminConstants.class);
 	
@@ -47,6 +49,7 @@ public class Adminmenu extends Composite implements Observable {
 	
 	public static final int SHOW_ACCOUNTS = 50;
 	public static final int SHOW_EXTERNAL_BANKS = 51;
+	public static final int SHOW_3S				= 52;
 	
 	public Adminmenu() {
 		observer = new ArrayList<Observer>();
@@ -57,6 +60,7 @@ public class Adminmenu extends Composite implements Observable {
 		externalBanks.setText(constants.externalBanks());
 		deleteData.setText(constants.deleteData());
 		generateData.setText(constants.generateData());
+		securedBySCB.setText(constants.securedBySCB());
 	}
 
 	@UiHandler("accounts")
@@ -68,6 +72,11 @@ public class Adminmenu extends Composite implements Observable {
 	@UiHandler("externalBanks")
 	void onClickExternalBanks(ClickEvent e) {
 		notifyObservers(SHOW_EXTERNAL_BANKS, null);
+	}
+	
+	@UiHandler("securedBySCB")
+	void onClickSecuredBySCB(ClickEvent e) {
+		notifyObservers(SHOW_3S, null);
 	}
 	
 	@UiHandler("generateData")
