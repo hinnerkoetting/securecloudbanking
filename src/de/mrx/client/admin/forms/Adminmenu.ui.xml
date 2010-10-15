@@ -12,8 +12,11 @@
 		<g:VerticalPanel>
 			<g:Button styleName="{style.menuButton}" ui:field="accounts" />
 			<g:Button styleName="{style.menuButton}" ui:field="externalBanks" />
+			<g:Button styleName="{style.menuButton}" ui:field="securedBySCB"/>
+			<g:HTMLPanel><br/><hr/><br/></g:HTMLPanel>
 			<g:Button styleName="{style.menuButton}" ui:field="deleteData"/>
 			<g:Button styleName="{style.menuButton}" ui:field="generateData"/>
+			
 		</g:VerticalPanel>
 		
 	</g:HTMLPanel>

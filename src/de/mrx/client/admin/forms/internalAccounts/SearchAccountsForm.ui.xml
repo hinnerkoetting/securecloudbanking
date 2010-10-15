@@ -4,7 +4,7 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
-	<ui:style src="../../SCB.css" type='de.mrx.client.admin.forms.SearchAccountsForm.MyStyle'>
+	<ui:style src="../../../SCB.css" type='de.mrx.client.admin.forms.internalAccounts.SearchAccountsForm.MyStyle'>
 		.searchDiv {
 			background-color:#DDDDDD;
 			position:relative;			

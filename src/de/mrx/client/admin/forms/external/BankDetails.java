@@ -1,4 +1,4 @@
-package de.mrx.client.admin.forms;
+package de.mrx.client.admin.forms.external;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,6 +198,7 @@ public class BankDetails extends Composite implements Observer, Observable {
 						
 					}
 				});
+				return;
 			}
 		}
 		notifyObservers((Integer)event, parameter);

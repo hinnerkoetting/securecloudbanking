@@ -28,8 +28,8 @@ public class ConfirmPayment extends Composite {
 	@UiField
 	TextBox amount;
 
-	Long id;
-	public ConfirmPayment(String shop, Double amount, Long id) {
+	Integer id;
+	public ConfirmPayment(String shop, Double amount, Integer id) {
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		

@@ -5,15 +5,15 @@ package de.mrx.client.secureBySCB;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import de.mrx.client.BankService;
-import de.mrx.client.TransactionDTO;
+import de.mrx.client.Transaction3SDTO;
 
 @RemoteServiceRelativePath("securybyscb")
 public interface SecuryBySCBService extends BankService {
-	public Long addTransaction(String shop, Double amount);
-	
-	public Boolean confirmTransaction(Long id);
 
-	public TransactionDTO getTransactionData(Long id);
+	
+	public Boolean confirmTransaction(Integer id);
+
+	public Transaction3SDTO getTransactionData(Integer id);
 	
 
 }

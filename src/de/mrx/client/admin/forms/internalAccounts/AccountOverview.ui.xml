@@ -2,7 +2,7 @@
 "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<ui:style src="../../SCB.css">
+	<ui:style src="../../../SCB.css">
 		.searchDiv {
 			background-color:#DDDDDD;
 			position:relative;			

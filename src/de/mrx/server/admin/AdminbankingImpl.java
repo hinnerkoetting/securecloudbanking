@@ -1,5 +1,6 @@
 package de.mrx.server.admin;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -16,7 +17,9 @@ import com.google.appengine.api.users.UserServiceFactory;
 import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.MoneyTransferDTO;
+import de.mrx.client.ShopDTO;
 import de.mrx.client.TansDTO;
+import de.mrx.client.Transaction3SDTO;
 import de.mrx.client.admin.AdminService;
 import de.mrx.server.AllBanks;
 import de.mrx.server.Bank;
@@ -29,7 +32,9 @@ import de.mrx.server.MoneyTransferPending;
 import de.mrx.server.NumberFormater;
 import de.mrx.server.PMF;
 import de.mrx.server.SCBIdentity;
+import de.mrx.server.Shop;
 import de.mrx.server.TANList;
+import de.mrx.server.secureBySCB.Transaction3S;
 import de.mrx.shared.SCBData;
 
 public class AdminbankingImpl extends BankServiceImpl implements
@@ -518,6 +523,108 @@ AdminService {
 			account.setPendingTransaction(null);
 			account.setBalance(5.0);
 			return "Success.";
+		}
+		finally {
+			pm.close();
+		}
+	}
+	@Override
+	public Boolean addShop(String name, String url) {
+		if (!checkAdmin())
+			return null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+				
+			
+			//generate accountnr
+			Random rd = new Random();
+			int accountNr = rd.nextInt(100000) + 1000;
+	
+			DecimalFormat format = new DecimalFormat("##");
+			format.setMinimumIntegerDigits(6);
+			
+			Bank scbBank = Bank.getByBLZ(pm, SCBData.SCB_PLZ);
+			Shop shop = new Shop(name, format.format(accountNr), url, scbBank);
+			pm.makePersistent(shop);
+			return true;
+		}
+		finally {
+			pm.close();
+		}
+	}
+	@Override
+	public List<ShopDTO> getAllShops() {
+		if (!checkAdmin())
+			return null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Extent<Shop> extent = pm.getExtent(Shop.class);
+			Query query = pm.newQuery(extent);
+			List<Shop> shops = (List<Shop>)query.execute();
+			
+			List<ShopDTO> result = new ArrayList<ShopDTO>();
+			for (Shop s: shops) {
+				result.add(s.getDTO());
+			}
+			return result;
+		}
+		finally {
+			pm.close();
+		}
+	}
+	@Override
+	public List<Transaction3SDTO> getAllOpenTransactions(String shopName) {
+		if (!checkAdmin())
+			return null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Extent<Transaction3S> extent = pm.getExtent(Transaction3S.class);
+			Query query = pm.newQuery(extent);
+			query.setFilter("shopName == param");
+			query.declareParameters("String param");
+			List<Transaction3S> transactions = (List<Transaction3S>)query.execute(shopName);
+			List<Transaction3SDTO> result = new ArrayList<Transaction3SDTO>();
+			for (Transaction3S t: transactions) {
+				result.add(t.getDTO());
+			}
+			return result;
+		}
+		finally {
+			pm.close();
+		}
+		
+	}
+	@Override
+	public Boolean deleteOpenTransactions() {
+		if (!checkAdmin())
+			return null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			delete(pm, Transaction3S.class);
+			return true;
+		}
+		finally {
+			pm.close();
+		}
+	}
+	@Override
+	public String editShopDetails(String oldName, String oldURL,
+			String newName, String newURL) {
+		if (!checkAdmin())
+			return null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Extent<Shop> extent = pm.getExtent(Shop.class);
+			Query query = pm.newQuery(extent);
+			query.setFilter("url == param1 && name == param2");
+			query.declareParameters("String param1, String param2");
+			query.setUnique(true);
+			Shop shop = (Shop)query.execute(oldURL, oldName);
+			if (shop == null)
+				return "Error. Bank not found";
+			shop.setName(newName);
+			shop.setUrl(newURL);
+			return "Success";
 		}
 		finally {
 			pm.close();

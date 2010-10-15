@@ -8,7 +8,9 @@ import de.mrx.client.AccountDTO;
 import de.mrx.client.BankDTO;
 import de.mrx.client.BankServiceAsync;
 import de.mrx.client.MoneyTransferDTO;
+import de.mrx.client.ShopDTO;
 import de.mrx.client.TansDTO;
+import de.mrx.client.Transaction3SDTO;
 
 /**
  * 
@@ -55,6 +57,17 @@ public interface AdminServiceAsync extends BankServiceAsync {
 			AsyncCallback<List<MoneyTransferDTO>> callback);
 
 	void resetInternalAccount(String accountNr, AsyncCallback<String> callback);
+
+	void addShop(String name, String url, AsyncCallback<Boolean> callback);
+
+	void getAllShops(AsyncCallback<List<ShopDTO>> callback);
+
+	void getAllOpenTransactions(String shopName, AsyncCallback<List<Transaction3SDTO>> callback);
+
+	void deleteOpenTransactions(AsyncCallback<Boolean> callback);
+
+	void editShopDetails(String oldName, String oldURL, String newName,
+			String newURL, AsyncCallback<String> callback);
 
 
 
