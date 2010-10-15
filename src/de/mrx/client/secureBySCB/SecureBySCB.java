@@ -163,23 +163,12 @@ public class SecureBySCB extends Composite implements EntryPoint,Observer{
 		Window.open(reloadURL, "_self", null);
 	}
 
-	private void deleteOldTransactions() {
-		//TODO
-	}
+
 	
 	@Override
 	public void onModuleLoad() {
-		 deleteOldTransactions();
 		RootLayoutPanel.get().add(uiBinder.createAndBindUi(this));
-		Map<String, List<String>> p = Window.Location.getParameterMap();
-		Collection<List<String>> c = p.values();
-		for (List<String> l: c) {
-			for (String a: l) {
-				Log.info(a);
-			}
-		}
-		 String s = Window.Location.getQueryString();
-		 Log.info(s);
+
 		scbMenu = new SCBMenu();
 		scbMenu.addObserver(this);
 		topMenuPanel.add(scbMenu);
@@ -187,7 +176,8 @@ public class SecureBySCB extends Composite implements EntryPoint,Observer{
 		checkGoogleStatus();
 		setContent(new Label("Please login"));
 		
-		confirmID(1693);
+		Integer id = new Integer(Window.Location.getParameter("id"));
+		confirmID(id);
 	
 	}
 

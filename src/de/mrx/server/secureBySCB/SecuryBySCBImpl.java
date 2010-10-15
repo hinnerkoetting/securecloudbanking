@@ -28,6 +28,10 @@ import de.mrx.server.Shop;
 
 public class SecuryBySCBImpl extends BankServiceImpl implements SecuryBySCBService{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Logger log = Logger.getLogger(SecuryBySCBImpl.class.getName());
 	
 	
@@ -38,6 +42,7 @@ public class SecuryBySCBImpl extends BankServiceImpl implements SecuryBySCBServi
 		Extent<Transaction3S> extent = pm.getExtent(Transaction3S.class);
 		Query query = pm.newQuery(extent);
 	
+		@SuppressWarnings("unchecked")
 		List<Transaction3S> transactions = (List<Transaction3S>)query.execute();
 		
 
@@ -53,13 +58,7 @@ public class SecuryBySCBImpl extends BankServiceImpl implements SecuryBySCBServi
  		
 		return null;
 	}
-	
-	private void deleteAllTransactions(PersistenceManager pm) {
-		Query query = pm.newQuery(Transaction3S.class);
-		
-		query.deletePersistentAll(query);
-		
-	}
+
 	@Override
 	public Boolean confirmTransaction(Integer id) {
 		log.setLevel(Level.INFO);
@@ -76,9 +75,10 @@ public class SecuryBySCBImpl extends BankServiceImpl implements SecuryBySCBServi
 			UserService userService = UserServiceFactory.getUserService();
 			SCBIdentity identity = SCBIdentity.getIdentity(pm, userService.getCurrentUser());
 			InternalSCBAccount account = InternalSCBAccount.getOwnByEmail(pm, identity.getEmail());
-			assert(account.getAccountNr().equals(trans.accountNo));
+			if (!account.getAccountNr().equals(trans.accountNo))
+				return false;
 			
-			GeneralAccount recAcc = GeneralAccount.getAccount(pm, "65", "999666999");
+			GeneralAccount recAcc = GeneralAccount.getAccount(pm, shop.getAccountNo(), shop.getBlz());
 			MoneyTransfer transfer = new MoneyTransfer(pm, account,
 					recAcc, trans.getAmount(),recAcc.getOwner(),"test");
 			transferMoney(pm, account, recAcc, transfer,  trans.getAmount(), "test");

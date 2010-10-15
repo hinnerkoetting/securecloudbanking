@@ -545,6 +545,8 @@ AdminService {
 			
 			Bank scbBank = Bank.getByBLZ(pm, SCBData.SCB_PLZ);
 			Shop shop = new Shop(name, format.format(accountNr), url, scbBank);
+			InternalSCBAccount account = new InternalSCBAccount(name, format.format(accountNr), 0.0, scbBank);
+			pm.makePersistent(account);
 			pm.makePersistent(shop);
 			return true;
 		}
@@ -560,6 +562,7 @@ AdminService {
 		try {
 			Extent<Shop> extent = pm.getExtent(Shop.class);
 			Query query = pm.newQuery(extent);
+			@SuppressWarnings("unchecked")
 			List<Shop> shops = (List<Shop>)query.execute();
 			
 			List<ShopDTO> result = new ArrayList<ShopDTO>();
@@ -582,6 +585,7 @@ AdminService {
 			Query query = pm.newQuery(extent);
 			query.setFilter("shopName == param");
 			query.declareParameters("String param");
+			@SuppressWarnings("unchecked")
 			List<Transaction3S> transactions = (List<Transaction3S>)query.execute(shopName);
 			List<Transaction3SDTO> result = new ArrayList<Transaction3SDTO>();
 			for (Transaction3S t: transactions) {

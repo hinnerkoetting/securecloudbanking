@@ -2,7 +2,6 @@ package de.mrx.server.secureBySCB;
 
 import java.util.Date;
 
-import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -13,7 +12,6 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 import de.mrx.client.Transaction3SDTO;
-import de.mrx.server.PMF;
 import de.mrx.server.Shop;
 //transaction commited by some shop
 //which is not yet confirmed
@@ -95,9 +93,7 @@ public class Transaction3S {
 	
 	
 	public Transaction3SDTO getDTO() {
-		if (myID == null) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-//			pm.deletePersistent(this);
+		if (myID == null) {			
 			return new Transaction3SDTO("----", -1.0, new Date(), "-1", -1);
 		}
 			
